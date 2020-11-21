@@ -1,0 +1,8 @@
+{
+    "name": "pb-ui",
+    "version": "0.0.0",
+    "description" : "Personal CRM / Address Book",
+    "author": "Jonathan Paul Wood",
+    "scripts": {
+    }
+}
