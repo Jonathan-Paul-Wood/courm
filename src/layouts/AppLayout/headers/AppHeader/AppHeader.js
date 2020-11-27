@@ -9,14 +9,43 @@ const HeaderWrapper = styled.div`
     height: 3em;
     display: flex;
     background-color: black;
+    margin: auto 0rem;
+    padding: 0.5rem;
+    color: white;
 `;
 
 const LogoContainer = styled.div`
     display: flex;
-    min-width: 10%;
+    width: 15vw;
 
     h3 {
-        color: white;
+        margin: auto 0rem;
+        align-content: center;
+        
+        a {
+            cursor: pointer;
+        }
+    }
+`;
+
+const PipeSeparator = styled.div`
+    display: flex;
+    font-size: 2rem;
+    justify-content: center;
+    align-content: center;
+    margin: auto 0.5rem;
+`;
+
+const RightHeaderWrapper = styled.div`
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    margin: auto 0.5rem auto 60vw;
+    h2 {
+        display: flex;
+        justify-content: center;
+        align-content: center;
+        margin: auto;
     }
 `;
 
@@ -31,7 +60,14 @@ export default function AppHeader() {
         <HeaderWrapper>
             <LogoContainer>
                 <h3><a onClick={() => handleHomeNavigation()}>Personal CRM</a></h3>
+                <PipeSeparator>|</PipeSeparator>
             </LogoContainer>
+            <RightHeaderWrapper> 
+                <PipeSeparator>|</PipeSeparator>
+                <h2>Help</h2>
+                <PipeSeparator>|</PipeSeparator>
+                <h2>Support</h2>
+            </RightHeaderWrapper>
         </HeaderWrapper>
     );
 }

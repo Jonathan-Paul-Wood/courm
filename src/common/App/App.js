@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { ToastContainer, toast, Slide } from 'react-toastify';
 import { Switch, Route, Redirect } from 'react-router-dom';
 import styled from 'styled-components';
+import './App.css';
 
 import PropTypes from 'prop-types';
 import axiosSingleton from '../../configs/axiosSingleton';
