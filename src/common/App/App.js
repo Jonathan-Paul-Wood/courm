@@ -1,51 +1,53 @@
 import React, { useEffect, useState } from 'react';
 import { ToastContainer, toast, Slide } from 'react-toastify';
-import { Switch, Router, Redirect } from 'react-router-dom';
+import { Switch, Route, Redirect } from 'react-router-dom';
+import styled from 'styled-components';
 
 import PropTypes from 'prop-types';
 import axiosSingleton from '../../configs/axiosSingleton';
 
 import ExampleService from '../../services/ExampleService';
 import appConfig from '../../configs/appConfig';
-
 import AppRouter from '../routers/AppRouter/AppRouter';
-import AppLayout from '../../layouts/AppLayout/AppLayout'
+
+const ErrorBoundary = styled.div`
+`;//todo: make it's own component. Wraps around and overlays screen if there is an error message
 
 export default function App(props) {
     const [isSetupComplete, setIsSetupComplete] = useState(false);
     const [timeoutInterval, setTimeoutInterval] = useState(null);
 
     useEffect(() => {
-        axiosSingleton.addListener(callBackEvent =? props.updateSessionLastTimestamp(new Date()));
+        axiosSingleton.addListener(callBackEvent => props.updateSessionLastTimestamp(new Date()));
         axiosSingleton.request();
         setIsSetupComplete(true);
     }, []);
 
-    useEffect(() => {
-        if(timeoutInterval) {
-            window.clearInterval(timeoutInterval);
-        } else {
-            props.updateSessionLastTimestamp(new Date());
-            //if authentication, get user and server details here
-        }
-        setTimeoutInterval(
-            window.setInterval(() => {
-                const timeout = props.appConfig.webServerAbout.timeout;
-                const timeElapsed = new Date() - props.user.lastTimestamp;
-                if (timeElapsed >= timeout) {
-                    onSessionTimeout();
-                } else {
-                    if (
-                        timeElapsed >=
-                        props.appConfig.webServerAbout.timout - appConfig.sessionTimeoutWarning
-                    ) {
-                        const sessionTimeLeft = Math.floor((timout - timeElapsed) / 1000);
-                        props.updateSessionTimer(sessionTimeLeft);
-                    }
-                }
-            }, 1000) //check every second
-        )
-    }, [props.user.lastTimstamp]);
+    // useEffect(() => {
+    //     if(timeoutInterval) {
+    //         window.clearInterval(timeoutInterval);
+    //     } else {
+    //         props.updateSessionLastTimestamp(new Date());
+    //         //if authentication, get user and server details here
+    //     }
+    //     setTimeoutInterval(
+    //         window.setInterval(() => {
+    //             const timeout = props.appConfig.webServerAbout.timeout;
+    //             const timeElapsed = new Date() - props.user.lastTimestamp;
+    //             if (timeElapsed >= timeout) {
+    //                 onSessionTimeout();
+    //             } else {
+    //                 if (
+    //                     timeElapsed >=
+    //                     props.appConfig.webServerAbout.timout - appConfig.sessionTimeoutWarning
+    //                 ) {
+    //                     const sessionTimeLeft = Math.floor((timeout - timeElapsed) / 1000);
+    //                     props.updateSessionTimer(sessionTimeLeft);
+    //                 }
+    //             }
+    //         }, 1000) //check every second
+    //     )
+    // }, [props.user.lastTimstamp]);
 
     function handleTimeoutConfirm() {
         //ping server or something to keep session alive
@@ -60,9 +62,13 @@ export default function App(props) {
         <div>
             <ErrorBoundary>
                 <Switch>
-                    <Redirect exact from="/" to="/home" />
-                    <AppLayout exact path="/home" component={AppHome} />
-                    <Route path="/page/:itemId" component={AppRouter} />
+                    <Redirect exact from="/" to="home" />
+                    <Route path="/home" component={AppRouter} />
+                    {/* <Route path="/contacts/:contactId" component={App} /> */}
+                    <Route path="/contacts" component={AppRouter} />
+                    {/* <Route path="/interactions/:interactionId" component={App} /> */}
+                    {/* <Route path="/interactions" component={App} /> */}
+                    {/* <Route exact path="/statistics" component={App} /> */}
                 </Switch>
             </ErrorBoundary>
 

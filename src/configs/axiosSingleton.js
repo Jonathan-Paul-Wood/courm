@@ -1,6 +1,6 @@
 import axios from 'axios';
 import Cookies from 'js-cookies';
-import { isJson } from '../Utilities'; //try catch returns bool on test JSON.parse(str)
+//import { isJson } from '../Utilities'; //try catch returns bool on test JSON.parse(str)
 
 export const axiosInstance = axios.create({ responseType : 'json' });
 
@@ -24,7 +24,7 @@ class AxiosSingleton {
 
             const xsrfToken = Cookies.get('X-XSRF-TOKEN');
             if (xsrfToken) {
-                condif.headers['X-XSRF-TOKEN'] = xsrfToken;
+                config.headers['X-XSRF-TOKEN'] = xsrfToken;
                 return config;
             }
             return config;

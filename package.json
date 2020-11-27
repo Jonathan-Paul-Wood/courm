@@ -21,6 +21,7 @@
     "history": "^5.0.0",
     "html-react-parser": "^0.14.1",
     "js-cookie": "^2.2.1",
+    "js-cookies": "^1.0.4",
     "prop-types": "^15.7.2",
     "qs": "^6.9.4",
     "react": "^17.0.1",
@@ -56,5 +57,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@babel/plugin-proposal-export-default-from": "^7.12.1"
   }
 }
