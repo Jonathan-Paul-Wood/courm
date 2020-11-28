@@ -12,6 +12,7 @@ const HeaderWrapper = styled.div`
     margin: auto 0rem;
     padding: 0.5rem;
     color: white;
+    z-index: 1000;
 `;
 
 const LogoContainer = styled.div`

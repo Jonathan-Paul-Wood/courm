@@ -12,6 +12,7 @@ const AppWrapper = styled.div`
         top: 4em;
         left: 8em;
         padding: 1em;
+        width: calc(100% - 10em);
     }
 `;
  
