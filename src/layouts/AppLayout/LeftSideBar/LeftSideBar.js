@@ -21,11 +21,11 @@ export default function LeftSidebar() {
             title: 'Home',
             path: '/home',
         },
-        // {
-        //     icon: 'people',
-        //     title: 'Contacts',
-        //     path: '/contacts',
-        // },
+        {
+            icon: 'people',
+            title: 'Contacts',
+            path: '/contacts',
+        },
     ]
 
     return (
