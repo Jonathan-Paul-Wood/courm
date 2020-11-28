@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-
+import icons from '../../assets/icons/bootstrapIcons';
 
 const StyleContainer = styled.div`
     margin: auto 0;
@@ -87,6 +87,10 @@ const StyleContainer = styled.div`
         color: var(--text-light-hover);
         background-color: var(--warning-color-hover);
       }
+
+      i {
+        margin: auto 0.5rem auto 0;
+      }
 `;
 
 
@@ -94,6 +98,7 @@ export default function Button(props) {
     return (
         <StyleContainer>
             <button className={`btn btn--${props.type} btn--${props.size} ${props.block ? 'btn-block' : ''}`}>
+                {icons[props.icon]}
                 {props.label}
             </button>
         </StyleContainer>
@@ -104,6 +109,7 @@ Button.defaultProps = {
     type: 'primary',
     size: 'md',
     block: false,
+    icon: '',
 }
 
 Button.propTypes = {
@@ -111,4 +117,5 @@ Button.propTypes = {
     size: PropTypes.string,
     block: PropTypes.bool,
     label: PropTypes.string.isRequired,
+    icon: PropTypes.string,
 }
