@@ -11,11 +11,8 @@ const ContentWrapper = styled.div`
 const ControlContainer = styled.div`
     display: flex;
     justify-content: space-between;
-`;
-
-const SearchBar = styled.input`
-    width: 60%;
-    border-radius: 5px;
+    align-content: center;
+    margin-bottom: 0.5em;
 `;
 
 
@@ -41,7 +38,12 @@ export default function MainToolbar(props) {
                 <Button 
                     label="Filter"
                 />
-                <Input placeholder="Search" onChange={val => setSearchTerm(val)} />
+                <Input
+                    placeholder="Search"
+                    label="Search"
+                    value={searchTerm}
+                    onChange={event => setSearchTerm(event.target.value)}
+                />
                 <Button 
                     label={`Sort`}
                 />

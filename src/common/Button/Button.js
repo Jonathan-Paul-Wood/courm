@@ -4,6 +4,8 @@ import PropTypes from 'prop-types';
 
 
 const StyleContainer = styled.div`
+    margin: auto 0;
+
     button {
         border-radius: 5px;
         text-transform: uppercase;
