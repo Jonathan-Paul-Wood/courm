@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { PropTypes } from 'prop-types';
 import AppLayout from '../../../layouts/AppLayout/AppLayout';
 import AppHome from '../../../components/AppHome/AppHome';
-import ContactsBrowse from '../../../components/ContactsBrowse/ContactsBrowse';
+import ContactsBrowse from '../../../components/ContactsBrowse';
 
 const LoadingContainer = styled.div`
     position: absolute;
