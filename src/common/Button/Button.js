@@ -10,16 +10,16 @@ const StyleContainer = styled.div`
     --text-dark-hover: #000000;
     --text-white: #ffffff;
     --text-light-hover: #ffffff;
-    --primary-color: #99bdff;
-    --primary-color-hover: #456cb5;
+    --primary-color: #4da6ff;
+    --primary-color-hover: #0066cc;
     --secondary-color: #ffffff;
     --secondary-color-hover: #e6e6e6;
-    --success-color: #76e02b;
-    --success-color-hover: #60a331;
-    --danger-color: #ff6e6e;
-    --danger-color-hover: #b54545;
-    --warning-color: #f2f241;
-    --warning-color-hover: #99993a;
+    --success-color: #00ff00;
+    --success-color-hover: #00e600;
+    --danger-color: #ff3333;
+    --danger-color-hover: #e63900;
+    --warning-color: #ffff4d;
+    --warning-color-hover: #e6e619;
       
       .btn {
         padding: 0.5em 1em;
