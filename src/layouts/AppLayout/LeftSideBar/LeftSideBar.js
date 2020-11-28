@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import SideBarNavItem from './SideBarNavItem/SideBarNavItem';
-import leftNavigationOptions from '../../../configs/appConfig';
+import { useLocation } from 'react-router-dom';
 
 const LeftSideBarWrapper = styled.div`
     position: fixed;
@@ -9,14 +9,20 @@ const LeftSideBarWrapper = styled.div`
     width: 8em;
     height: calc(100% - 4em);
     display: flex;
-    background-color: gray;
+    background-color: #4d4d4d;
     color: white;
     display: grid;
     grid-template-columns: 8em;
     grid-template-rows: 5rem 5rem 5rem 5rem;
 `;
 
+const ActiveTab = styled.div`
+    background-color: #4da6ff;
+`;
+
 export default function LeftSidebar() {
+    const location = useLocation();
+    const activeTab = location.pathname;
 
     const leftNavigationOptions = [
         {
@@ -29,18 +35,29 @@ export default function LeftSidebar() {
             title: 'Contacts',
             path: '/contacts',
         },
-    ]
+    ];
 
     return (
         <LeftSideBarWrapper>
             {leftNavigationOptions.map((option, index) => {
                 return (
-                    <SideBarNavItem
-                        key={index}
-                        icon={option.icon}
-                        title={option.title}
-                        path={option.path}
-                    />
+                    option.path === activeTab ? (
+                        <ActiveTab>  
+                            <SideBarNavItem
+                                key={index}
+                                icon={option.icon}
+                                title={option.title}
+                                path={option.path}
+                            />
+                        </ActiveTab>
+                    ) : (
+                        <SideBarNavItem
+                            key={index}
+                            icon={option.icon}
+                            title={option.title}
+                            path={option.path}
+                        />
+                    )
                 )
             })}
         </LeftSideBarWrapper>

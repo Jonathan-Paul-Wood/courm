@@ -1,9 +1,11 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
+import icons from '../../../../assets/icons/bootstrapIcons';
 
 const ItemWrapper = styled.div`
-    font-size: 1.2rem;
+    height: 100%;
+    font-size: 1rem!important;
     border-bottom: 1px solid black;
     display: flex;
     position: relative;
@@ -19,10 +21,19 @@ const ItemWrapper = styled.div`
 
 const ItemContainer = styled.div`
     display: flex;
-    margin: auto;
+    margin: auto 0.5rem;
+    width: calc(100% - 1rem);
 
     span {
         font-size: 0.5rem;
+    }
+
+    i {
+        margin: auto 0.5rem auto 0;
+    }
+
+    svg {
+        margin: auto 0.5rem auto 0;
     }
 `;
 
@@ -36,7 +47,7 @@ export default function LeftSidebar(props) {
     return (
         <ItemWrapper>
             <ItemContainer className="nav-option" onClick={() => handleNavigation(props.path)}>
-                <span>{props.icon}</span>
+                {icons[props.icon]}
                 {props.title.toUpperCase()}
             </ItemContainer>
         </ItemWrapper>
