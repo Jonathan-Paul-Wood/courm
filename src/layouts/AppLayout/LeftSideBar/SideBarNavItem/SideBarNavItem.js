@@ -25,7 +25,7 @@ export default function LeftSidebar(props) {
     const history = useHistory();
 
     function handleNavigation(path) {
-        history.push(`/${path}`);
+        history.push(`${path}`);
     }
 
     return (

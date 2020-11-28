@@ -7,9 +7,9 @@ export default function AppHome() {
     function handleActionSelection(action, object) {
         switch (action) {
             case 'view':
-                history.push(`/${object}`);
+                history.push(`${object}`);
             case 'create':
-                history.push(`/${object}/new`);
+                history.push(`${object}/new`);
             default:
                 console.log('error, invalid action: ', action);
         }

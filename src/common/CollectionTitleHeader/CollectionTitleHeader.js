@@ -5,8 +5,10 @@ import Button from '../Button/Button';
 
 const ContentWrapper = styled.div`
     border-bottom: solid 1px black;
-    padding: 0 1em;
+    padding: 0 1em 1em 1em;
     margin-bottom: 1em;
+    display: flex;
+    justify-content: space-between;
 `;
 
 const RightSideContent = styled.div`
