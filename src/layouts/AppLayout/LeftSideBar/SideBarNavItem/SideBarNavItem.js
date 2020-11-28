@@ -3,13 +3,18 @@ import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 
 const ItemWrapper = styled.div`
-    width: 8rem;
-    height: 5rem;
     font-size: 1.2rem;
-    margin: 0.2rem;
     border-bottom: 1px solid black;
     display: flex;
     position: relative;
+
+    .nav-option {
+        cursor: pointer;
+    }
+
+    .nav-option:hover {
+        opacity: 0.8;
+    }
 `;
 
 const ItemContainer = styled.div`
@@ -30,7 +35,7 @@ export default function LeftSidebar(props) {
 
     return (
         <ItemWrapper>
-            <ItemContainer onClick={() => handleNavigation(props.path)}>
+            <ItemContainer className="nav-option" onClick={() => handleNavigation(props.path)}>
                 <span>{props.icon}</span>
                 {props.title.toUpperCase()}
             </ItemContainer>

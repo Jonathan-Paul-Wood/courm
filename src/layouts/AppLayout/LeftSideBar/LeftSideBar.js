@@ -11,6 +11,9 @@ const LeftSideBarWrapper = styled.div`
     display: flex;
     background-color: gray;
     color: white;
+    display: grid;
+    grid-template-columns: 8em;
+    grid-template-rows: 5rem 5rem 5rem 5rem;
 `;
 
 export default function LeftSidebar() {
