@@ -42,9 +42,8 @@ export default function LeftSidebar() {
             {leftNavigationOptions.map((option, index) => {
                 return (
                     option.path === activeTab ? (
-                        <ActiveTab>  
+                        <ActiveTab key={index}>  
                             <SideBarNavItem
-                                key={index}
                                 icon={option.icon}
                                 title={option.title}
                                 path={option.path}
