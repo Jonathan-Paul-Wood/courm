@@ -30,9 +30,10 @@ export default function LeftSidebar() {
 
     return (
         <LeftSideBarWrapper>
-            {leftNavigationOptions.map(option => {
+            {leftNavigationOptions.map((option, index) => {
                 return (
                     <SideBarNavItem
+                        key={index}
                         icon={option.icon}
                         title={option.title}
                         path={option.path}

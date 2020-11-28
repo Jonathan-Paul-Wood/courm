@@ -26,11 +26,11 @@ export default function CollectionTitleHeader(props) {
             <h2>{props.title}</h2>
             <RightSideContent>
                 {listMode ? (
-                    <div class="switch">
+                    <div className="switch">
                         <label>
                         List
                         <input type="checkbox" />
-                        <span class="lever"></span> Map
+                        <span className="lever"></span> Map
                         </label>
                     </div>
                 ) : (
