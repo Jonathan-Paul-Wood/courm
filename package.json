@@ -16,6 +16,7 @@
     "@testing-library/user-event": "^12.2.2",
     "axios": "^0.21.0",
     "bootstrap": "^4.5.3",
+    "bootstrap-icons": "^1.1.0",
     "classnames": "^2.2.6",
     "content-disposition": "^0.5.3",
     "history": "^5.0.0",
