@@ -88,7 +88,7 @@ const StyleContainer = styled.div`
         background-color: var(--warning-color-hover);
       }
 
-      i {
+      svg {
         margin: auto 0.5rem auto 0;
       }
 `;

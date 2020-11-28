@@ -27,7 +27,8 @@ export default function MainToolbar(props) {
     return (
         <ContentWrapper>
             <ControlContainer>
-                <Button 
+                <Button
+                    icon="plusCircle"
                     label={`Add ${props.type}`}
                 />
                 <Button 
@@ -37,6 +38,7 @@ export default function MainToolbar(props) {
             <ControlContainer>
                 <Button 
                     label="Filter"
+                    type="secondary"
                 />
                 <Input
                     placeholder="Search"
@@ -46,6 +48,7 @@ export default function MainToolbar(props) {
                 />
                 <Button 
                     label={`Sort`}
+                    type="secondary"
                 />
             </ControlContainer>
         </ContentWrapper>
