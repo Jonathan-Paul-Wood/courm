@@ -14,9 +14,6 @@ const LoadingContainer = styled.div`
     top: 40%;
 `;
 
-const ErrorBoundary = styled.div`
-`;//todo: make it's own component. Wraps around and overlays screen if there is an error message
-
 export default function AppRouter(props) {
     const [showAccessWarning, setShowAccessWarning] = useState(false);
     const history = useHistory();
@@ -36,16 +33,14 @@ export default function AppRouter(props) {
 
     return (
         <React.Fragment>
-            <ErrorBoundary>
-                <Switch>
-                    <Redirect exact from="/" to="/home" />
-                    <AppLayout exact path="/home" component={AppHome} />
-                    {/* <AppLayout path="/contacts/:contactsId" component={Contact} /> */}
-                    <AppLayout path="/contacts" component={ContactsBrowse} />
-                    {/* <AppLayout path="/interactions/:interactionsId" component={Interaction} />
-                    <AppLayout path="/interactions" component={InteractionsBrowse} /> */}
-                </Switch>
-            </ErrorBoundary>
+            <Switch>
+                <Redirect exact from="/" to="/home" />
+                <AppLayout path="/home" exact component={AppHome} />
+                {/* <AppLayout path="/contacts/:contactsId" component={Contact} /> */}
+                <AppLayout path="/contacts" exact component={ContactsBrowse} />
+                {/* <AppLayout path="/interactions/:interactionsId" component={Interaction} />
+                <AppLayout path="/interactions" component={InteractionsBrowse} /> */}
+            </Switch>
             {
                 showAccessWarning && (
                     {/* CommonModal */}

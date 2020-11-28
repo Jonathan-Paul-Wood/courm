@@ -18,7 +18,7 @@ export default function EntityTitleHeader(props) {
 
     return (
         <ContentWrapper>
-            <button onClick={() => history.goBack}>Back</button>
+            <button onClick={() => history.back()}>Back</button>
             <h2>{props.title}</h2>
             <RightSideContent>
                 {editMode ? (
