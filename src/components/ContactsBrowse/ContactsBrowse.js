@@ -11,12 +11,13 @@ const ContentWrapper = styled.div`
 const ScrollContainer = styled.div`
     overflow-y: auto;
     height: 80vh;
-    margin: 0 1em;
+    margin: 2em 2em 0 2em;
 `;
 
 const NoResultsMessage = styled.div`
     font-size: 1.2rem;
-    font: italics;
+    font-style: italic;
+    padding-left: 6em;
 `;
 
 export default function ContactsBrowse(props) {
@@ -41,7 +42,9 @@ export default function ContactsBrowse(props) {
                         )
                     })
                 ) : (
-                <NoResultsMessage className="warningMessage">Sorry, no results to display{activeFilters.length ? ' for your applied search filters' : ''}</NoResultsMessage>
+                <NoResultsMessage className="warningMessage">
+                    Sorry, no results to display{activeFilters.length ? ' for your applied search filters' : ''}
+                </NoResultsMessage>
                 )}
             </ScrollContainer>
         </ContentWrapper>
