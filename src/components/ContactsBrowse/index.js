@@ -1,13 +1,13 @@
 import ContactsBrowse from './ContactsBrowse';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { getContactList } from '../../store/Contact/actions';
+import { getContactList } from '../../store/ContactList/actions';
 
 function mapStateToProps(state) {
     return {
-        contacts: state.contact.contacts,
-        isContactListPending: state.contact.isContactListPending,
-        contactListError: state.contact.contactListError,
+        contacts: state.contactList.contacts,
+        isContactListPending: state.contactList.isContactListPending,
+        contactListError: state.contactList.contactListError,
     };
 }
 

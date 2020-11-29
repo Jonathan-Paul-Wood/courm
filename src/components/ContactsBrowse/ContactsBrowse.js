@@ -21,8 +21,13 @@ const NoResultsMessage = styled.div`
 `;
 
 export default function ContactsBrowse(props) {
+    const { contacts, isContactListPending, contactListError, getContactList } = props;
     const history = useHistory();
     const [activeFilters, setActiveFilters] = useState([]);
+
+    useEffect(() => {
+        getContactList();
+    }, [])
 
     function handleNavigation(path) {
         history.push(`/${path}`);
@@ -33,8 +38,8 @@ export default function ContactsBrowse(props) {
             <CollectionTitleHeader title="View Contacts" />
             <MainToolbar type="Contact" />
             <ScrollContainer>
-                {props.contacts.length ? (
-                    props.contacts.map(contact => {
+                {contacts.length ? (
+                    contacts.map(contact => {
                         return (
                             <div>
                                 {contact}
