@@ -46,7 +46,7 @@ export default function LeftSidebar(props) {
 
     return (
         <ItemWrapper>
-            <ItemContainer className="nav-option" onClick={() => handleNavigation(props.path)}>
+            <ItemContainer classNames="nav-option" onClick={() => handleNavigation(props.path)}>
                 {icons[props.icon]}
                 {props.title.toUpperCase()}
             </ItemContainer>

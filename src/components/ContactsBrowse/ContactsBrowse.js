@@ -47,7 +47,7 @@ export default function ContactsBrowse(props) {
                         )
                     })
                 ) : (
-                <NoResultsMessage className="warningMessage">
+                <NoResultsMessage classNames="warningMessage">
                     Sorry, no results to display{activeFilters.length ? ' for your applied search filters' : ''}
                 </NoResultsMessage>
                 )}
