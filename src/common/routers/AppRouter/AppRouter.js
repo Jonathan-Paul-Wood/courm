@@ -6,6 +6,7 @@ import { PropTypes } from 'prop-types';
 import AppLayout from '../../../layouts/AppLayout/AppLayout';
 import AppHome from '../../../components/AppHome/AppHome';
 import ContactsBrowse from '../../../components/ContactsBrowse';
+import Contact from '../../../components/Contact';
 
 const LoadingContainer = styled.div`
     position: absolute;
@@ -36,7 +37,8 @@ export default function AppRouter(props) {
             <Switch>
                 <Redirect exact from="/" to="/home" />
                 <AppLayout path="/home" exact component={AppHome} />
-                {/* <AppLayout path="/contacts/:contactsId" component={Contact} /> */}
+                <AppLayout path="/contacts/:contactId" component={Contact} />
+                <AppLayout path="/contacts/new" component={Contact} />
                 <AppLayout path="/contacts" exact component={ContactsBrowse} />
                 {/* <AppLayout path="/interactions/:interactionsId" component={Interaction} />
                 <AppLayout path="/interactions" component={InteractionsBrowse} /> */}

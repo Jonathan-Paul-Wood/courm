@@ -65,9 +65,10 @@ export default function App(props) {
                 <Switch>
                     <Redirect exact from="/" to="home" />
                     <Route path="/home" component={AppRouter} />
-                    {/* <Route path="/contacts/:contactId" component={App} /> */}
+                    <Route path="/contacts/:contactId" component={AppRouter} />
+                    <Route path="/contacts/new" component={AppRouter} />
                     <Route path="/contacts" component={AppRouter} />
-                    {/* <Route path="/interactions/:interactionId" component={App} /> */}
+                    {/*<Route path="/interactions/:interactionId" component={App} /> */}
                     {/* <Route path="/interactions" component={App} /> */}
                     {/* <Route exact path="/statistics" component={App} /> */}
                 </Switch>
