@@ -5,29 +5,29 @@ import ContactService from '../../services/ContactService';
 
 function getContactLoading() {
     return {
-        type: types.GET_CONTACT_LIST_PENDING,
+        type: types.GET_CONTACT_PENDING,
     }
 }
 
 function getContactSuccess(payload) {
     return {
-        type: types.GET_CONTACT_LIST_SUCCESS,
+        type: types.GET_CONTACT_SUCCESS,
         payload,
     }
 }
 
 function getContactError(error) {
     return {
-        type: types.GET_CONTACT_LIST_ERROR,
+        type: types.GET_CONTACT_ERROR,
         error: new ServiceError('get contacts list', error)
     }
 }
 
-export function getContactList() { //todo: add search/filter/sort
+export function getContact(id) { //todo: add search/filter/sort
     return async dispatch => {
         dispatch(getContactLoading());
         try {
-            const response = await ContactService.getContactList();
+            const response = await ContactService.getContact(id);
             dispatch(getContactSuccess(response));
         } catch (e) {
             dispatch(getContactError(e));
