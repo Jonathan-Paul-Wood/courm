@@ -22,7 +22,7 @@ const ActiveTab = styled.div`
 
 export default function LeftSidebar() {
     const location = useLocation();
-    const activeTab = location.pathname;
+    const activeTab = location.pathname.split('/')[1];
 
     const leftNavigationOptions = [
         {
@@ -41,7 +41,7 @@ export default function LeftSidebar() {
         <LeftSideBarWrapper>
             {leftNavigationOptions.map((option, index) => {
                 return (
-                    option.path === activeTab ? (
+                    option.path.match(activeTab) ? (
                         <ActiveTab key={index}>  
                             <SideBarNavItem
                                 icon={option.icon}
