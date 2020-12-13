@@ -24,6 +24,7 @@ export default function CollectionTitleHeader(props) {
             <Button
                 label="Back"
                 type="secondary"
+                onClick={history.goBack}
             />
             <h2>{props.title}</h2>
             <RightSideContent>

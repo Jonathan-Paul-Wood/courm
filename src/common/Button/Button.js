@@ -5,6 +5,8 @@ import icons from '../../assets/icons/bootstrapIcons';
 
 const StyleContainer = styled.div`
     margin: auto 0;
+    display: flex;
+    align-content: center;
 
     --text-dark: #000000;
     --text-dark-hover: #000000;
@@ -91,15 +93,21 @@ const StyleContainer = styled.div`
       svg {
         margin: auto 0.5rem auto 0;
       }
+
+      span {
+        position: relative:
+      }
 `;
 
 
 export default function Button(props) {
     return (
         <StyleContainer>
-            <button className={`btn btn--${props.type} btn--${props.size} ${props.block ? 'btn-block' : ''}`}>
+            <button
+              className={`btn btn--${props.type} btn--${props.size} ${props.block ? 'btn-block' : ''}`}
+              onClick={props.onClick}>
                 {icons[props.icon]}
-                {props.label}
+                <span>{props.label}</span>
             </button>
         </StyleContainer>
     );
@@ -118,4 +126,5 @@ Button.propTypes = {
     block: PropTypes.bool,
     label: PropTypes.string.isRequired,
     icon: PropTypes.string,
+    onClick: PropTypes.func.isRequired,
 }

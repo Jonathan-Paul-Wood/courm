@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import { Redirect, useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import Input from '../../common/Input/Input';
 import Button from '../../common/Button/Button';
@@ -30,6 +30,7 @@ export default function MainToolbar(props) {
                 <Button
                     icon="plusCircle"
                     label={`Add ${props.type}`}
+                    onClick={() => history.push('/contacts/new')}
                 />
                 <Button 
                     label={`Export ${props.type}s`}
