@@ -12,16 +12,24 @@ const ContentWrapper = styled.div`
     justify-content: space-between;
     display: grid;
     gird-template-rows: 100%;
-    grid-template-columns: 15% 70% 15%;
+    grid-template-columns: 15% 65% 20%;
+    grid-template-areas: "back title save-edit";
 
+    .back {
+        grid-area: back;
+    }
     .pageTitle {
-        margin: auto 0;
-        padding: 0 auto;
+        grid-area: title;
+        margin: 0 auto;
+    }
+    .save-edit {
+        grid-area: save-edit;
     }
 `;
 
 const RightSideContent = styled.div`
-    margin-left: 60%;
+    display: flex;
+    justify-content: space-between;
 `;
 
 export default function EntityTitleHeader(props) {
@@ -29,13 +37,17 @@ export default function EntityTitleHeader(props) {
 
     return (
         <ContentWrapper>
-            <Button label="Back" type="secondary" onClick={() => history.back()} />
-            <h2 className="pageTitle">{props.title}</h2>
-            <RightSideContent>
+            <Button classNames="back" label="Back" type="secondary" onClick={history.goBack} />
+            <h2 classNames="pageTitle">{props.title}</h2>
+            <RightSideContent classNames="save-edit">
                 {props.editMode ? (
                     <React.Fragment>
-                        <Button label="Cancel" type="secondary" />
-                        <Button label="Save" type="success" />
+                        <Button
+                            label="Cancel"
+                            type="secondary"
+                            onClick={() => history.goBack()}
+                        />
+                        <Button label="Save" type="success" icon="saveIcon" />
                     </React.Fragment>
                 ) : (
                     <Button label="Edit" type="secondary" />
