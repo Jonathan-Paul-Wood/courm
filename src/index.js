@@ -9,8 +9,7 @@ import { Router, Switch, Route } from 'react-router-dom';
 //import reportWebVitals from './reportWebVitals';
 
 ReactDOM.render(
-  <React.StrictMode>
-    <Router history={createBrowserHistory()}>
+  <Router history={createBrowserHistory()}>
     <Provider store={store}>
       <Switch>
         <Route path="/home" component={App} />
@@ -23,8 +22,7 @@ ReactDOM.render(
         {/* <Route component={PageNotFound} /> */}
       </Switch>
     </Provider>
-    </Router>
-  </React.StrictMode>,
+  </Router>,
   document.getElementById('root')
 );
 

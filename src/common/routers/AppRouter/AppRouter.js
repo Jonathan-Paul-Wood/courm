@@ -36,10 +36,10 @@ export default function AppRouter(props) {
         <React.Fragment>
             <Switch>
                 <Redirect exact from="/" to="/home" />
-                <AppLayout path="/home" exact component={AppHome} />
-                <AppLayout path="/contacts/:contactId" component={Contact} />
-                <AppLayout path="/contacts/new" component={Contact} />
-                <AppLayout path="/contacts" exact component={ContactsBrowse} />
+                <AppLayout path="/home" component={AppHome} {...commonRouteProps} />
+                <AppLayout path="/contacts" exact component={ContactsBrowse} {...commonRouteProps} />
+                <AppLayout path="/contacts/new" exact component={Contact} {...commonRouteProps} />
+                <AppLayout path="/contacts/:contactId" component={Contact} {...commonRouteProps} />
                 {/* <AppLayout path="/interactions/:interactionsId" component={Interaction} />
                 <AppLayout path="/interactions" component={InteractionsBrowse} /> */}
             </Switch>
