@@ -18,11 +18,16 @@ const GridWrapper = styled.div`
     display: grid;
     grid-template-columns: 100%;
     grid-template-rows: 15vh 45vh 20vh 20rem auto;
+
+    .metadataRow {
+        grid-template-columns: 50% 50%;
+        grid-template-rows: 30em 10em 20em;
+    }
 `;
 
 export default function ContactsBrowse(props) {
     const location = useLocation();
-    const isNewContact = location.pathname.match('/new');
+    const isNewContact = !!location.pathname.match('/new');
     const { contact, isContactPending, contactError, getContact } = props;
     const [editMode, setEditMode] = useState(isNewContact);
     const history = useHistory();
@@ -67,5 +72,5 @@ export default function ContactsBrowse(props) {
                 </GridWrapper>
             </ScrollContainer>
         </ContentWrapper>
-    );
+);
 }
