@@ -13,6 +13,7 @@ const HeaderWrapper = styled.div`
     padding: 0.5rem;
     color: white;
     z-index: 1000;
+    cursor: default;
 `;
 
 const LogoContainer = styled.div`
@@ -47,6 +48,7 @@ const RightHeaderWrapper = styled.div`
         justify-content: center;
         align-content: center;
         margin: auto;
+        cursor: pointer;
     }
 `;
 
