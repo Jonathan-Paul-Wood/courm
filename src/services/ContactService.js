@@ -5,7 +5,7 @@ export default class ContactService {
         return axios.get(`/contacts/${id}`);
     }
 
-    static createContact(body) {
+    static createContact(id, body) {
         return axios.post(`/contacts/${id}`, body);
     }
 
