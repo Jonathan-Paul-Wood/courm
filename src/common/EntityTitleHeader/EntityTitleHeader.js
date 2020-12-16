@@ -20,7 +20,7 @@ const ContentWrapper = styled.div`
     }
     .pageTitle {
         grid-area: title;
-        margin: 0 auto;
+        margin: auto auto;
     }
     .save-edit {
         grid-area: save-edit;
@@ -37,9 +37,9 @@ export default function EntityTitleHeader(props) {
 
     return (
         <ContentWrapper>
-            <Button classNames="back" label="Back" type="secondary" onClick={history.goBack} />
-            <h2 classNames="pageTitle">{props.title}</h2>
-            <RightSideContent classNames="save-edit">
+            <Button className="back" label="Back" type="secondary" onClick={history.goBack} />
+            <h2 className="pageTitle">{props.title}</h2>
+            <RightSideContent className="save-edit">
                 {props.editMode ? (
                     <React.Fragment>
                         <Button

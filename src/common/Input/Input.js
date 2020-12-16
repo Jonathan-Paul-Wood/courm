@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 const StyleContainer = styled.div`
     width: 100%;
-    margin: 0 3em;
+    padding: 0 3em;
 
     .secondary-field {
         width: 100%;
