@@ -151,32 +151,22 @@ app.get("/api/contacts/:id", (req, res) => {
 });
 
 app.put("/api/contacts/:id", (req, res) => {
-    console.log('PUT contact: ', req.params.id, ' :: ', req.body);
-    const sql = `UPDATE contacts
-    SET
-        firstName = ${req.body.firstName},
-        lastName = ${req.body.lastName},
-        profilePicture = ${req.body.profilePicture},
-        phoneNumber = ${req.body.phoneNumber},
-        email = ${req.body.email},
-        address = ${req.body.address},
-        firm = ${req.body.firm},
-        industry = ${req.body.industry},
-        dateOfBirth = ${req.body.dateOfBirth},
-        tags = ${req.body.tags},
-        interactions = ${req.body.interactions},
-        lastModifiedBy = ${req.body.lastModifiedBy},
-        lastModifiedOn = ${req.body.lastModifiedOn},
-        lastInteractionId = ${req.body.lastInteractionId},
-        lastInteractionOn = ${req.body.lastInteractionOn}
-    WHERE id = ${req.params.id}`;
-    db.run(sql, (err, row) => {
+    console.log('PUT contact: ', req.body);
+    let data = Object.keys(req.body).map(key => {
+        return req.body[key];
+    });
+    data.push(req.params.id);
+    console.log('shaped data: ', data);
+    const sql = `UPDATE contacts SET firstName=?, lastName=?, profilePicture=?, phoneNumber=?, email=?, address=?, firm=?, industry=?, dateOfBirth=?, tags=?, interactions=?, lastModifiedBy=?, lastModifiedOn=?, lastInteractionId=?, lastInteractionOn=? WHERE id=?`;
+    db.run(sql, data, (err, row) => {
+        console.log(err);
+        console.log(row);
         if (err) {
             res.status = ERROR_CODE;
-            return console.error(err.message);
+            res.json(err);
         } else if (!row) {
             res.status = NOT_FOUND_CODE;
-            return;
+            res.json({'response': 'NOT FOUND'});
         } else {
             res.status = SUCCESS_CODE;
             res.json({'response': row});
@@ -190,10 +180,10 @@ app.delete("/api/contacts/:id", (req, res) => {
     db.run(sql, (err, row) => {
         if (err) {
             res.status = ERROR_CODE;
-            return console.error(err.message);
+            res.json(err);
         } else if (!row) {
             res.status = NOT_FOUND_CODE;
-            return;
+            res.json({'response': 'NOT FOUND'});
         } else {
             res.status = SUCCESS_CODE;
             res.json({'response': row});
