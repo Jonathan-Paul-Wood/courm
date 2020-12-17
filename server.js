@@ -118,10 +118,10 @@ app.post('/api/contacts/new', (req, res) => {
     res.json(response);
 });
 
-//accepts requests of the form: localhost:8080/api/contacts?order=id?results=3&page=1
+//accepts requests of the form: localhost:8080/api/contacts?order=id?results=3&page=1?direction=[ASC|DESC]
 app.get("/api/contacts", (req, res) => {
-    const { results, page, order } = req.query;
-    const sql = `SELECT * FROM contacts ORDER BY ${order} LIMIT ${results} OFFSET ((${page - 1})* ${results})`;
+    const { results, page, order, direction } = req.query;
+    const sql = `SELECT * FROM contacts ORDER BY ${order} ${direction} LIMIT ${results} OFFSET ((${page - 1})* ${results})`;
     db.all(sql, (err, rows) => {
         if (err) {
             res.status = ERROR_CODE;
