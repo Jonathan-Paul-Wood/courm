@@ -13,7 +13,7 @@ export default function contact(state = initialState, action) {
         case types.GET_CONTACT_LIST_ERROR:
             return { ...state, isContactListPending: false, contactListError: action.error }
         case types.GET_CONTACT_LIST_SUCCESS:
-            return { ...state, isContactListPending: true, contactListError: '', contacts: action.payload || action.payload.data } //todo: figure out which one
+            return { ...state, isContactListPending: true, contactListError: '', contacts: action.payload.data.response }
         default:
             return state;
     }

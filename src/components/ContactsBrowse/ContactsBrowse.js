@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import CollectionTitleHeader from '../../common/CollectionTitleHeader/CollectionTitleHeader';
 import MainToolbar from '../../common/MainToolbar/MainToolbar';
+import ContactCard from './ContactCard';
 
 const ContentWrapper = styled.div`
 
@@ -41,9 +42,7 @@ export default function ContactsBrowse(props) {
                 {contacts.length ? (
                     contacts.map(contact => {
                         return (
-                            <div>
-                                {contact}
-                            </div>
+                            <ContactCard key={contact.id} name={contact.firstName+' '+contact.lastName} />
                         )
                     })
                 ) : (
