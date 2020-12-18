@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import CollectionTitleHeader from '../../common/CollectionTitleHeader/CollectionTitleHeader';
 import MainToolbar from '../../common/MainToolbar/MainToolbar';
 import ContactCard from './ContactCard';
 import Paginate from './Paginate/Paginate';
+import {RESULTS_PER_PAGE} from '../../common/constants/constants';
 
 const ContentWrapper = styled.div`
 
@@ -33,8 +33,7 @@ export default function ContactsBrowse(props) {
         isContactListMetadataError, 
         getContactListMetadata 
     } = props;
-    const history = useHistory();
-    const [activeFilters, setActiveFilters] = useState([]);
+    const [activeFilters, setActiveFilters] = useState({});
     const [page, setPage] = useState(1);
 
     const {total} = contactsMetadata;
@@ -46,11 +45,7 @@ export default function ContactsBrowse(props) {
 
     useEffect(() => {
         getContactList(page);
-    }, [page])
-
-    function handleNavigation(path) {
-        history.push(`/${path}`);
-    }
+    }, [page]);
 
     return (
         <ContentWrapper>
@@ -65,15 +60,16 @@ export default function ContactsBrowse(props) {
                     })
                 ) : (
                 <NoResultsMessage classNames="warningMessage">
-                    Sorry, no results to display{activeFilters.length ? ' for your applied search filters' : ''}
+                    Sorry, no results to display{Object.keys(activeFilters).length ? ' for your applied search filters' : ''}
                 </NoResultsMessage>
                 )}
             </ScrollContainer>
-            {total > 3 && (
+            {total > RESULTS_PER_PAGE && (
                 <Paginate 
                     total={total}
                     page={page}
-                    cardsPerPage={3}
+                    cardsPerPage={RESULTS_PER_PAGE}
+                    count={contacts.length}
                     updatePage={setPage}
                 />
             )}
