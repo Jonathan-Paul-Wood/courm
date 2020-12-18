@@ -120,8 +120,18 @@ app.post('/api/contacts/new', (req, res) => {
 
 //accepts requests of the form: localhost:8080/api/contacts?order=id?results=3&page=1?direction=[ASC|DESC]
 app.get("/api/contacts", (req, res) => {
-    const { results, page, order, direction } = req.query;
-    const sql = `SELECT * FROM contacts ORDER BY ${order} ${direction} LIMIT ${results} OFFSET ((${page - 1})* ${results})`;
+    const { results, page, order, direction, filters } = req.query;
+    let sql = `SELECT * FROM contacts`;
+    //apply clause for each filter
+    // if(filters.length) {
+    //     let filterClauses = ` WHERE ${filters[0].field} `;
+    //     filters.forEach(filter => {
+    
+    //     });
+    // }
+
+    //apply sort order and pagination
+    sql = sql+` ORDER BY ${order} ${direction} LIMIT ${results} OFFSET ((${page - 1})* ${results})`;
     db.all(sql, (err, rows) => {
         if (err) {
             res.status = ERROR_CODE;
@@ -131,7 +141,39 @@ app.get("/api/contacts", (req, res) => {
             return;
         } else {
             res.status = SUCCESS_CODE;
-            res.json({'response': rows});
+            res.json(rows);
+        }
+    });
+});
+
+app.get("/api/contacts/all", (req, res) => {
+    const sql = `SELECT * FROM contacts`;
+    db.all(sql, (err, rows) => {
+        if (err) {
+            res.status = ERROR_CODE;
+            return console.error(err.message);
+        } else if (!rows) {
+            res.status = NOT_FOUND_CODE;
+            return;
+        } else {
+            res.status = SUCCESS_CODE;
+            res.json(rows);
+        }
+    });
+});
+
+app.get("/api/contacts/metadata", (req, res) => {
+    const sql = `SELECT COUNT(*) FROM contacts`;
+    db.get(sql, (err, result) => {
+        if (err) {
+            res.status = ERROR_CODE;
+            return console.error(err.message);
+        } else if (!result) {
+            res.status = NOT_FOUND_CODE;
+            return;
+        } else {
+            res.status = SUCCESS_CODE;
+            res.json({total: result['COUNT(*)']});
         }
     });
 });
