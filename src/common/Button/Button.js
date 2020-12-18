@@ -90,6 +90,12 @@ const StyleContainer = styled.div`
         background-color: var(--warning-color-hover);
       }
 
+      .btn-disabled {
+        transform: scale(1) !important; /*override active class*/
+        background-color: #e6e6e6;
+        cursor: not-allowed;
+      }
+
       svg {
         margin: auto 0.5rem auto 0;
       }
@@ -101,13 +107,16 @@ const StyleContainer = styled.div`
 
 
 export default function Button(props) {
+  const { type, size, block, icon, label, onClick, disabled } = props;
     return (
         <StyleContainer>
             <button
-              className={`btn btn--${props.type} btn--${props.size} ${props.block ? 'btn-block' : ''}`}
-              onClick={props.onClick}>
-                {icons[props.icon]}
-                <span>{props.label}</span>
+              className={`btn btn--${type} btn--${size} ${block ? 'btn-block' : ''} ${disabled ? 'btn-disabled' : ''}`}
+              onClick={onClick}
+              disabled={disabled}  
+            >
+                {icons[icon]}
+                <span>{label}</span>
             </button>
         </StyleContainer>
     );
@@ -118,6 +127,7 @@ Button.defaultProps = {
     size: 'md',
     block: false,
     icon: '',
+    disabled: false,
 }
 
 Button.propTypes = {
@@ -127,4 +137,5 @@ Button.propTypes = {
     label: PropTypes.string.isRequired,
     icon: PropTypes.string,
     onClick: PropTypes.func.isRequired,
+    disabled: PropTypes.bool,
 }
