@@ -23,14 +23,47 @@ function getContactListError(error) {
     }
 }
 
-export function getContactList() { //todo: add search/filter/sort
+export function getContactList(page, order, direction) { //todo: add search/filter
     return async dispatch => {
         dispatch(getContactListLoading());
         try {
-            const response = await ContactListService.getContactList();
+            const response = await ContactListService.getContactList(page, order, direction);
             dispatch(getContactListSuccess(response));
         } catch (e) {
             dispatch(getContactListError(e));
+        }
+    }
+}
+
+
+function getContactListMetadataLoading() {
+    return {
+        type: types.GET_CONTACT_LIST_METADATA_PENDING,
+    }
+}
+
+function getContactListMetadataSuccess(payload) {
+    return {
+        type: types.GET_CONTACT_LIST_METADATA_SUCCESS,
+        payload,
+    }
+}
+
+function getContactListMetadataError(error) {
+    return {
+        type: types.GET_CONTACT_LIST_METADATA_ERROR,
+        error: new ServiceError('get contacts list metadata', error)
+    }
+}
+
+export function getContactListMetadata() {
+    return async dispatch => {
+        dispatch(getContactListMetadataLoading());
+        try {
+            const response = await ContactListService.getContactListMetadata();
+            dispatch(getContactListMetadataSuccess(response));
+        } catch (e) {
+            dispatch(getContactListMetadataError(e));
         }
     }
 }

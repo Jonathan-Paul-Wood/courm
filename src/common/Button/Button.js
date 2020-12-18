@@ -92,8 +92,13 @@ const StyleContainer = styled.div`
 
       .btn-disabled {
         transform: scale(1) !important; /*override active class*/
-        background-color: #e6e6e6;
+        background-color: #e6e6e6 !important;
         cursor: not-allowed;
+        color: var(--text-dark) !important;
+      }
+      .btn-disabled:hover {
+        background-color: #e6e6e6 !important;
+        color: var(--text-dark-hover) !important;
       }
 
       svg {

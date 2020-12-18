@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import CollectionTitleHeader from '../../common/CollectionTitleHeader/CollectionTitleHeader';
 import MainToolbar from '../../common/MainToolbar/MainToolbar';
 import ContactCard from './ContactCard';
+import Paginate from './Paginate/Paginate';
 
 const ContentWrapper = styled.div`
 
@@ -22,13 +23,30 @@ const NoResultsMessage = styled.div`
 `;
 
 export default function ContactsBrowse(props) {
-    const { contacts, isContactListPending, contactListError, getContactList } = props;
+    const { 
+        contacts,
+        isContactListPending, 
+        contactListError, 
+        getContactList, 
+        contactsMetadata, 
+        isContactListMetadataPending, 
+        isContactListMetadataError, 
+        getContactListMetadata 
+    } = props;
     const history = useHistory();
     const [activeFilters, setActiveFilters] = useState([]);
+    const [page, setPage] = useState(1);
+
+    const {total} = contactsMetadata;
 
     useEffect(() => {
         getContactList();
-    }, [])
+        getContactListMetadata(); // call again when filters/search changes
+    }, []);
+
+    useEffect(() => {
+        getContactList(page);
+    }, [page])
 
     function handleNavigation(path) {
         history.push(`/${path}`);
@@ -51,6 +69,14 @@ export default function ContactsBrowse(props) {
                 </NoResultsMessage>
                 )}
             </ScrollContainer>
+            {total > 3 && (
+                <Paginate 
+                    total={total}
+                    page={page}
+                    cardsPerPage={3}
+                    updatePage={setPage}
+                />
+            )}
         </ContentWrapper>
     );
 }
