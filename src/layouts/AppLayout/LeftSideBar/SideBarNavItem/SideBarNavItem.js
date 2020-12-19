@@ -9,10 +9,7 @@ const ItemWrapper = styled.div`
     border-bottom: 1px solid black;
     display: flex;
     position: relative;
-
-    .nav-option {
-        cursor: pointer;
-    }
+    cursor: pointer;
 
     .nav-option:hover {
         opacity: 0.8;
@@ -45,8 +42,8 @@ export default function LeftSidebar(props) {
     }
 
     return (
-        <ItemWrapper>
-            <ItemContainer classNames="nav-option" onClick={() => handleNavigation(props.path)}>
+        <ItemWrapper onClick={() => handleNavigation(props.path)}>
+            <ItemContainer className="nav-option">
                 {icons[props.icon]}
                 {props.title.toUpperCase()}
             </ItemContainer>
