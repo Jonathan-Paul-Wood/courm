@@ -5,6 +5,7 @@ import { Provider } from 'react-redux';
 import store from './configureStore';
 import { createBrowserHistory } from 'history';
 import { Router, Switch, Route } from 'react-router-dom';
+import './styles/index.scss';
 //import PageNotFound from './components/pages/PageNotFound';
 //import reportWebVitals from './reportWebVitals';
 
