@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import Input from '../../common/Input/Input';
 import Button from '../../common/Button/Button';
+import Tooltip from '../Tooltip/Tooltip';
 
 const ContentWrapper = styled.div`
 
@@ -47,10 +48,17 @@ export default function MainToolbar(props) {
                     value={searchTerm}
                     onChange={event => setSearchTerm(event.target.value)}
                 />
-                <Button 
-                    label={`Sort`}
-                    type="secondary"
-                />
+                <Tooltip
+                    content={'Hello there my name is billy and I have a good time'}
+                    style={{
+                        'margin': 'auto 0',
+                    }}
+                >
+                    <Button 
+                        label={`Sort`}
+                        type="secondary"
+                    />
+                </Tooltip>
             </ControlContainer>
         </ContentWrapper>
     );
