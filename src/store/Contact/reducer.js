@@ -4,6 +4,10 @@ export const initialState = {
     contact: {},
     isContactPending: false,
     contactError: '',
+    isContactPostPending: false,
+    contactPostError: '',
+    isContactPutPending: false,
+    contactPutError: '',
 }
 
 export default function contact(state = initialState, action) {
@@ -13,7 +17,19 @@ export default function contact(state = initialState, action) {
         case types.GET_CONTACT_ERROR:
             return { ...state, isContactPending: false, contactError: action.error }
         case types.GET_CONTACT_SUCCESS:
-            return { ...state, isContactPending: true, contactError: '', contacts: action.payload || action.payload.data } //todo: figure out which one
+            return { ...state, isContactPending: true, contactError: '', contacts: action.payload.data }
+        case types.POST_CONTACT_PENDING:
+            return { ...state, isContactPostPending: true, contactPostError: '' };
+        case types.POST_CONTACT_ERROR:
+            return { ...state, isContactPostPending: false, contactPostError: action.error }
+        case types.POST_CONTACT_SUCCESS:
+            return { ...state, isContactPostPending: true, contactPostError: '' }
+        case types.PUT_CONTACT_PENDING:
+            return { ...state, isContactPutPending: true, contactPutError: '' };
+        case types.PUT_CONTACT_ERROR:
+            return { ...state, isContactPutPending: false, contactPutError: action.error }
+        case types.PUT_CONTACT_SUCCESS:
+            return { ...state, isContactPutPending: true, contactPutError: '' }
         default:
             return state;
     }

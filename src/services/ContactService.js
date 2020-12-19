@@ -5,11 +5,11 @@ export default class ContactService {
         return axios.get(`/contacts/${id}`);
     }
 
-    static createContact(id, body) {
-        return axios.post(`/contacts/${id}`, body);
+    static postContact(body) {
+        return axios.post(`/contacts/new`, body);
     }
 
-    static updateContact(id, body) {
+    static putContact(id, body) {
         return axios.put(`/contacts/${id}`, body);
     }
 
