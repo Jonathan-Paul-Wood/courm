@@ -1,7 +1,7 @@
 import Contact from './Contact';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { getContact } from '../../store/Contact/actions';
+import { getContact, putContact, postContact } from '../../store/Contact/actions';
 
 function mapStateToProps(state) {
     return {
@@ -9,13 +9,19 @@ function mapStateToProps(state) {
         isContactPending: state.contact.isContactPending,
         contactError: state.contact.contactError,
         id: state.contactId,
+        isContactPostPending: state.contact.isContactPostPending,
+        contactPostError: state.contact.contactPostError,
+        isContactPutPending: state.contact.isContactPutPending,
+        contactPutError: state.contact.contactPutError,
     };
 }
 
 const mapDispatchToProps = dispatch =>
     bindActionCreators(
         {
-            getContact
+            getContact,
+            putContact,
+            postContact
         },
         dispatch
     );

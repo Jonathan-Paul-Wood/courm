@@ -33,15 +33,27 @@ const RightSideContent = styled.div`
 `;
 
 export default function EntityTitleHeader(props) {
+    const {title, handleSave, editMode, toggleEdit, disableSave} = props;
     const history = useHistory();
-
+//TODO: toggleEdit: should back just switch the bool if we are editing a contact? Ya, that way default is navigate back (away from new), but can also just toggle out of edit (of existing)
     return (
         <ContentWrapper>
-            <Button className="back" label="Back" type="secondary" onClick={history.goBack} />
-            <h2 className="pageTitle">{props.title}</h2>
+            <Button
+                className="back"
+                label="Back"
+                type="secondary"
+                onClick={history.goBack} //Need some way to distinguish new from editing
+            />
+            <h2 className="pageTitle">{title}</h2>
             <RightSideContent className="save-edit">
-                {props.editMode ? (
-                    <Button label="Save" type="success" icon="saveIcon" />
+                {editMode ? (
+                    <Button
+                        label="Save"
+                        type="success"
+                        icon="saveIcon"
+                        onClick={handleSave}
+                        disabled={disableSave}
+                    />
                 ) : (
                     <Button label="Edit" type="secondary" />
                 )}
@@ -51,6 +63,9 @@ export default function EntityTitleHeader(props) {
 }
 
 EntityTitleHeader.propTypes = {
+    title: PropTypes.string.isRequired,
     editMode: PropTypes.bool.isRequired,
     toggleEdit: PropTypes.func.isRequired,
+    handleSave: PropTypes.func.isRequired,
+    disableSave: PropTypes.bool.isRequired,
 }

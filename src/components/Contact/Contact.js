@@ -18,8 +18,6 @@ const ScrollContainer = styled.div`
 `;
 
 const GridWrapper = styled.div`
-    width: 80vw;
-
     .imageRow {
         height: 15vh;
         display: flex;
@@ -36,19 +34,7 @@ const GridWrapper = styled.div`
     .metadataRow {
         height: 45vh;
 
-        .contactData {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .placeData {
-            width: 100%;
-            display: flex;
-            justify-content: space-between;
-        }
-
-        .dateData {
+        .inputRow {
             width: 100%;
             display: flex;
             justify-content: space-between;
@@ -66,22 +52,115 @@ const GridWrapper = styled.div`
     }
 `;
 
+const ToggleSwitch = styled.div`
+width: 30%;
+display: flex;
+justify-content: space-between;
+
+/* The switch - the box around the slider */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+/* Hide default HTML checkbox */
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+/* The slider */
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+input:checked + .slider {
+  background-color: #2196F3;
+}
+
+input:focus + .slider {
+  box-shadow: 0 0 1px #2196F3;
+}
+
+input:checked + .slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
+}
+
+/* Rounded sliders */
+.slider.round {
+  border-radius: 34px;
+}
+
+.slider.round:before {
+  border-radius: 50%;
+} 
+`;
+
 export default function ContactsBrowse(props) {
     const location = useLocation();
     const isNewContact = !!location.pathname.match('/new');
-    const { contact, isContactPending, contactError, getContact, id } = props;
+    const { 
+        contact,
+        isContactPending,
+        contactError, 
+        getContact, 
+        id,
+        postContact,
+        isContactPostPending,
+        contactPostError,
+        putContact,
+        isContactPutPending,
+        contactPutError
+    } = props;
     const [editMode, setEditMode] = useState(isNewContact);
-    const [pendingChanges, setPendingChanges] = useState({});
+    const [entityType, setEntityType] = useState(false);
+    const [pendingChanges, setPendingChanges] = useState({
+        firstName: '',
+        lastName: '',
+        profilePicture: '',
+        email: '',
+        phoneNumber: '',
+        firm: '',
+        industry: '',
+        address: '',
+        dateOfBirth: '',
+        bio: '',
+    });
     const [error, setError] = useState({
-        firstName: false,
-        lastName: false,
-        email: false,
-        phone: false,
-        firm: false,
-        industry: false,
-        address: false,
-        dob: false,
-        bio: false,
+        firstName: '',
+        lastName: '',
+        email: '',
+        phoneNumber: '',
+        firm: '',
+        industry: '',
+        address: '',
+        dateOfBirth: '',
+        bio: '',
     });
     const history = useHistory();
 
@@ -102,10 +181,53 @@ export default function ContactsBrowse(props) {
         setError({...error, ...updateError});
 
         //update the value
-        const copyPendingChanges = JSON.parse(JSON.stringify(pendingChanges));
         let updatedValue = {};
         updatedValue[field] = value;
         setPendingChanges({...pendingChanges, ...updatedValue});
+    }
+
+    function handleSaveContact() {
+        //validate inputs, error messages if needed TODO
+        let valid = true;
+        if (!pendingChanges.firstName) {
+            valid = false;
+            setError({...error, ...{firstName: 'Please enter name'}});
+        }
+        if (pendingChanges.email && !pendingChanges.email.match(/^.{1,}\@[a-zA-Z0-9-_]{1,}\.[a-z]{1,}$/g)) { //^ and $ to match pattern on entire string, not subset
+            valid = false;
+            setError({...error, ...{email: 'Expected format: name@example.com'}});
+        }
+        if (pendingChanges.phoneNumber && !pendingChanges.phoneNumber.match(/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/g)) {
+            valid = false;
+            setError({...error, ...{phoneNumber: 'Expected format: ###-###-####'}});
+        }
+        if (pendingChanges.dateOfBirth && !pendingChanges.dateOfBirth.match(/^[0-9]{1,5}-[0-9]{2}-[0-9]{2}$/g)) {
+            valid = false;
+            setError({...error, ...{dateOfBirth: 'Expect format: YYYY-MM-DD'}});
+        }
+
+        if (valid) {
+            let dob = pendingChanges.dateOfBirth;
+            if (dob) {
+                dob = new Date(pendingChanges.dateOfBirth).toISOString()
+            }
+
+            const entity = pendingChanges.entityType ? 'organization' : 'person';
+            //submit changes
+            let submitChanges = {
+                ...pendingChanges,
+                lastModifiedOn: new Date().toISOString(),
+                dateOfBirth: dob,
+                entityType: entity,
+            }
+            if (isNewContact) {
+                submitChanges.entityType = entityType;
+                console.log(submitChanges);
+                postContact(submitChanges);
+            } else {
+                putContact(id, submitChanges);
+            }
+        }
     }
 
     return (
@@ -114,37 +236,76 @@ export default function ContactsBrowse(props) {
                 title={isNewContact ? 'New Contact' : `${contact.firstName} ${contact.lastName}`}
                 editMode={editMode}
                 toggleEdit={setEditMode}
+                handleSave={handleSaveContact}
+                disableSave={
+                    isContactPending
+                    || isContactPostPending
+                    || isContactPutPending
+                }
             />
             <ScrollContainer>
                 <GridWrapper>
                     <div className="imageRow">
                         <img src="" alt="profile image" />
                         {editMode ? 
-                            <div /*TODO: disable if not isNewContact*/>Toggle entity/organization</div>
+                            <ToggleSwitch>
+                                <span>
+                                    {entityType
+                                        ? 'Organization'
+                                        : 'Person'}
+                                </span>
+                                <label class="switch">
+                                    <input type="checkbox" onClick={() => setEntityType(!entityType)} />
+                                    <span class="slider round"></span>
+                                </label>
+                            </ToggleSwitch>
                             : <Button label="Export" />
                         }
                     </div>
                     <div className="metadataRow">
-                        <div className="contactData rowMargin">
-                                <Input
-                                    placeholder="mail@example.com"
-                                    value={pendingChanges.email}
-                                    label="Email"
-                                    locked={!editMode}
-                                    error={error.email}
-                                    onChange={(event) => updateData('email', event.target.value)}
-                                />
-                                <Input
-                                    placeholder="###-###-####"
-                                    value={pendingChanges.phone}
-                                    label="Phone Number"
-                                    locked={!editMode}
-                                    error={error.phone}
-                                    onChange={(event) => updateData('phone', event.target.value)}
-                                />
+
+                        <div id="nameData" className="inputRow rowMargin">
+                            <Input
+                                placeholder="Enter Name"
+                                value={pendingChanges.firstName}
+                                label={entityType ? 'Firm Name *' : 'First Name *'}
+                                locked={!editMode}
+                                error={error.firstName}
+                                onChange={(event) => updateData('firstName', event.target.value)}
+                            />
+                            <Input
+                                placeholder={entityType ? 'eg: LLC, Corp, 401(c)3' : 'Enter Name'}
+                                value={pendingChanges.lastName}
+                                label={entityType ? 'Firm Type' : 'Last Name'}
+                                locked={!editMode}
+                                error={error.lastName}
+                                onChange={(event) => updateData('lastName', event.target.value)}
+                            />
                         </div>
 
-                        <div className="placeData rowMargin">
+                        <div id="contactData" className="inputRow rowMargin">
+                            <Input
+                                placeholder="mail@example.com"
+                                value={pendingChanges.email}
+                                label="Email"
+                                locked={!editMode}
+                                error={error.email}
+                                onChange={(event) => updateData('email', event.target.value)}
+                                maxLength={254}
+                            />
+                            <Input
+                                placeholder="###-###-####"
+                                value={pendingChanges.phoneNumber}
+                                label="Phone Number"
+                                locked={!editMode}
+                                error={error.phoneNumber}
+                                onChange={(event) => updateData('phoneNumber', event.target.value)}
+                                maxLength={12}
+                            />
+                        </div>
+
+                        {!entityType && (
+                            <div id="personOnlyData" className="inputRow rowMargin">
                                 <Input
                                     placeholder="Company X, LLC"
                                     value={pendingChanges.firm}
@@ -154,31 +315,34 @@ export default function ContactsBrowse(props) {
                                     onChange={(event) => updateData('firm', event.target.value)}
                                 />
                                 <Input
-                                    placeholder="212 Oak PL, Neverland OH 12345"
-                                    value={pendingChanges.address}
-                                    label="Address"
-                                    locked={!editMode}
-                                    error={error.address}
-                                    onChange={(event) => updateData('address', event.target.value)}
-                                />
-                        </div>
-
-                        <div className="dateData rowMargin">
-                                <Input
                                     placeholder="1950-11-24"
-                                    value={pendingChanges.dob}
+                                    value={pendingChanges.dateOfBirth}
                                     label="Date of Birth"
                                     locked={!editMode}
-                                    error={error.dob}
-                                    onChange={(event) => updateData('dob', event.target.value)}
+                                    error={error.dateOfBirth}
+                                    onChange={(event) => updateData('dateOfBirth', event.target.value)}
+                                    maxLength={11}
                                 />
-                                <Input
-                                    value="2020-03-14"
-                                    label="Last Contact"
-                                    locked={true}
-                                    error={''}
-                                    onChange={() => {}}
-                                />
+                            </div>
+                        )}
+
+                        <div id="placementData" className="inputRow rowMargin">                                
+                            <Input
+                                placeholder="212 Oak PL, Neverland OH 12345"
+                                value={pendingChanges.address}
+                                label="Address"
+                                locked={!editMode}
+                                error={error.address}
+                                onChange={(event) => updateData('address', event.target.value)}
+                            />
+                            <Input
+                                placeholder="eg: Retail, Academia, In School"
+                                value={pendingChanges.industry}
+                                label="Industry"
+                                locked={!editMode}
+                                error={error.industry}
+                                onChange={(event) => updateData('industry', event.target.value)}
+                            />
                         </div>
                         {/*TODO: have all the fields as inputs, dis-/en-abled based on editState*/}
                     </div>
@@ -191,6 +355,7 @@ export default function ContactsBrowse(props) {
                             error={error.bio}
                             onChange={(event) => updateData('bio', event.target.value)}
                             height="18vh"
+                            maxLength={750}
                         />
                     </div>
                     <div classNames="tagsRow">
