@@ -5,6 +5,7 @@ import MainToolbar from '../../common/MainToolbar/MainToolbar';
 import ContactCard from './ContactCard';
 import Paginate from './Paginate/Paginate';
 import {RESULTS_PER_PAGE} from '../../common/constants/constants';
+import Tooltip from '../../common/Tooltip/Tooltip';
 
 const ContentWrapper = styled.div`
 

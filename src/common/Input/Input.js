@@ -5,11 +5,9 @@ import PropTypes from 'prop-types';
 
 const StyleContainer = styled.div`
     width: 100%;
-    padding: 0 3em;
 
     .secondary-field {
         width: 100%;
-        height: 56px;
         border-radius: 2px;
         position: relative;
         background-color: rgba(255, 255, 255, 0.3);
@@ -26,25 +24,15 @@ const StyleContainer = styled.div`
         box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.2);
     }
 
-    .secondary-field.active input {
-        padding: 24px 16px 8px 16px;
-    }
-
-    .secondary-field.active input + label {
-        top: 4px;
-        opacity: 1;
-        color: #512da8;
-    }
-
     .secondary-field.locked {
         pointer-events: none;
     }
 
     .secondary-field input {
         width: 100%;
-        height: 56px;
+        min-height: 56px;
         position: relative;
-        padding: 0px 16px;
+        padding: 24px 16px 8px 16px;
         border: none;
         border-radius: 4px;
         font-size: 16px;
@@ -74,20 +62,18 @@ const StyleContainer = styled.div`
 
     .secondary-field input + label {
         position: absolute;
-        top: 24px;
         left: 16px;
         font-size: 12px;
         font-weight: 600;
         line-height: 24px;
-        color: #ffffff;
-        opacity: 0;
+        top: 4px;
+        opacity: 1;
+        color: #512da8;
         pointer-events: none;
-        transition: 0.1s all ease-in-out;
     }
 
     .field {
         width: 100%;
-        height: 56px;
         border-radius: 2px;
         position: relative;
         background-color: #f2f2f2;
@@ -103,26 +89,15 @@ const StyleContainer = styled.div`
         background-color: #ffffff;
         box-shadow: 0px 4px 20px 0px rgba(0, 0, 0, 0.2);
     }
-
-    .field.active input {
-        padding: 14px 16px 8px 16px;
-    }
-
-    .field.active input + label {
-        top: 4px;
-        opacity: 1;
-        color: #512da8;
-    }
-
     .field.locked {
         pointer-events: none;
     }
 
     .field input {
         width: 100%;
-        height: 56px;
+        min-height: 56px;
         position: relative;
-        padding: 0px 8px;
+        padding: 14px 16px 8px 16px;
         border: none;
         border-radius: 4px;
         font-size: 16px;
@@ -152,15 +127,14 @@ const StyleContainer = styled.div`
 
     .field input + label {
         position: absolute;
-        top: 16px;
         left: 16px;
         font-size: 12px;
         font-weight: 600;
         line-height: 24px;
-        color: #ffffff;
-        opacity: 0;
+        top: 4px;
+        opacity: 1;
+        color: #512da8;
         pointer-events: none;
-        transition: 0.1s all ease-in-out;
     }
 
     input + label.error {
@@ -170,21 +144,21 @@ const StyleContainer = styled.div`
 
 
 export default function Input(props) {
-    const { placeholder, value, onChange, error, label, locked, secondary } = props;
+    const { placeholder, value, onChange, error, label, locked, secondary, height } = props;
     const [active, setActive] = useState(false);
 
     const fieldClassName = `${secondary ? 'secondary-field' : 'field'} ${active ? "active" : ''} ${(locked && !active) ? "locked" : ''}`;
 
     return (
-        <StyleContainer>
-            <div className={fieldClassName}>
+        <StyleContainer className="input-field">
+            <div className={fieldClassName} style={{height: `${height}`}}>
                 <input
                     type="text"
                     placeholder={placeholder}
                     value={value}
                     onChange={onChange}
                     onFocus={() => !locked && setActive(true)}
-                    onBlur={() => !locked && setActive(false)}
+                    onBlur={() => !locked && setActive(false)} //TODO: make break up active so cell only highlighted when selected, but label shows when selected OR !!value
                 />
                 <label className={error ? "error" : ''}>
                     {error || label}
@@ -199,6 +173,7 @@ Input.defaultProps = {
     error: '',
     locked: false,
     secondary: false, //by default (for white backgrounds)
+    height: '56px',
 }
 
 Input.propTypes = {
@@ -209,4 +184,5 @@ Input.propTypes = {
     error: PropTypes.string,
     locked: PropTypes.bool,
     secondary: PropTypes.bool, //if true, will be white/transparent (for colored backgrounds)
+    height: PropTypes.string,
 }
