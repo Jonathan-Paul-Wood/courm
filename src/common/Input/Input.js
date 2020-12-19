@@ -174,6 +174,7 @@ Input.defaultProps = {
     locked: false,
     secondary: false, //by default (for white backgrounds)
     height: '56px',
+    maxLength: 140,
 }
 
 Input.propTypes = {
@@ -185,4 +186,5 @@ Input.propTypes = {
     locked: PropTypes.bool,
     secondary: PropTypes.bool, //if true, will be white/transparent (for colored backgrounds)
     height: PropTypes.string,
+    maxLength: PropTypes.number,
 }
