@@ -118,27 +118,43 @@ app.post('/api/contacts/new', (req, res) => {
     res.json(response);
 });
 
-//accepts requests of the form: localhost:8080/api/contacts?order=id?results=3&page=1?direction=[ASC|DESC]
+//accepts requests of the form: localhost:8080/api/contacts?order=id?results=3&page=1?direction=[ASC|DESC]?search=string
 app.get("/api/contacts", (req, res) => {
-    const { results, page, order, direction, filters } = req.query;
+    const { results, page, order, direction, search } = req.query;
+    // const filters = req.body;
     let sql = `SELECT * FROM contacts`;
     //apply clause for each filter
-    // if(filters.length) {
-    //     let filterClauses = ` WHERE ${filters[0].field} `;
-    //     filters.forEach(filter => {
-    
-    //     });
+    // if(filters.entityType) {
+    //     sql = sql+` WHERE entityType LIKE ${filters.entityType}`;
+    // }
+
+    //apply search
+    // if(search) {
+    //     sql = sql+` WHERE (firstName,lastName) GLOB '*${search}*'`;
+
+    //     /*
+    //      sql = sql+` WHERE firstName GLOB '*${search}*'`;
+    //     sql = sql+` OR WHERE lastName GLOB '*${search}*'`;
+    //     sql = sql+` OR WHERE firm GLOB '*${search}*'`;
+    //     sql = sql+` OR WHERE phoneNumber GLOB '*${search}*'`;
+    //     sql = sql+` OR WHERE email GLOB '*${search}*'`;
+    //     sql = sql+` OR WHERE address GLOB '*${search}*'`;
+    //     sql = sql+` OR WHERE industry GLOB '*${search}*'`;
+    //     sql = sql+` OR WHERE tags GLOB '*${search}*'`;
+    //     */
+    //     // use % to match >=0 chars before and after search term
     // }
 
     //apply sort order and pagination
     sql = sql+` ORDER BY ${order} ${direction} LIMIT ${results} OFFSET ((${page - 1})* ${results})`;
+    console.log(sql);
     db.all(sql, (err, rows) => {
         if (err) {
             res.status = ERROR_CODE;
-            return console.error(err.message);
+            res.json(err);
         } else if (!rows) {
             res.status = NOT_FOUND_CODE;
-            return;
+            res.json({message: 'NOT FOUND'});
         } else {
             res.status = SUCCESS_CODE;
             res.json(rows);
@@ -151,7 +167,7 @@ app.get("/api/contacts/all", (req, res) => {
     db.all(sql, (err, rows) => {
         if (err) {
             res.status = ERROR_CODE;
-            return console.error(err.message);
+            res.json(err);
         } else if (!rows) {
             res.status = NOT_FOUND_CODE;
             return;
@@ -195,14 +211,18 @@ app.get("/api/contacts/:id", (req, res) => {
 });
 
 app.put("/api/contacts/:id", (req, res) => {
-    console.log('PUT contact: ', req.body);
-    let data = Object.keys(req.body).map(key => {
-        return req.body[key];
+    const b = req.body;
+    let sql = `UPDATE contacts SET`;
+    Object.keys(b).map(key => {
+        if(key !== 'id' && key !== 'firstName') {
+            sql = sql+`, ${key}='${b[key]}'`
+        } if (key === 'firstName') {
+            sql = sql+` ${key}='${b[key]}'`
+        }
     });
-    data.push(req.params.id);
-    console.log('shaped data: ', data);
-    const sql = `UPDATE contacts SET firstName=?, lastName=?, profilePicture=?, phoneNumber=?, email=?, address=?, firm=?, industry=?, dateOfBirth=?, tags=?, interactions=?, lastModifiedBy=?, lastModifiedOn=?, lastInteractionId=?, lastInteractionOn=? WHERE id=?`;
-    db.run(sql, data, (err, row) => {
+    sql = sql+` WHERE id=${req.params.id}`;
+    console.log(sql);
+    db.run(sql, (err, row) => {
         console.log(err);
         console.log(row);
         if (err) {
@@ -219,7 +239,6 @@ app.put("/api/contacts/:id", (req, res) => {
 });
 
 app.delete("/api/contacts/:id", (req, res) => {
-    console.log('DELETING... ', req.params.id);
     const sql = `DELETE FROM contacts WHERE id = ${req.params.id}`;
     db.run(sql, (err, row) => {
         if (err) {
