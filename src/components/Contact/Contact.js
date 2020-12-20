@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useHistory, useLocation, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import EntityTitleHeader from '../../common/EntityTitleHeader/EntityTitleHeader';
 import Button from '../../common/Button/Button';
@@ -124,12 +124,12 @@ input:checked + .slider:before {
 export default function ContactsBrowse(props) {
     const location = useLocation();
     const isNewContact = !!location.pathname.match('/new');
+    const { contactId } = useParams();
     const { 
         contact,
         isContactPending,
         contactError, 
-        getContact, 
-        id,
+        getContact,
         postContact,
         isContactPostPending,
         contactPostError,
@@ -165,10 +165,15 @@ export default function ContactsBrowse(props) {
     const history = useHistory();
 
     useEffect(() => {
-        if(id) {
-            setPendingChanges(getContact(id));
+        if(contactId) {
+            setPendingChanges(getContact(contactId));
         }
     }, []);
+
+    useEffect(() => {
+        const newValues = {...contact, dateOfBirth: contact.dateOfBirth.split('T')[0]}
+        setPendingChanges(newValues);
+    }, [contact])
 
     function handleNavigation(path) {
         history.push(`/${path}`);
@@ -225,7 +230,7 @@ export default function ContactsBrowse(props) {
                 console.log(submitChanges);
                 postContact(submitChanges);
             } else {
-                putContact(id, submitChanges);
+                putContact(contactId, submitChanges);
             }
         }
     }
@@ -358,7 +363,7 @@ export default function ContactsBrowse(props) {
                             maxLength={750}
                         />
                     </div>
-                    <div classNames="tagsRow">
+                    <div className="tagsRow">
 
                     </div>
                     <div className="InteractionsRow">

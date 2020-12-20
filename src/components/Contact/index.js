@@ -5,10 +5,9 @@ import { getContact, putContact, postContact } from '../../store/Contact/actions
 
 function mapStateToProps(state) {
     return {
-        contact: state.contact.contacts,
+        contact: state.contact.contact,
         isContactPending: state.contact.isContactPending,
         contactError: state.contact.contactError,
-        id: state.contactId,
         isContactPostPending: state.contact.isContactPostPending,
         contactPostError: state.contact.contactPostError,
         isContactPutPending: state.contact.isContactPutPending,

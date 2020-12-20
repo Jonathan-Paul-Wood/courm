@@ -1,7 +1,26 @@
 import * as types from './types';
 
 export const initialState = {
-    contact: {},
+    contact: {
+        "firstName": null,
+        "lastName": null,
+        "profilePicture": null,
+        "phoneNumber": null,
+        "email": null,
+        "address": null,
+        "firm": null,
+        "industry": null,
+        "dateOfBirth": null,
+        "tags": null,
+        "interactions": null,
+        "createdBy": null,
+        "createdOn": null,
+        "lastModifiedBy": null,
+        "lastModifiedOn": null,
+        "lastInteractionId": null,
+        "lastInteractionOn": null,
+        "entityType": null
+    },
     isContactPending: false,
     contactError: '',
     isContactPostPending: false,
@@ -17,19 +36,19 @@ export default function contact(state = initialState, action) {
         case types.GET_CONTACT_ERROR:
             return { ...state, isContactPending: false, contactError: action.error }
         case types.GET_CONTACT_SUCCESS:
-            return { ...state, isContactPending: true, contactError: '', contacts: action.payload.data }
+            return { ...state, isContactPending: false, contactError: '', contact: action.payload.data }
         case types.POST_CONTACT_PENDING:
             return { ...state, isContactPostPending: true, contactPostError: '' };
         case types.POST_CONTACT_ERROR:
             return { ...state, isContactPostPending: false, contactPostError: action.error }
         case types.POST_CONTACT_SUCCESS:
-            return { ...state, isContactPostPending: true, contactPostError: '' }
+            return { ...state, isContactPostPending: false, contactPostError: '' }
         case types.PUT_CONTACT_PENDING:
             return { ...state, isContactPutPending: true, contactPutError: '' };
         case types.PUT_CONTACT_ERROR:
             return { ...state, isContactPutPending: false, contactPutError: action.error }
         case types.PUT_CONTACT_SUCCESS:
-            return { ...state, isContactPutPending: true, contactPutError: '' }
+            return { ...state, isContactPutPending: false, contactPutError: '' }
         default:
             return state;
     }
