@@ -1,4 +1,4 @@
-import Contact from './Contact';
+import EditContact from './EditContact';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { getContact, putContact, postContact } from '../../store/Contact/actions';
@@ -25,4 +25,4 @@ const mapDispatchToProps = dispatch =>
         dispatch
     );
 
-export default connect(mapStateToProps, mapDispatchToProps)(Contact);
+export default connect(mapStateToProps, mapDispatchToProps)(EditContact);

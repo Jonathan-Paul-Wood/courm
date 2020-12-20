@@ -6,7 +6,8 @@ import { PropTypes } from 'prop-types';
 import AppLayout from '../../../layouts/AppLayout/AppLayout';
 import AppHome from '../../../components/AppHome/AppHome';
 import ContactsBrowse from '../../../components/ContactsBrowse';
-import Contact from '../../../components/Contact';
+import ViewContact from '../../../components/ViewContact';
+import EditContact from '../../../components/EditContact';
 
 const LoadingContainer = styled.div`
     position: absolute;
@@ -38,8 +39,9 @@ export default function AppRouter(props) {
                 <Redirect exact from="/" to="/home" />
                 <AppLayout path="/home" component={AppHome} {...commonRouteProps} />
                 <AppLayout path="/contacts" exact component={ContactsBrowse} {...commonRouteProps} />
-                <AppLayout path="/contacts/new" exact component={Contact} {...commonRouteProps} />
-                <AppLayout path="/contacts/:contactId" component={Contact} {...commonRouteProps} />
+                <AppLayout path="/contacts/new" exact component={EditContact} {...commonRouteProps} />
+                <AppLayout path="/contacts/:contactId/edit" component={EditContact} {...commonRouteProps} />
+                <AppLayout path="/contacts/:contactId" component={ViewContact} {...commonRouteProps} />
                 {/* <AppLayout path="/interactions/:interactionsId" component={Interaction} />
                 <AppLayout path="/interactions" component={InteractionsBrowse} /> */}
             </Switch>

@@ -121,7 +121,7 @@ input:checked + .slider:before {
 } 
 `;
 
-export default function ContactsBrowse(props) {
+export default function ViewContact(props) {
     const location = useLocation();
     const isNewContact = !!location.pathname.match('/new');
     const { contactId } = useParams();
@@ -137,8 +137,7 @@ export default function ContactsBrowse(props) {
         isContactPutPending,
         contactPutError
     } = props;
-    const [editMode, setEditMode] = useState(isNewContact);
-    const [entityType, setEntityType] = useState(false);
+    const [entityIsOrganization, setEntityIsOrganization] = useState('person');
     const [pendingChanges, setPendingChanges] = useState({
         firstName: '',
         lastName: '',
@@ -165,15 +164,34 @@ export default function ContactsBrowse(props) {
     const history = useHistory();
 
     useEffect(() => {
+        //initial GET of contact
         if(contactId) {
             setPendingChanges(getContact(contactId));
         }
     }, []);
 
     useEffect(() => {
-        const newValues = {...contact, dateOfBirth: contact.dateOfBirth.split('T')[0]}
+        //update page when GET returns
+        const dob = contact.dateOfBirth ? contact.dateOfBirth.split('T')[0] : "null";
+        const newValues = {...contact, dateOfBirth: dob}
+        //TODO: handle 404, and Errors
         setPendingChanges(newValues);
-    }, [contact])
+        setEntityIsOrganization(contact.entityType);
+    }, [contact]);
+
+    useEffect(() => {
+        //re-GET contacts after update
+        if(!isContactPostPending && !isContactPutPending) {
+            /**
+             * TODO:
+             * compare with prev props
+             * if a PUT or POST has completed (true -> false)
+             *      push history to /contacts/id
+             *      POST will need to be modified to return contactId in response
+             *          maybe a checkmark next to save that renders on /new and asks 'Create Another?' , reset new on Save if checked
+             */
+        }
+    }, [isContactPutPending, isContactPostPending])
 
     function handleNavigation(path) {
         history.push(`/${path}`);
@@ -206,7 +224,7 @@ export default function ContactsBrowse(props) {
             valid = false;
             setError({...error, ...{phoneNumber: 'Expected format: ###-###-####'}});
         }
-        if (pendingChanges.dateOfBirth && !pendingChanges.dateOfBirth.match(/^[0-9]{1,5}-[0-9]{2}-[0-9]{2}$/g)) {
+        if (pendingChanges.dateOfBirth && !pendingChanges.dateOfBirth.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/g)) {
             valid = false;
             setError({...error, ...{dateOfBirth: 'Expect format: YYYY-MM-DD'}});
         }
@@ -216,18 +234,17 @@ export default function ContactsBrowse(props) {
             if (dob) {
                 dob = new Date(pendingChanges.dateOfBirth).toISOString()
             }
+            const entity = pendingChanges.entityIsOrganization ? 'organization' : 'person';
 
-            const entity = pendingChanges.entityType ? 'organization' : 'person';
-            //submit changes
             let submitChanges = {
                 ...pendingChanges,
                 lastModifiedOn: new Date().toISOString(),
                 dateOfBirth: dob,
                 entityType: entity,
             }
+            
+            //submit changes
             if (isNewContact) {
-                submitChanges.entityType = entityType;
-                console.log(submitChanges);
                 postContact(submitChanges);
             } else {
                 putContact(contactId, submitChanges);
@@ -235,12 +252,12 @@ export default function ContactsBrowse(props) {
         }
     }
 
+    //TODO: handle loading state, 404s and errors
     return (
         <ContentWrapper>
             <EntityTitleHeader
-                title={isNewContact ? 'New Contact' : `${contact.firstName} ${contact.lastName}`}
-                editMode={editMode}
-                toggleEdit={setEditMode}
+                title={isNewContact ? 'New Contact' : `Edit Contact`}
+                editMode={true}
                 handleSave={handleSaveContact}
                 disableSave={
                     isContactPending
@@ -252,20 +269,22 @@ export default function ContactsBrowse(props) {
                 <GridWrapper>
                     <div className="imageRow">
                         <img src="" alt="profile image" />
-                        {editMode ? 
-                            <ToggleSwitch>
-                                <span>
-                                    {entityType
-                                        ? 'Organization'
-                                        : 'Person'}
-                                </span>
-                                <label class="switch">
-                                    <input type="checkbox" onClick={() => setEntityType(!entityType)} />
-                                    <span class="slider round"></span>
-                                </label>
-                            </ToggleSwitch>
-                            : <Button label="Export" />
-                        }
+                        <ToggleSwitch>
+                            <span>
+                                {entityIsOrganization 
+                                    ? 'Organization'
+                                    : 'Person'}
+                            </span>
+                            <label class="switch">
+                                <input
+                                    active={entityIsOrganization}
+                                    type="checkbox"
+                                    onClick={() => setEntityIsOrganization(!entityIsOrganization)}
+                                    disabled={!isNewContact}
+                                />
+                                <span class="slider round"></span>
+                            </label>
+                        </ToggleSwitch>
                     </div>
                     <div className="metadataRow">
 
@@ -273,16 +292,16 @@ export default function ContactsBrowse(props) {
                             <Input
                                 placeholder="Enter Name"
                                 value={pendingChanges.firstName}
-                                label={entityType ? 'Firm Name *' : 'First Name *'}
-                                locked={!editMode}
+                                label={entityIsOrganization ? 'Firm Name *' : 'First Name *'}
+                                locked={false}
                                 error={error.firstName}
                                 onChange={(event) => updateData('firstName', event.target.value)}
                             />
                             <Input
-                                placeholder={entityType ? 'eg: LLC, Corp, 401(c)3' : 'Enter Name'}
+                                placeholder={entityIsOrganization ? 'eg: LLC, Corp, 401(c)3' : 'Enter Name'}
                                 value={pendingChanges.lastName}
-                                label={entityType ? 'Firm Type' : 'Last Name'}
-                                locked={!editMode}
+                                label={entityIsOrganization ? 'Firm Type' : 'Last Name'}
+                                locked={false}
                                 error={error.lastName}
                                 onChange={(event) => updateData('lastName', event.target.value)}
                             />
@@ -293,7 +312,7 @@ export default function ContactsBrowse(props) {
                                 placeholder="mail@example.com"
                                 value={pendingChanges.email}
                                 label="Email"
-                                locked={!editMode}
+                                locked={false}
                                 error={error.email}
                                 onChange={(event) => updateData('email', event.target.value)}
                                 maxLength={254}
@@ -302,20 +321,20 @@ export default function ContactsBrowse(props) {
                                 placeholder="###-###-####"
                                 value={pendingChanges.phoneNumber}
                                 label="Phone Number"
-                                locked={!editMode}
+                                locked={false}
                                 error={error.phoneNumber}
                                 onChange={(event) => updateData('phoneNumber', event.target.value)}
                                 maxLength={12}
                             />
                         </div>
 
-                        {!entityType && (
+                        {!entityIsOrganization && (
                             <div id="personOnlyData" className="inputRow rowMargin">
                                 <Input
                                     placeholder="Company X, LLC"
                                     value={pendingChanges.firm}
                                     label="Firm"
-                                    locked={!editMode}
+                                    locked={false}
                                     error={error.firm}
                                     onChange={(event) => updateData('firm', event.target.value)}
                                 />
@@ -323,10 +342,11 @@ export default function ContactsBrowse(props) {
                                     placeholder="1950-11-24"
                                     value={pendingChanges.dateOfBirth}
                                     label="Date of Birth"
-                                    locked={!editMode}
+                                    locked={false}
                                     error={error.dateOfBirth}
                                     onChange={(event) => updateData('dateOfBirth', event.target.value)}
                                     maxLength={11}
+                                    isDate={true}
                                 />
                             </div>
                         )}
@@ -336,7 +356,7 @@ export default function ContactsBrowse(props) {
                                 placeholder="212 Oak PL, Neverland OH 12345"
                                 value={pendingChanges.address}
                                 label="Address"
-                                locked={!editMode}
+                                locked={false}
                                 error={error.address}
                                 onChange={(event) => updateData('address', event.target.value)}
                             />
@@ -344,7 +364,7 @@ export default function ContactsBrowse(props) {
                                 placeholder="eg: Retail, Academia, In School"
                                 value={pendingChanges.industry}
                                 label="Industry"
-                                locked={!editMode}
+                                locked={false}
                                 error={error.industry}
                                 onChange={(event) => updateData('industry', event.target.value)}
                             />
@@ -356,7 +376,7 @@ export default function ContactsBrowse(props) {
                             placeholder="Add biographical notes here"
                             value={pendingChanges.bio}
                             label="Bio"
-                            locked={!editMode}
+                            locked={false}
                             error={error.bio}
                             onChange={(event) => updateData('bio', event.target.value)}
                             height="18vh"

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import Button from '../Button/Button';
@@ -33,39 +33,48 @@ const RightSideContent = styled.div`
 `;
 
 export default function EntityTitleHeader(props) {
-    const {title, handleSave, editMode, toggleEdit, disableSave} = props;
+    const {title, handleSave, editMode, disableSave} = props;
+    const { contactId } = useParams();
     const history = useHistory();
-//TODO: toggleEdit: should back just switch the bool if we are editing a contact? Ya, that way default is navigate back (away from new), but can also just toggle out of edit (of existing)
+
     return (
         <ContentWrapper>
             <Button
                 className="back"
-                label="Back"
+                label={'BACK'}
                 type="secondary"
-                onClick={history.goBack} //Need some way to distinguish new from editing
+                onClick={history.goBack}
             />
             <h2 className="pageTitle">{title}</h2>
             <RightSideContent className="save-edit">
                 {editMode ? (
                     <Button
-                        label="Save"
+                        label="SAVE"
                         type="success"
                         icon="saveIcon"
                         onClick={handleSave}
                         disabled={disableSave}
                     />
                 ) : (
-                    <Button label="Edit" type="secondary" />
+                    <Button
+                        label="EDIT"
+                        type="secondary" 
+                        onClick={() => history.push(`/contacts/${contactId}/edit`)}
+                    />
                 )}
             </RightSideContent>
         </ContentWrapper>
     );
 }
 
+EntityTitleHeader.defaultProps = {
+    handleSave: () => {},
+    disableSave: true,
+}
+
 EntityTitleHeader.propTypes = {
     title: PropTypes.string.isRequired,
+    handleSave: PropTypes.func,
+    disableSave: PropTypes.bool,
     editMode: PropTypes.bool.isRequired,
-    toggleEdit: PropTypes.func.isRequired,
-    handleSave: PropTypes.func.isRequired,
-    disableSave: PropTypes.bool.isRequired,
 }

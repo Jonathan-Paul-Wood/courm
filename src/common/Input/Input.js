@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
+import DatePicker from "react-datepicker";
+ 
+import "react-datepicker/dist/react-datepicker.css";
 
 
 const StyleContainer = styled.div`
@@ -144,7 +147,7 @@ const StyleContainer = styled.div`
 
 
 export default function Input(props) {
-    const { placeholder, value, onChange, error, label, locked, secondary, height } = props;
+    const { placeholder, value, onChange, error, label, locked, secondary, height, isDate } = props;
     const [active, setActive] = useState(false);
 
     const fieldClassName = `${secondary ? 'secondary-field' : 'field'} ${active ? "active" : ''} ${(locked && !active) ? "locked" : ''}`;
@@ -152,14 +155,24 @@ export default function Input(props) {
     return (
         <StyleContainer className="input-field">
             <div className={fieldClassName} style={{height: `${height}`}}>
-                <input
-                    type="text"
-                    placeholder={placeholder}
-                    value={value}
-                    onChange={onChange}
-                    onFocus={() => !locked && setActive(true)}
-                    onBlur={() => !locked && setActive(false)} //TODO: make break up active so cell only highlighted when selected, but label shows when selected OR !!value
-                />
+                {isDate ? (
+                    <DatePicker
+                        selected={(value && value !== "null") ? new Date(value) : new Date()}
+                        onChange={date => onChange(date)}
+                        onClickOutside={() => {}}
+                        showYearDropdown={true}
+                        showMonthDropdown={true}
+                    />
+                ) : (
+                    <input
+                        type="text"
+                        placeholder={placeholder}
+                        value={value}
+                        onChange={onChange}
+                        onFocus={() => !locked && setActive(true)}
+                        onBlur={() => !locked && setActive(false)} //TODO: make break up active so cell only highlighted when selected, but label shows when selected OR !!value
+                    />
+                )}
                 <label className={error ? "error" : ''}>
                     {error || label}
                 </label>
@@ -170,21 +183,25 @@ export default function Input(props) {
 
 Input.defaultProps = {
     placeholder: '',
+    value: '',
     error: '',
     locked: false,
     secondary: false, //by default (for white backgrounds)
     height: '56px',
     maxLength: 140,
+    isDate: false,
+    onChange: () => {},
 }
 
 Input.propTypes = {
     placeholder: PropTypes.string,
-    value: PropTypes.string.isRequired,
+    value: PropTypes.string,
     label: PropTypes.string.isRequired,
-    onChange: PropTypes.func.isRequired,
+    onChange: PropTypes.func,
     error: PropTypes.string,
     locked: PropTypes.bool,
     secondary: PropTypes.bool, //if true, will be white/transparent (for colored backgrounds)
     height: PropTypes.string,
     maxLength: PropTypes.number,
+    isDate: PropTypes.bool
 }
