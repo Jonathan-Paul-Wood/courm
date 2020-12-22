@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import EntityTitleHeader from '../../common/EntityTitleHeader/EntityTitleHeader';
 import Button from '../../common/Button/Button';
 import Input from '../../common/Input/Input';
+import DateInput from '../../common/DateInput/DateInput';
 import TextArea from '../../common/TextArea/TextArea';
 
 const ContentWrapper = styled.div`
@@ -49,6 +50,17 @@ const GridWrapper = styled.div`
 
     tagsRow {
         height: 20rem;
+    }
+
+    #dangerRow {
+        margin: 2rem;
+        display: flex;
+        justify-content: space-between;
+
+        #delete-contact-button {
+            display: flex;
+            justify-content: right;
+        }
     }
 `;
 
@@ -137,8 +149,7 @@ export default function ViewContact(props) {
         isContactPutPending,
         contactPutError
     } = props;
-    const [entityIsOrganization, setEntityIsOrganization] = useState('person');
-    const [pendingChanges, setPendingChanges] = useState({
+    const defaultChanges = {
         firstName: '',
         lastName: '',
         profilePicture: '',
@@ -149,7 +160,9 @@ export default function ViewContact(props) {
         address: '',
         dateOfBirth: '',
         bio: '',
-    });
+    }
+    const [entityIsOrganization, setEntityIsOrganization] = useState('person');
+    const [pendingChanges, setPendingChanges] = useState(defaultChanges);
     const [error, setError] = useState({
         firstName: '',
         lastName: '',
@@ -167,6 +180,8 @@ export default function ViewContact(props) {
         //initial GET of contact
         if(contactId) {
             setPendingChanges(getContact(contactId));
+        } else {
+            setPendingChanges(defaultChanges);
         }
     }, []);
 
@@ -224,7 +239,7 @@ export default function ViewContact(props) {
             valid = false;
             setError({...error, ...{phoneNumber: 'Expected format: ###-###-####'}});
         }
-        if (pendingChanges.dateOfBirth && !pendingChanges.dateOfBirth.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/g)) {
+        if (pendingChanges.dateOfBirth && !pendingChanges.dateOfBirth.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}Z$/g)) {
             valid = false;
             setError({...error, ...{dateOfBirth: 'Expect format: YYYY-MM-DD'}});
         }
@@ -338,15 +353,14 @@ export default function ViewContact(props) {
                                     error={error.firm}
                                     onChange={(event) => updateData('firm', event.target.value)}
                                 />
-                                <Input
-                                    placeholder="1950-11-24"
-                                    value={pendingChanges.dateOfBirth}
+                                <DateInput
+                                    placeholder="Enter or select YYYY/MM/DD"
+                                    value={(pendingChanges.dateOfBirth && pendingChanges.dateOfBirth !== "null") ? new Date(pendingChanges.dateOfBirth) : ''}
                                     label="Date of Birth"
                                     locked={false}
                                     error={error.dateOfBirth}
-                                    onChange={(event) => updateData('dateOfBirth', event.target.value)}
+                                    onChange={(event) => updateData('dateOfBirth', event.toISOString())}
                                     maxLength={11}
-                                    isDate={true}
                                 />
                             </div>
                         )}
@@ -391,6 +405,16 @@ export default function ViewContact(props) {
                         <div>
                             cards go here, or none available message...
                         </div>
+                    </div>
+                    <div id="dangerRow">
+                        <div></div>
+                        <Button 
+                            id="delete-contact-button"
+                            label="DELETE CONTACT"
+                            type="danger"
+                            icon="trashCan"
+                            onClick={console.log(`delete ${contactId}`)}
+                        />
                     </div>
                 </GridWrapper>
             </ScrollContainer>

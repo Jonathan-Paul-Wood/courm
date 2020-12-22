@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import EntityTitleHeader from '../../common/EntityTitleHeader/EntityTitleHeader';
 import Button from '../../common/Button/Button';
 import Input from '../../common/Input/Input';
+import DateInput from '../../common/DateInput/DateInput';
 import TextArea from '../../common/TextArea/TextArea';
 
 const ContentWrapper = styled.div`
@@ -129,7 +130,7 @@ export default function ViewContact(props) {
                                     label="Firm"
                                     locked={true}
                                 />
-                                <input
+                                <DateInput
                                     value={contact.dateOfBirth}
                                     label="Date of Birth"
                                     locked={true}
