@@ -11,7 +11,7 @@ const AppWrapper = styled.div`
         position: relative;
         top: 4em;
         left: 8em;
-        padding: 1em;
+        padding: 1em 0em;
         width: calc(100% - 10em);
     }
 `;

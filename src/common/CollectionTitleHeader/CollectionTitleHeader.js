@@ -4,9 +4,16 @@ import styled from 'styled-components';
 import Button from '../Button/Button';
 
 const ContentWrapper = styled.div`
+    position: fixed;
+    top: 4em; //tied to height of header bar
+    height: 4em;
+    width: calc(100% - 10em);
+    background-color: #ffffff;
+    z-index: 700;
+    padding: 0 1em;
+    margin: 0 0 1em 0;
+
     border-bottom: solid 1px black;
-    padding: 0 0 1em 0;
-    margin-bottom: 1em;
     display: flex;
     justify-content: space-between;
 `;
