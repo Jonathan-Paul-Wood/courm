@@ -26,7 +26,7 @@ export default function AppLayout({component: Component, ...props}) {
                 <LeftSidebar />
                 <div className="content">
                     <Component {...matchProps} />
-                    <div>Footer</div>
+                    <div id="layout-footer"></div>
                 </div>
             </AppWrapper>
         )}
