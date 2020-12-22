@@ -45,11 +45,6 @@ export default function AppRouter(props) {
                 {/* <AppLayout path="/interactions/:interactionsId" component={Interaction} />
                 <AppLayout path="/interactions" component={InteractionsBrowse} /> */}
             </Switch>
-            {
-                showAccessWarning && (
-                    {/* CommonModal */}
-                )
-            }
         </React.Fragment>
     )
     //change 'return' to 'return props.appData ?' ...  : (
