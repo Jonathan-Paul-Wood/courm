@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import DatePicker from "react-datepicker";
- 
 import "react-datepicker/dist/react-datepicker.css";
 
 
@@ -33,7 +32,7 @@ const StyleContainer = styled.div`
 
     .secondary-field input {
         width: 100%;
-        min-height: 56px;
+        min-height: 28px;
         position: relative;
         padding: 24px 16px 8px 16px;
         border: none;
@@ -98,7 +97,7 @@ const StyleContainer = styled.div`
 
     .field input {
         width: 100%;
-        min-height: 56px;
+        min-height: 28px;
         position: relative;
         padding: 14px 16px 8px 16px;
         border: none;
@@ -140,13 +139,20 @@ const StyleContainer = styled.div`
         pointer-events: none;
     }
 
+    .react-datepicker-wrapper {
+        width: 100%;
+    }
+    .react-datepicker__input-container {
+        width: 100%;
+    }
+
     input + label.error {
         color: red;
     }
 `;
 
 
-export default function Input(props) {
+export default function DateInput(props) {
     const { placeholder, value, onChange, error, label, locked, secondary, height, isDate } = props;
     const [active, setActive] = useState(false);
 
@@ -155,23 +161,24 @@ export default function Input(props) {
     return (
         <StyleContainer className="input-field">
             <div className={fieldClassName} style={{height: `${height}`}}>
-                <input
-                    type="text"
-                    placeholder={placeholder}
-                    value={value}
-                    onChange={onChange}
-                    onFocus={() => !locked && setActive(true)}
-                    onBlur={() => !locked && setActive(false)}
-                />
                 <label className={error ? "error" : ''}>
                     {error || label}
                 </label>
+                <DatePicker
+                    placeholderText={placeholder}
+                    selected={(value && value !== "null") ? new Date(value) : ''}
+                    onChange={date => onChange(date)}
+                    onClickOutside={() => {}}
+                    showYearDropdown={true}
+                    showMonthDropdown={true}
+                    dateFormat='yyyy/MM/dd'
+                />
             </div>
         </StyleContainer>
     );
 }
 
-Input.defaultProps = {
+DateInput.defaultProps = {
     placeholder: '',
     value: '',
     error: '',
@@ -182,7 +189,7 @@ Input.defaultProps = {
     onChange: () => {},
 }
 
-Input.propTypes = {
+DateInput.propTypes = {
     placeholder: PropTypes.string,
     value: PropTypes.string,
     label: PropTypes.string.isRequired,
