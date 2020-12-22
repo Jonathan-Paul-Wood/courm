@@ -1,5 +1,10 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
+import styled from 'styled-components';
+
+const HomeWrapper = styled.div`
+    padding: 0 1em;
+`;
 
 export default function AppHome() {
     const history = useHistory();
@@ -16,7 +21,7 @@ export default function AppHome() {
     }
 
     return (
-        <React.Fragment>
+        <HomeWrapper>
             <h2>Welcome</h2>
             <h4>Use this personal CRM / Address Book to keep track of your contacts!</h4>
             <h2>Actions</h2>
@@ -26,6 +31,6 @@ export default function AppHome() {
                 <li><a onClick={() => history.push('/contacts')}>View & Search Contacts</a></li>
                 <li><a onClick={() => history.push('/interactions')}>View & Search Interactions</a></li>
             </ul>
-        </React.Fragment>
+        </HomeWrapper>
     );
 }

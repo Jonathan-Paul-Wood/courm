@@ -6,16 +6,12 @@ import Button from '../../common/Button/Button';
 import Input from '../../common/Input/Input';
 import DateInput from '../../common/DateInput/DateInput';
 import TextArea from '../../common/TextArea/TextArea';
-
-const ContentWrapper = styled.div`
-
-`;
+import CommonModal from '../../common/CommonModal/CommonModal';
 
 const ScrollContainer = styled.div`
-    overflow-y: auto;
+    margin: 6em 2em 0 2em;
     overflow-x: hidden;
-    height: 80vh;
-    margin: 2em 2em 0 2em;
+    padding: 0 1em;
 `;
 
 const GridWrapper = styled.div`
@@ -175,6 +171,7 @@ export default function ViewContact(props) {
         bio: '',
     });
     const history = useHistory();
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
 
     useEffect(() => {
         //initial GET of contact
@@ -267,9 +264,14 @@ export default function ViewContact(props) {
         }
     }
 
+    function handleDeleteConfirm() {
+        setShowDeleteModal(false);
+        console.log(`hit DELETE /api/contacts/${contactId}`);
+    }
+
     //TODO: handle loading state, 404s and errors
     return (
-        <ContentWrapper>
+        <>
             <EntityTitleHeader
                 title={isNewContact ? 'New Contact' : `Edit Contact`}
                 editMode={true}
@@ -406,18 +408,31 @@ export default function ViewContact(props) {
                             cards go here, or none available message...
                         </div>
                     </div>
-                    <div id="dangerRow">
+                    {!isNewContact && <div id="dangerRow">
                         <div></div>
                         <Button 
                             id="delete-contact-button"
-                            label="DELETE CONTACT"
+                            label="DELETE"
                             type="danger"
                             icon="trashCan"
-                            onClick={console.log(`delete ${contactId}`)}
+                            onClick={() => setShowDeleteModal(true)}
                         />
-                    </div>
+                    </div>}
                 </GridWrapper>
             </ScrollContainer>
-        </ContentWrapper>
+        
+            <CommonModal 
+                show={showDeleteModal}
+                icon={'trashCan'}
+                title={'Please Confirm Contact Deletion'}
+                onClose={() => setShowDeleteModal(false)}
+                onSubmit={() => {}}
+                submitText={'Confirm'}
+            >
+                <div>
+                    Are you certain you would like to delete {contact.firstName}? This cannot be undone.
+                </div>
+            </CommonModal>
+        </>
 );
 }

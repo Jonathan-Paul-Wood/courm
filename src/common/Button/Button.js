@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import icons from '../../assets/icons/bootstrapIcons';
+import LoadingLoop from '../LoadingLoop/LoadingLoop';
 
 const StyleContainer = styled.div`
     margin: auto 0;
@@ -112,16 +113,25 @@ const StyleContainer = styled.div`
 
 
 export default function Button(props) {
-  const { type, size, block, icon, label, onClick, disabled } = props;
+  const { type, size, block, icon, label, onClick, disabled, isPending } = props;
     return (
         <StyleContainer>
             <button
               className={`btn btn--${type} btn--${size} ${block ? 'btn-block' : ''} ${disabled ? 'btn-disabled' : ''}`}
               onClick={onClick}
-              disabled={disabled}  
+              disabled={disabled || isPending}  
             >
-                {icons[icon]}
-                <span>{label}</span>
+              {isPending ? (         
+                <LoadingLoop
+                  styleGroup='primary'
+                  size={size}
+                />
+              ) : (
+                <>
+                  {icons[icon]}
+                </>
+              )}              
+              <span>{label}</span>
             </button>
         </StyleContainer>
     );
@@ -133,6 +143,7 @@ Button.defaultProps = {
     block: false,
     icon: '',
     disabled: false,
+    isPending: false,
 }
 
 Button.propTypes = {
@@ -143,4 +154,5 @@ Button.propTypes = {
     icon: PropTypes.string,
     onClick: PropTypes.func.isRequired,
     disabled: PropTypes.bool,
+    isPending: PropTypes.bool,
 }
