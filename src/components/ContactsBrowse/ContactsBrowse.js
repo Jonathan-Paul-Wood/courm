@@ -8,7 +8,8 @@ import {RESULTS_PER_PAGE} from '../../common/constants/constants';
 import Tooltip from '../../common/Tooltip/Tooltip';
 
 const ContentWrapper = styled.div`
-
+    margin-top: 4em;
+    padding: 0 1em;
 `;
 
 const ScrollContainer = styled.div`
@@ -49,31 +50,33 @@ export default function ContactsBrowse(props) {
     }, [page]);
 
     return (
-        <ContentWrapper>
+        <>
             <CollectionTitleHeader title="View Contacts" />
-            <MainToolbar type="Contact" />
-            <ScrollContainer>
-                {contacts.length ? (
-                    contacts.map(contact => {
-                        return (
-                            <ContactCard key={contact.id} name={contact.firstName+' '+contact.lastName} />
-                        )
-                    })
-                ) : (
-                <NoResultsMessage className="warningMessage">
-                    Sorry, no results to display{Object.keys(activeFilters).length ? ' for your applied search filters' : ''}
-                </NoResultsMessage>
+            <ContentWrapper>
+                <MainToolbar type="Contact" />
+                <ScrollContainer>
+                    {contacts.length ? (
+                        contacts.map(contact => {
+                            return (
+                                <ContactCard key={contact.id} name={contact.firstName+' '+contact.lastName} />
+                            )
+                        })
+                    ) : (
+                    <NoResultsMessage className="warningMessage">
+                        Sorry, no results to display{Object.keys(activeFilters).length ? ' for your applied search filters' : ''}
+                    </NoResultsMessage>
+                    )}
+                </ScrollContainer>
+                {total > RESULTS_PER_PAGE && (
+                    <Paginate 
+                        total={total}
+                        page={page}
+                        cardsPerPage={RESULTS_PER_PAGE}
+                        count={contacts.length}
+                        updatePage={setPage}
+                    />
                 )}
-            </ScrollContainer>
-            {total > RESULTS_PER_PAGE && (
-                <Paginate 
-                    total={total}
-                    page={page}
-                    cardsPerPage={RESULTS_PER_PAGE}
-                    count={contacts.length}
-                    updatePage={setPage}
-                />
-            )}
-        </ContentWrapper>
+            </ContentWrapper>
+        </>
     );
 }
