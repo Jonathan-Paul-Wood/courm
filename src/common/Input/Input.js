@@ -8,6 +8,7 @@ import "react-datepicker/dist/react-datepicker.css";
 
 const StyleContainer = styled.div`
     width: 100%;
+    overflow: hidden;
 
     .secondary-field {
         width: 100%;
