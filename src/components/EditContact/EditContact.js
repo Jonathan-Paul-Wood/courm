@@ -296,14 +296,14 @@ export default function ViewContact(props) {
                                     ? 'Organization'
                                     : 'Person'}
                             </span>
-                            <label class="switch">
+                            <label className="switch">
                                 <input
                                     active={entityIsOrganization}
                                     type="checkbox"
                                     onClick={() => setEntityIsOrganization(!entityIsOrganization)}
                                     disabled={!isNewContact}
                                 />
-                                <span class="slider round"></span>
+                                <span className="slider round"></span>
                             </label>
                         </ToggleSwitch>
                     </div>
