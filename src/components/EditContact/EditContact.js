@@ -10,7 +10,6 @@ import CommonModal from '../../common/CommonModal/CommonModal';
 
 const ScrollContainer = styled.div`
     margin: 6em 2em 0 2em;
-    overflow-x: hidden;
     padding: 0 1em;
 `;
 
@@ -194,6 +193,11 @@ export default function ViewContact(props) {
     useEffect(() => {
         //re-GET contacts after update
         if(!isContactPostPending && !isContactPutPending) {
+            if (!isContactPostPending && !contactPostError) {
+               // history.push(`/contacts`)
+            } else if (!isContactPutPending && contactId && !contactPutError) {
+                //history.push(`/contacts/${contactId}`)
+            }
             /**
              * TODO:
              * compare with prev props
@@ -236,14 +240,14 @@ export default function ViewContact(props) {
             valid = false;
             setError({...error, ...{phoneNumber: 'Expected format: ###-###-####'}});
         }
-        if (pendingChanges.dateOfBirth && !pendingChanges.dateOfBirth.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}Z$/g)) {
+        if (!entityIsOrganization && pendingChanges.dateOfBirth && !pendingChanges.dateOfBirth.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}Z$/g)) {
             valid = false;
             setError({...error, ...{dateOfBirth: 'Expect format: YYYY-MM-DD'}});
         }
 
         if (valid) {
             let dob = pendingChanges.dateOfBirth;
-            if (dob) {
+            if (!entityIsOrganization && dob) {
                 dob = new Date(pendingChanges.dateOfBirth).toISOString()
             }
             const entity = pendingChanges.entityIsOrganization ? 'organization' : 'person';

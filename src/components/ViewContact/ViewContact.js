@@ -14,7 +14,6 @@ const ContentWrapper = styled.div`
 
 const ScrollContainer = styled.div`
     margin: 2em 2em 0 2em;
-    overflow-x: hidden;
 `;
 
 const GridWrapper = styled.div`

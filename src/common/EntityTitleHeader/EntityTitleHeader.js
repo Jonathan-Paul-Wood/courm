@@ -27,7 +27,13 @@ const ContentWrapper = styled.div`
     }
     .pageTitle {
         grid-area: title;
+        width: 100%;
+        white-space: nowrap;
         margin: auto auto;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        cursor: default;
+        text-align: center;
     }
     .save-edit {
         grid-area: save-edit;
@@ -52,7 +58,7 @@ export default function EntityTitleHeader(props) {
                 type="secondary"
                 onClick={history.goBack}
             />
-            <h2 className="pageTitle">{title}</h2>
+            <h2 className="pageTitle" title={title}>{title}</h2>
             <RightSideContent className="save-edit">
                 {editMode ? (
                     <Button

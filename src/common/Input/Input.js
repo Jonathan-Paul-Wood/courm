@@ -8,7 +8,6 @@ import "react-datepicker/dist/react-datepicker.css";
 
 const StyleContainer = styled.div`
     width: 100%;
-    overflow: hidden;
 
     .secondary-field {
         width: 100%;
@@ -33,7 +32,9 @@ const StyleContainer = styled.div`
     }
 
     .secondary-field input {
-        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: calc(100% - 32px); //tied to left+right padding
         min-height: 56px;
         position: relative;
         padding: 24px 16px 8px 16px;
@@ -98,7 +99,9 @@ const StyleContainer = styled.div`
     }
 
     .field input {
-        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        width: calc(100% - 32px); //tied to left+right padding
         min-height: 56px;
         position: relative;
         padding: 14px 16px 8px 16px;
@@ -154,7 +157,7 @@ export default function Input(props) {
     const fieldClassName = `${secondary ? 'secondary-field' : 'field'} ${active ? "active" : ''} ${(locked && !active) ? "locked" : ''}`;
 
     return (
-        <StyleContainer className="input-field">
+        <StyleContainer className="input-field" title={value}>
             <div className={fieldClassName} style={{height: `${height}`}}>
                 <input
                     type="text"
