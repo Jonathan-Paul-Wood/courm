@@ -25,6 +25,17 @@ const CardWrapper = styled.div`
         display: flex;
         justify-content: space-around;
     }
+
+    #contact-name {
+        max-width: 50rem;
+        padding: 0 2rem;
+    }
+
+    .limit-content {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
 `;
 
 export default function ContactCard(props) {
@@ -35,7 +46,7 @@ export default function ContactCard(props) {
         <CardWrapper>
             <div id="head-wrapper">
                 <div>img</div>
-                <div>
+                <div id="contact-name" className="limit-content" title={contact.firstName+' '+contact.lastName}>
                     <b>{contact.firstName}</b>, {contact.lastName}
                 </div>
                 <Button
