@@ -39,12 +39,12 @@ function initializeDB() {
             tags TEXT,
             interactions TEXT,
             createdBy TEXT,
-            createdOn TEXT,
+            createdOn TEXT NOT NULL,
             lastModifiedBy TEXT,
             lastModifiedOn TEXT,
             lastInteractionId TEXT,
-            lastInteractionOn TEXT,
-            entityType TEXT        
+            lastInteractionOn TEXT NOT NULL,
+            entityType TEXT NOT NULL
             )`);
       });      
 }
@@ -73,8 +73,8 @@ app.delete("/api/disconnect", (req, res) => {
 });
 
 app.post('/api/contacts/new', (req, res) => {
-    console.log(req.body);
-    const response = db.run(
+    const createdOn = req.body.createdOn;
+    db.run(
         `INSERT INTO contacts(
             firstName,
             lastName,
@@ -113,14 +113,27 @@ app.post('/api/contacts/new', (req, res) => {
             '${req.body.lastInteraction}',
             '${req.body.lastInteraction}',
             '${req.body.entityType}'
-            )`
+            )`, (err, rows) => {
+                if (err) {
+                    res.status = ERROR_CODE;
+                    res.json(err);
+                } else {
+                    res.status = SUCCESS_CODE;
+                    db.run(`SELECT id FROM contacts WHERE createdOn=${createdOn}`, (err, id) => {
+                        if (err) {
+                            res.json({'message': 'could not get new Id'});
+                        } else {
+                            res.json({'newId': id});
+                        }
+                    });
+                }
+            }
         );
-    res.json(response);
 });
 
 //accepts requests of the form: localhost:8080/api/contacts?order=id?results=3&page=1?direction=[ASC|DESC]?search=string
 app.get("/api/contacts", (req, res) => {
-    const { results, page, order, direction, search } = req.query;
+    const { results, page, order, direction, searchTerm } = req.query;
     // const filters = req.body;
     let sql = `SELECT * FROM contacts`;
     //apply clause for each filter
@@ -129,21 +142,19 @@ app.get("/api/contacts", (req, res) => {
     // }
 
     //apply search
-    // if(search) {
-    //     sql = sql+` WHERE (firstName,lastName) GLOB '*${search}*'`;
-
-    //     /*
-    //      sql = sql+` WHERE firstName GLOB '*${search}*'`;
-    //     sql = sql+` OR WHERE lastName GLOB '*${search}*'`;
-    //     sql = sql+` OR WHERE firm GLOB '*${search}*'`;
-    //     sql = sql+` OR WHERE phoneNumber GLOB '*${search}*'`;
-    //     sql = sql+` OR WHERE email GLOB '*${search}*'`;
-    //     sql = sql+` OR WHERE address GLOB '*${search}*'`;
-    //     sql = sql+` OR WHERE industry GLOB '*${search}*'`;
-    //     sql = sql+` OR WHERE tags GLOB '*${search}*'`;
-    //     */
-    //     // use % to match >=0 chars before and after search term
-    // }
+    if(searchTerm) {
+        //sql = sql+` WHERE (firstName,lastName) GLOB '*${searchTerm}*'`;
+        sql = sql+` WHERE firstName LIKE '%${searchTerm}%'`;
+        //sql = sql+` or WHERE lastName LIKE '%${searchTerm}%'`;
+        // sql = sql+` or SELECT FROM contacts WHERE firm LIKE '%${searchTerm}%'`;
+        // sql = sql+` or SELECT FROM contacts WHERE phoneNumber LIKE '%${searchTerm}%'`;
+        // sql = sql+` or SELECT FROM contacts WHERE email LIKE '%${searchTerm}%'`;
+        // sql = sql+` or SELECT FROM contacts WHERE address LIKE '%${searchTerm}%'`;
+        // sql = sql+` or SELECT FROM contacts WHERE industry LIKE '%${searchTerm}%'`;
+        // sql = sql+` or SELECT FROM contacts WHERE tags LIKE '%${searchTerm}%'`;
+        
+        // use % to match >=0 chars before and after search term
+    }
 
     //apply sort order and pagination
     sql = sql+` ORDER BY ${order} ${direction} LIMIT ${results} OFFSET ((${page - 1})* ${results})`;
@@ -179,7 +190,11 @@ app.get("/api/contacts/all", (req, res) => {
 });
 
 app.get("/api/contacts/metadata", (req, res) => {
-    const sql = `SELECT COUNT(*) FROM contacts`;
+    const { searchTerm } = req.query;
+    let sql = `SELECT COUNT(*) FROM contacts`;
+    if (searchTerm) {
+        sql=sql+` WHERE firstName LIKE '%${searchTerm}%'`;
+    }
     db.get(sql, (err, result) => {
         if (err) {
             res.status = ERROR_CODE;
