@@ -23,11 +23,11 @@ function getContactListError(error) {
     }
 }
 
-export function getContactList(results, page, order, direction) { //todo: add search/filter
+export function getContactList(results, page, searchTerm, order, direction) { //todo: add filter
     return async dispatch => {
         dispatch(getContactListLoading());
         try {
-            const response = await ContactListService.getContactList(results, page, order, direction);
+            const response = await ContactListService.getContactList(results, page, searchTerm, order, direction);
             dispatch(getContactListSuccess(response));
         } catch (e) {
             dispatch(getContactListError(e));
@@ -56,11 +56,11 @@ function getContactListMetadataError(error) {
     }
 }
 
-export function getContactListMetadata() {
+export function getContactListMetadata(searchTerm) {
     return async dispatch => {
         dispatch(getContactListMetadataLoading());
         try {
-            const response = await ContactListService.getContactListMetadata();
+            const response = await ContactListService.getContactListMetadata(searchTerm);
             dispatch(getContactListMetadataSuccess(response));
         } catch (e) {
             dispatch(getContactListMetadataError(e));

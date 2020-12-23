@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useHistory } from 'react-router-dom';
+import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Input from '../../common/Input/Input';
 import Button from '../../common/Button/Button';
@@ -127,11 +128,6 @@ const RadioEntry = styled.div`
 
 export default function MainToolbar(props) {
     const history = useHistory();
-    const [searchTerm, setSearchTerm] = useState('');
-
-    function handleNavigation(path) {
-        history.push(`/${path}`);
-    }
 
     const contactSortOptions = [
         {
@@ -183,8 +179,8 @@ export default function MainToolbar(props) {
                 <Input
                     placeholder="Search"
                     label="Search"
-                    value={searchTerm}
-                    onChange={event => setSearchTerm(event.target.value)}
+                    value={props.searchTerm}
+                    onChange={event => props.updateSearchTerm(event.target.value)}
                 />
                 <Tooltip
                     content={
@@ -196,15 +192,15 @@ export default function MainToolbar(props) {
                                 {contactSortOptions.map((option, index) => {
                                     return (
                                         <RadioEntry key={index}>
-                                            <input type="radio" class="hidden" id={index} name="inputs" />
-                                            <label class="entry" for={index}>
-                                                <div class="circle"></div>
-                                                <div class="entry-label">{option.label}</div>
+                                            <input type="radio" className="hidden" id={index} name="inputs" />
+                                            <label className="entry" for={index}>
+                                                <div className="circle"></div>
+                                                <div className="entry-label">{option.label}</div>
                                             </label>
                                         </RadioEntry>
                                     )
                                 })}
-                                <div class="highlight"></div>
+                                <div className="highlight"></div>
                             </RadioList>
                         </PopoverContainer>
                     }
@@ -220,4 +216,10 @@ export default function MainToolbar(props) {
             </ControlContainer>
         </ContentWrapper>
     );
+}
+
+MainToolbar.propTypes = {
+    searchTerm: PropTypes.string.isRequired,
+    updateSearchTerm: PropTypes.func.isRequired,
+    type: PropTypes.string.isRequired,
 }

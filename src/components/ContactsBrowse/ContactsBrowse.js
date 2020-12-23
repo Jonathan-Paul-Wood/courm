@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import CollectionTitleHeader from '../../common/CollectionTitleHeader/CollectionTitleHeader';
-import MainToolbar from '../../common/MainToolbar/MainToolbar';
+import MainToolbar from '../../common/MainToolbar';
 import ContactCard from './ContactCard';
 import Paginate from './Paginate/Paginate';
 import {RESULTS_PER_PAGE} from '../../common/constants/constants';
@@ -21,6 +21,7 @@ const ContentWrapper = styled.div`
     }
     .scroll-container {
         grid-area: "container";
+        min-height: 45vh;
     }
     .paginate {
         grid-area: "paginate";
@@ -50,23 +51,38 @@ export default function ContactsBrowse(props) {
     } = props;
     const [activeFilters, setActiveFilters] = useState({});
     const [page, setPage] = useState(1);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [cardTotal, setCardTotal] = useState(0);
 
-    const {total} = contactsMetadata;
+    useEffect(() => {
+        setCardTotal(contactsMetadata.total);
+    }, [contactsMetadata]);
 
     useEffect(() => {
         getContactList(RESULTS_PER_PAGE);
-        getContactListMetadata(); // call again when filters/search changes
+        getContactListMetadata(); // call again when filters changes
     }, []);
 
     useEffect(() => {
-        getContactList(RESULTS_PER_PAGE, page);
+        getContactList(RESULTS_PER_PAGE, page, searchTerm);
     }, [page]);
+
+    useEffect(() => {
+        //todo: apply delay to search term
+        getContactList(RESULTS_PER_PAGE, 1, searchTerm);
+        getContactListMetadata(searchTerm);
+    }, [searchTerm]);
 
     return (
         <>
             <CollectionTitleHeader title="View Contacts" />
             <ContentWrapper>
-                <MainToolbar type="Contact" className="main-toolbar" />
+                <MainToolbar
+                    type="Contact"
+                    className="main-toolbar"
+                    searchTerm={searchTerm}
+                    updateSearchTerm={setSearchTerm}
+                />
                 <ScrollContainer className="scroll-container">
                     {contacts.length ? (
                         contacts.map(contact => {
@@ -80,10 +96,10 @@ export default function ContactsBrowse(props) {
                     </NoResultsMessage>
                     )}
                 </ScrollContainer>
-                {total > RESULTS_PER_PAGE && (
+                {cardTotal > RESULTS_PER_PAGE && (
                     <Paginate
                         className="paginate"
-                        total={total}
+                        total={cardTotal}
                         page={page}
                         cardsPerPage={RESULTS_PER_PAGE}
                         count={contacts.length}
