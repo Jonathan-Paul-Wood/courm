@@ -94,7 +94,7 @@ export default function ViewContact(props) {
                     <GridWrapper>
                         <div className="imageRow">
                             <img src="" alt="profile image" />
-                            <Button label="Export" />
+                            <Button label="Export" onClick={() => window.open(`http://localhost:8080/api/contacts/${contactId}`, '_blank')}/>
                         </div>
                         <div className="metadataRow">
                             <div id="nameData" className="inputRow rowMargin">

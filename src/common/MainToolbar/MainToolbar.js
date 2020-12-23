@@ -160,6 +160,8 @@ export default function MainToolbar(props) {
         },
     ]
 
+    const exportEndpoint = props.type === 'Contact' ? `http://localhost:8080/api/contacts/all` : `http://localhost:8080/api/interactions/all`;
+
     return (
         <ContentWrapper>
             <ControlContainer>
@@ -170,6 +172,7 @@ export default function MainToolbar(props) {
                 />
                 <Button 
                     label={`Export ${props.type}s`}
+                    onClick={() => window.open(exportEndpoint, '_blank')}
                 />
             </ControlContainer>
             <ControlContainer>
