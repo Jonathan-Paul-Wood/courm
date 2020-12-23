@@ -5,8 +5,8 @@ export default class ContactListService {
         return axios.get(`/contacts/metadata`);
     }
 
-    static getContactList(page, order, direction) {
-        const results = 3; //TODO: make configuratble variable?
+    static getContactList(results, page, order, direction) {
+        results = results || 5;
         page = page || 1;
         order = order || 'firstName';
         direction = direction === 'DESC' ? 'DESC' : 'ASC';

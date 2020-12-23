@@ -29,6 +29,7 @@ export default function Paginate(props) {
     function handlePageUpdate(newPage) {
         if (newPage >= 1 && newPage <= max) {
             updatePage(newPage);
+            window.scrollTo(0, 0);
         }
     }
 

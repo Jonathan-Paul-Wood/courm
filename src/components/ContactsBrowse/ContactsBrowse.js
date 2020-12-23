@@ -10,11 +10,24 @@ import Tooltip from '../../common/Tooltip/Tooltip';
 const ContentWrapper = styled.div`
     margin-top: 4em;
     padding: 0 1em;
+
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: auto auto auto;
+    grid-template-areas: "toolbar" "container" "paginate";
+
+    .main-toolbar {
+        grid-area: "toolbar";
+    }
+    .scroll-container {
+        grid-area: "container";
+    }
+    .paginate {
+        grid-area: "paginate";
+    }
 `;
 
 const ScrollContainer = styled.div`
-    overflow-y: auto;
-    height: 80vh;
     margin: 2em 2em 0 2em;
 `;
 
@@ -41,24 +54,24 @@ export default function ContactsBrowse(props) {
     const {total} = contactsMetadata;
 
     useEffect(() => {
-        getContactList();
+        getContactList(RESULTS_PER_PAGE);
         getContactListMetadata(); // call again when filters/search changes
     }, []);
 
     useEffect(() => {
-        getContactList(page);
+        getContactList(RESULTS_PER_PAGE, page);
     }, [page]);
 
     return (
         <>
             <CollectionTitleHeader title="View Contacts" />
             <ContentWrapper>
-                <MainToolbar type="Contact" />
-                <ScrollContainer>
+                <MainToolbar type="Contact" className="main-toolbar" />
+                <ScrollContainer className="scroll-container">
                     {contacts.length ? (
                         contacts.map(contact => {
                             return (
-                                <ContactCard key={contact.id} name={contact.firstName+' '+contact.lastName} />
+                                <ContactCard key={contact.id} contact={contact} />
                             )
                         })
                     ) : (
@@ -68,7 +81,8 @@ export default function ContactsBrowse(props) {
                     )}
                 </ScrollContainer>
                 {total > RESULTS_PER_PAGE && (
-                    <Paginate 
+                    <Paginate
+                        className="paginate"
                         total={total}
                         page={page}
                         cardsPerPage={RESULTS_PER_PAGE}
