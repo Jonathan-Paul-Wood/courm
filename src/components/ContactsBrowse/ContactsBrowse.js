@@ -6,6 +6,7 @@ import ContactCard from './ContactCard';
 import Paginate from './Paginate/Paginate';
 import {RESULTS_PER_PAGE} from '../../common/constants/constants';
 import Tooltip from '../../common/Tooltip/Tooltip';
+import LoadingSpinner from '../../common/LoadingSpinner/LoadingSpinner';
 
 const ContentWrapper = styled.div`
     margin-top: 4em;
@@ -76,37 +77,42 @@ export default function ContactsBrowse(props) {
     return (
         <>
             <CollectionTitleHeader title="View Contacts" />
-            <ContentWrapper>
-                <MainToolbar
-                    type="Contact"
-                    className="main-toolbar"
-                    searchTerm={searchTerm}
-                    updateSearchTerm={setSearchTerm}
-                />
-                <ScrollContainer className="scroll-container">
-                    {contacts.length ? (
-                        contacts.map(contact => {
-                            return (
-                                <ContactCard key={contact.id} contact={contact} />
-                            )
-                        })
-                    ) : (
-                    <NoResultsMessage className="warningMessage">
-                        Sorry, no results to display{Object.keys(activeFilters).length ? ' for your applied search filters' : ''}
-                    </NoResultsMessage>
-                    )}
-                </ScrollContainer>
-                {cardTotal > RESULTS_PER_PAGE && (
-                    <Paginate
-                        className="paginate"
-                        total={cardTotal}
-                        page={page}
-                        cardsPerPage={RESULTS_PER_PAGE}
-                        count={contacts.length}
-                        updatePage={setPage}
-                    />
-                )}
-            </ContentWrapper>
+            {(isContactListPending || isContactListMetadataPending) ? (
+                <LoadingSpinner type="spinner" />
+                ) : (
+                    <ContentWrapper>
+                        <MainToolbar
+                            type="Contact"
+                            className="main-toolbar"
+                            searchTerm={searchTerm}
+                            updateSearchTerm={setSearchTerm}
+                        />
+                        <ScrollContainer className="scroll-container">
+                            {contacts.length ? (
+                                contacts.map(contact => {
+                                    return (
+                                        <ContactCard key={contact.id} contact={contact} />
+                                    )
+                                })
+                            ) : (
+                            <NoResultsMessage className="warningMessage">
+                                Sorry, no results to display{(Object.keys(activeFilters).length || searchTerm) ? ' for your applied search filters' : ''}
+                            </NoResultsMessage>
+                            )}
+                        </ScrollContainer>
+                        {cardTotal > RESULTS_PER_PAGE && (
+                            <Paginate
+                                className="paginate"
+                                total={cardTotal}
+                                page={page}
+                                cardsPerPage={RESULTS_PER_PAGE}
+                                count={contacts.length}
+                                updatePage={setPage}
+                            />
+                        )}
+                    </ContentWrapper>
+                )
+            }
         </>
     );
 }

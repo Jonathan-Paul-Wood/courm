@@ -14,12 +14,24 @@ const ContentWrapper = styled.div`
     margin: 0 0 1em 0;
 
     border-bottom: solid 1px black;
-    display: flex;
-    justify-content: space-between;
-`;
+    
+    display: grid;
+    grid-template-columns: 10% 80% 10%;
+    grid-template-rows: 100%;
+    grid-template-areas: "header-left" "header-title" "header-right";
 
-const RightSideContent = styled.div`
-    margin-left: 60%;
+    #header-title {
+        text-align: center;
+        margin: auto 2em;
+        grid-area: "header-title";
+    }
+
+    #header-right {
+        margin: auto 0;
+        display: flex;
+        justify-content: right;
+        grid-area: "header-right";
+    }
 `;
 
 export default function CollectionTitleHeader(props) {
@@ -33,8 +45,8 @@ export default function CollectionTitleHeader(props) {
                 type="secondary"
                 onClick={history.goBack}
             />
-            <h2>{props.title}</h2>
-            <RightSideContent>
+            <h2 id="header-title">{props.title}</h2>
+            <div id="header-right">
                 {listMode ? (
                     <div className="switch">
                         <label>
@@ -46,7 +58,7 @@ export default function CollectionTitleHeader(props) {
                 ) : (
                     <button>Edit</button>
                 )}
-            </RightSideContent>
+            </div>
         </ContentWrapper>
     );
 }
