@@ -6,10 +6,11 @@ import Button from '../../common/Button/Button';
 import Input from '../../common/Input/Input';
 import DateInput from '../../common/DateInput/DateInput';
 import TextArea from '../../common/TextArea/TextArea';
+import icons from '../../assets/icons/bootstrapIcons';
 import CommonModal from '../../common/CommonModal/CommonModal';
 
 const ScrollContainer = styled.div`
-    margin: 6em 2em 0 2em;
+    margin: 4em 2em 0 2em;
     padding: 0 1em;
 `;
 
@@ -18,6 +19,12 @@ const GridWrapper = styled.div`
         height: 15vh;
         display: flex;
         justify-content: space-between;
+        
+        #profile-picture {
+            margin: auto 0;
+            max-height: 13vh;
+            width: auto;
+        }
     }
 
     .rowMargin {
@@ -63,6 +70,7 @@ const ToggleSwitch = styled.div`
 width: 30%;
 display: flex;
 justify-content: space-between;
+margin: auto 0;
 
 /* The switch - the box around the slider */
 .switch {
@@ -289,7 +297,9 @@ export default function ViewContact(props) {
             <ScrollContainer>
                 <GridWrapper>
                     <div className="imageRow">
-                        <img src="" alt="profile image" />
+                        <div id="profile-picture">
+                            {contact.profilePicture ? contact.profilePicture : icons['personCard']}
+                        </div>
                         <ToggleSwitch>
                             <span>
                                 {entityIsOrganization 

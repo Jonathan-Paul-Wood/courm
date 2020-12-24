@@ -6,6 +6,7 @@ import Button from '../../common/Button/Button';
 import Input from '../../common/Input/Input';
 import DateInput from '../../common/DateInput/DateInput';
 import TextArea from '../../common/TextArea/TextArea';
+import icons from '../../assets/icons/bootstrapIcons';
 
 const ContentWrapper = styled.div`
     margin-top: 4em;
@@ -21,6 +22,12 @@ const GridWrapper = styled.div`
         height: 15vh;
         display: flex;
         justify-content: space-between;
+        
+        #profile-picture {
+            margin: auto 0;
+            max-height: 13vh;
+            width: auto;
+        }
     }
 
     .rowMargin {
@@ -92,7 +99,9 @@ export default function ViewContact(props) {
                 <ScrollContainer>
                     <GridWrapper>
                         <div className="imageRow">
-                            <img src="" alt="profile image" />
+                            <div id="profile-picture">
+                                {contact.profilePicture ? contact.profilePicture : icons['personCard']}
+                            </div>
                             <Button label="Export" onClick={() => window.open(`http://localhost:8080/api/contacts/${contactId}`, '_blank')}/>
                         </div>
                         <div className="metadataRow">

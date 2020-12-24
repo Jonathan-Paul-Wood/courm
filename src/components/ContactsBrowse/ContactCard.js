@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
 import Button from '../../common/Button/Button';
+import icons from '../../assets/icons/bootstrapIcons';
 
 const CardWrapper = styled.div`
     height: 15vh;
@@ -45,7 +46,9 @@ export default function ContactCard(props) {
     return (
         <CardWrapper>
             <div id="head-wrapper">
-                <div>img</div>
+                <div id="profile-picture">
+                    {contact.profilePicture ? contact.profilePicture : icons['personCard']}
+                </div>
                 <div id="contact-name" className="limit-content" title={contact.firstName+' '+contact.lastName}>
                     <b>{contact.firstName}</b>, {contact.lastName}
                 </div>
