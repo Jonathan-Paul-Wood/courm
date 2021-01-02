@@ -89,3 +89,32 @@ export function putContact(id, body) {
         }
     }
 }
+
+function deleteContactLoading() {
+    return {
+        type: types.DELETE_CONTACT_PENDING,
+    }
+}
+function deleteContactSuccess(payload) {
+    return {
+        type: types.DELETE_CONTACT_SUCCESS,
+        payload,
+    }
+}
+function deleteContactError(error) {
+    return {
+        type: types.DELETE_CONTACT_ERROR,
+        error: new ServiceError('delete contact error ', error)
+    }
+}
+export function deleteContact(id) {
+    return async dispatch => {
+        dispatch(deleteContactLoading());
+        try {
+            const response = await ContactService.deleteContact(id);
+            dispatch(deleteContactSuccess(response));
+        } catch (e) {
+            dispatch(deleteContactError(e));
+        }
+    }
+}

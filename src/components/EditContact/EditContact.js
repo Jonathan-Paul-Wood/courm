@@ -25,6 +25,14 @@ const GridWrapper = styled.div`
             max-height: 13vh;
             width: auto;
         }
+
+        #picture-upload {
+            display: none;
+        }
+
+        img {
+            cursor: pointer;
+        }
     }
 
     .rowMargin {
@@ -150,7 +158,10 @@ export default function ViewContact(props) {
         contactPostError,
         putContact,
         isContactPutPending,
-        contactPutError
+        contactPutError,
+        deleteContact,
+        isContactDeletePending,
+        contactDeleteError
     } = props;
     const defaultChanges = {
         firstName: '',
@@ -164,7 +175,7 @@ export default function ViewContact(props) {
         dateOfBirth: '',
         bio: '',
     }
-    const [entityIsOrganization, setEntityIsOrganization] = useState('person');
+    const [entityIsOrganization, setEntityIsOrganization] = useState(false);
     const [pendingChanges, setPendingChanges] = useState(defaultChanges);
     const [error, setError] = useState({
         firstName: '',
@@ -224,7 +235,7 @@ export default function ViewContact(props) {
     function updateData(field, value) {
         //clear any errors
         let updateError = {};
-        updateError[field] = false;
+        updateError[field] = '';
         setError({...error, ...updateError});
 
         //update the value
@@ -278,7 +289,15 @@ export default function ViewContact(props) {
 
     function handleDeleteConfirm() {
         setShowDeleteModal(false);
-        console.log(`hit DELETE /api/contacts/${contactId}`);
+        deleteContact(contactId);
+    }
+
+    function handleProfileImage() {
+        console.log('image clicked')
+    }
+
+    function handlePictureUpload(data) {
+        console.log(data)
     }
 
     //TODO: handle loading state, 404s and errors
@@ -298,7 +317,8 @@ export default function ViewContact(props) {
                 <GridWrapper>
                     <div className="imageRow">
                         <div id="profile-picture">
-                            {contact.profilePicture ? contact.profilePicture : icons['personCard']}
+                            <input id="picture-upload" type="file" onChange={() => handlePictureUpload(this)} capture />
+                            <img src={contact.profilePicture ? `../../assets/images/contact-${contactId}-picture/` : '../../assets/images/default-profile.png'} alt="profile picture" onClick={() => handleProfileImage()}/>
                         </div>
                         <ToggleSwitch>
                             <span>
@@ -308,7 +328,7 @@ export default function ViewContact(props) {
                             </span>
                             <label className="switch">
                                 <input
-                                    active={entityIsOrganization}
+                                    active={`${entityIsOrganization}`}
                                     type="checkbox"
                                     onClick={() => setEntityIsOrganization(!entityIsOrganization)}
                                     disabled={!isNewContact}
@@ -371,7 +391,7 @@ export default function ViewContact(props) {
                                 />
                                 <DateInput
                                     placeholder="Enter or select YYYY/MM/DD"
-                                    value={(pendingChanges.dateOfBirth && pendingChanges.dateOfBirth !== "null") ? new Date(pendingChanges.dateOfBirth) : ''}
+                                    value={pendingChanges.dateOfBirth}
                                     label="Date of Birth"
                                     locked={false}
                                     error={error.dateOfBirth}
@@ -436,11 +456,11 @@ export default function ViewContact(props) {
             </ScrollContainer>
         
             <CommonModal 
-                show={showDeleteModal}
+                show={showDeleteModal || isContactDeletePending}
                 icon={'trashCan'}
                 title={'Please Confirm Contact Deletion'}
                 onClose={() => setShowDeleteModal(false)}
-                onSubmit={() => {}}
+                onSubmit={() => handleDeleteConfirm()}
                 submitText={'Confirm'}
             >
                 <div>

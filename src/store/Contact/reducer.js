@@ -27,6 +27,8 @@ export const initialState = {
     contactPostError: '',
     isContactPutPending: false,
     contactPutError: '',
+    isContactDeletePending: false,
+    contactDeleteError: '',
 }
 
 export default function contact(state = initialState, action) {
@@ -49,6 +51,12 @@ export default function contact(state = initialState, action) {
             return { ...state, isContactPutPending: false, contactPutError: action.error }
         case types.PUT_CONTACT_SUCCESS:
             return { ...state, isContactPutPending: false, contactPutError: '' }
+            case types.DELETE_CONTACT_PENDING:
+                return { ...state, isContactDeletePending: true, contactDeleteError: '' };
+            case types.DELETE_CONTACT_ERROR:
+                return { ...state, isContactDeletePending: false, contactDeleteError: action.error }
+            case types.DELETE_CONTACT_SUCCESS:
+                return { ...state, isContactDeletePending: false, contactDeleteError: '' }
         default:
             return state;
     }
