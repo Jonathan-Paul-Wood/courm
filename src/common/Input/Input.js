@@ -151,21 +151,28 @@ const StyleContainer = styled.div`
 
 
 export default function Input(props) {
-    const { placeholder, value, onChange, error, label, locked, secondary, height, isDate } = props;
+    const { type, placeholder, value, onChange, error, label, locked, secondary, height, onEnter } = props;
     const [active, setActive] = useState(false);
 
     const fieldClassName = `${secondary ? 'secondary-field' : 'field'} ${active ? "active" : ''} ${(locked && !active) ? "locked" : ''}`;
+
+    function handleKeyPress(target) {
+        if(target.charCode==13){
+            onEnter();  
+        } 
+    }
 
     return (
         <StyleContainer className="input-field" title={value}>
             <div className={fieldClassName} style={{height: `${height}`}}>
                 <input
-                    type="text"
+                    type={type}
                     placeholder={placeholder}
                     value={value}
                     onChange={onChange}
                     onFocus={() => !locked && setActive(true)}
                     onBlur={() => !locked && setActive(false)}
+                    onKeyPress={handleKeyPress}
                 />
                 <label className={error ? "error" : ''}>
                     {error || label}
@@ -176,6 +183,7 @@ export default function Input(props) {
 }
 
 Input.defaultProps = {
+    type: "text",
     placeholder: '',
     value: '',
     error: '',
@@ -184,9 +192,11 @@ Input.defaultProps = {
     height: '56px',
     maxLength: 140,
     onChange: () => {},
+    onEnter: () => {},
 }
 
 Input.propTypes = {
+    type: PropTypes.string,
     placeholder: PropTypes.string,
     value: PropTypes.string,
     label: PropTypes.string.isRequired,
@@ -196,4 +206,5 @@ Input.propTypes = {
     secondary: PropTypes.bool, //if true, will be white/transparent (for colored backgrounds)
     height: PropTypes.string,
     maxLength: PropTypes.number,
+    onEnter: PropTypes.func,
 }

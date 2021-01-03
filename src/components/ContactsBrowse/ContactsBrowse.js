@@ -53,7 +53,10 @@ export default function ContactsBrowse(props) {
     const [activeFilters, setActiveFilters] = useState({});
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
+    const [flipSearchSwitch, setFlipSearchSwitch] = useState(false);
     const [cardTotal, setCardTotal] = useState(0);
+    const [searchOrderBy, setSearchOrderBy] = useState('firstName');
+    const [direction, setDirection] = useState(true); //true if ascending, false if descending
 
     useEffect(() => {
         setCardTotal(contactsMetadata.total);
@@ -70,9 +73,13 @@ export default function ContactsBrowse(props) {
 
     useEffect(() => {
         //todo: apply delay to search term
-        getContactList(RESULTS_PER_PAGE, 1, searchTerm);
+        getContactList(RESULTS_PER_PAGE, 1, searchTerm, searchOrderBy);
         getContactListMetadata(searchTerm);
-    }, [searchTerm]);
+    }, [flipSearchSwitch, searchOrderBy, direction]);
+
+    function handleSearchEntry() {
+        setFlipSearchSwitch(!flipSearchSwitch);
+    }
 
     return (
         <>
@@ -86,6 +93,11 @@ export default function ContactsBrowse(props) {
                             className="main-toolbar"
                             searchTerm={searchTerm}
                             updateSearchTerm={setSearchTerm}
+                            handleSearchEntry={handleSearchEntry}
+                            currentOrder={searchOrderBy}
+                            handleOrderUpdate={setSearchOrderBy}
+                            currentDirection={direction}
+                            handleDirectionUpdate={setDirection}
                         />
                         <ScrollContainer className="scroll-container">
                             {contacts.length ? (

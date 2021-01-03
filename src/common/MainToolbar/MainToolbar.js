@@ -42,6 +42,28 @@ const PopoverContainer = styled.div`
         justify-content: right;
     }
 
+    #order-direction {
+        margin: 0 2.5%;
+        justify-content: left;
+    }
+
+    .activeDirection {
+        cursor: default;
+        color: #4da6ff;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        padding: 0 0.5rem;
+    }
+    .inactiveDirection {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        padding: 0 0.5rem;
+    }
+    .inactiveDirection:hover {
+        cursor: pointer;
+        background-color: #f2f2f2;
+    }
+
 `;
 
 const RadioList = styled.div`
@@ -177,10 +199,12 @@ export default function MainToolbar(props) {
                     type="secondary"
                 />
                 <Input
+                    type='search'
                     placeholder="Search"
                     label="Search"
                     value={props.searchTerm}
                     onChange={event => props.updateSearchTerm(event.target.value)}
+                    onEnter={() => props.handleSearchEntry()}
                 />
                 <Tooltip
                     content={
@@ -188,11 +212,20 @@ export default function MainToolbar(props) {
                             <div id="popover-header" label="Select Sort Field & Direction">
                                 Select Sort Field & Direction
                             </div>
+                            <div id="order-direction">
+                                <span title="Ascending" className={props.currentDirection ? 'activeDirection' : 'inactiveDirection'}>
+                                    Ascending
+                                </span>
+                                 or 
+                                <span title="Descending" className={!props.currentDirection ? 'activeDirection' : 'inactiveDirection'}>
+                                    Descending
+                                </span>
+                            </div>
                             <RadioList>
                                 {contactSortOptions.map((option, index) => {
                                     return (
                                         <RadioEntry key={index}>
-                                            <input type="radio" className="hidden" id={index} name="inputs" />
+                                            <input checked={option.value === props.currentOrder} type="radio" className="hidden" id={index} name="inputs" onClick={event => props.handleOrderUpdate(contactSortOptions[event.target.id].value)} />
                                             <label className="entry" for={index}>
                                                 <div className="circle"></div>
                                                 <div className="entry-label">{option.label}</div>
@@ -221,5 +254,10 @@ export default function MainToolbar(props) {
 MainToolbar.propTypes = {
     searchTerm: PropTypes.string.isRequired,
     updateSearchTerm: PropTypes.func.isRequired,
+    handleSearchEntry: PropTypes.func.isRequired,
     type: PropTypes.string.isRequired,
+    currentOrder: PropTypes.string.isRequired,
+    handleOrderUpdate: PropTypes.func.isRequired,
+    currentDirection: PropTypes.bool.isRequired,
+    handleDirectionUpdate: PropTypes.func.isRequired,
 }
