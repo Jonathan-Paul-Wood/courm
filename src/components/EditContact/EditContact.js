@@ -190,6 +190,7 @@ export default function ViewContact(props) {
     });
     const history = useHistory();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [pageLoaded, setPageLoaded] = useState(false);
 
     useEffect(() => {
         //initial GET of contact
@@ -209,28 +210,25 @@ export default function ViewContact(props) {
         setEntityIsOrganization(contact.entityType);
     }, [contact]);
 
+    //only after the page is first loaded, a post/put/delete changing from pending to success requires a redirect
     useEffect(() => {
-        //re-GET contacts after update
-        if(!isContactPostPending && !isContactPutPending) {
-            if (!isContactPostPending && !contactPostError) {
-               // history.push(`/contacts`)
-            } else if (!isContactPutPending && contactId && !contactPutError) {
-                //history.push(`/contacts/${contactId}`)
-            }
-            /**
-             * TODO:
-             * compare with prev props
-             * if a PUT or POST has completed (true -> false)
-             *      push history to /contacts/id
-             *      POST will need to be modified to return contactId in response
-             *          maybe a checkmark next to save that renders on /new and asks 'Create Another?' , reset new on Save if checked
-             */
+        if(!isContactPending && contact) {
+            setPageLoaded(true);
         }
-    }, [isContactPutPending, isContactPostPending])
-
-    function handleNavigation(path) {
-        history.push(`/${path}`);
-    }
+    }, [isContactPending]);
+    useEffect(() => {
+        setPendingChanges(defaultChanges);
+    }, [isContactPostPending]);
+    useEffect(() => {
+        if(pageLoaded && !isContactPutPending) {
+            history.push(`/contacts/${contactId}`);
+        }
+    }, [isContactPutPending]);
+    useEffect(() => {
+        if(pageLoaded && !isContactDeletePending) {
+            history.push(`/contacts`);
+        }
+    }, [isContactDeletePending]);
 
     function updateData(field, value) {
         //clear any errors
