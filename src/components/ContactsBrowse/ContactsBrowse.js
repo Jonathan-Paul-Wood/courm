@@ -56,7 +56,7 @@ export default function ContactsBrowse(props) {
     const [flipSearchSwitch, setFlipSearchSwitch] = useState(false);
     const [cardTotal, setCardTotal] = useState(0);
     const [searchOrderBy, setSearchOrderBy] = useState('firstName');
-    const [direction, setDirection] = useState(true); //true if ascending, false if descending
+    const [direction, setDirection] = useState("ASC"); //ASC if ascending, DESC if descending
 
     useEffect(() => {
         setCardTotal(contactsMetadata.total);
@@ -73,7 +73,7 @@ export default function ContactsBrowse(props) {
 
     useEffect(() => {
         //todo: apply delay to search term
-        getContactList(RESULTS_PER_PAGE, 1, searchTerm, searchOrderBy);
+        getContactList(RESULTS_PER_PAGE, 1, searchTerm, searchOrderBy, direction);
         getContactListMetadata(searchTerm);
     }, [flipSearchSwitch, searchOrderBy, direction]);
 

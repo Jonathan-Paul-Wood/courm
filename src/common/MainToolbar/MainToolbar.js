@@ -24,7 +24,7 @@ const PopoverContainer = styled.div`
     background-color: #ffffff;
     width: 20vw;
     min-width: 275px;
-    height: 30vh;
+    max-height: 40vh;
     min-height: 150px;
     border: solid black 1px;
     border-radius: 4px;
@@ -43,18 +43,27 @@ const PopoverContainer = styled.div`
     }
 
     #order-direction {
-        margin: 0 2.5%;
-        justify-content: left;
+        margin: 0.5em 2.5%;
+        display: flex;
+        justify-content: space-around;
+        border: 0.1em solid #e2e2e2;
+        border-radius: 5px;
     }
 
     .activeDirection {
+        width: 100%;
+        text-align: center;
         cursor: default;
-        color: #4da6ff;
+        color: white;
+        background-color: #4da6ff;
+        border-radius: 5px;
         white-space: nowrap;
         text-overflow: ellipsis;
         padding: 0 0.5rem;
     }
     .inactiveDirection {
+        width: 100%;
+        text-align: center;
         white-space: nowrap;
         text-overflow: ellipsis;
         padding: 0 0.5rem;
@@ -88,7 +97,8 @@ const RadioEntry = styled.div`
     display: block;
     width: 100%;
     height: 1em;
-    margin: 0.25em 0 0.75em 0;
+    line-height: 1em;
+    margin: 0.25em 0 0.75em 1em;
     position: relative;
     
     .entry {
@@ -96,53 +106,17 @@ const RadioEntry = styled.div`
         position: absolute;
         width: 100%;
     }
-    .entry:nth-child(2) {
-        left: 8px;
-        top: 8px;
-    }
-    .entry:nth-child(4) {
-        left: 8px;
-        top: 58px;
-    }
-    .entry:nth-child(6) {
-        left: 8px;
-        top: 108px;
-    }
-    .circle {
-        border: 2px solid #545556;
-        border-radius: 50%;
-        cursor: pointer;
-        height: 1.1em;
-        position: absolute;
-        transition: border-color 300ms;
-        width: 1.1em;
-    }
     .entry-label {
         cursor: pointer;
-        padding-left: 2em;
+        padding-left: 0.5em;
         user-select: none;
         -moz-user-select: none;
     }
-    .hidden {
-        display: none;
-    }
-    .hidden:nth-child(1):checked ~ .highlight {
-        transform: translateY(0);
-    }
-    .hidden:nth-child(3):checked ~ .highlight {
-        transform: translateY(50px);
-    }
-    .hidden:nth-child(5):checked ~ .highlight {
-        transform: translateY(100px);
-    }
-    .hidden:nth-child(1):checked + .entry .circle {
+    input:checked {
         border-color: #4D98EF;
     }
-    .hidden:nth-child(3):checked + .entry .circle {
-        border-color: #4D98EF;
-    }
-    .hidden:nth-child(5):checked + .entry .circle {
-        border-color: #4D98EF;
+    input:hover {
+        cursor: pointer;
     }
 `;
 
@@ -210,12 +184,11 @@ export default function MainToolbar(props) {
                             <div id="popover-header" label="Select Sort Field & Direction">
                                 Select Sort Field & Direction
                             </div>
-                            <div id="order-direction">
-                                <span title="Ascending" className={props.currentDirection ? 'activeDirection' : 'inactiveDirection'}>
+                            <div id="order-direction" onClick={event => props.handleDirectionUpdate(event.target.attributes.value.value)}>
+                                <span value="ASC" title="Ascending" className={props.currentDirection === 'ASC' ? 'activeDirection' : 'inactiveDirection'}>
                                     Ascending
                                 </span>
-                                 or 
-                                <span title="Descending" className={!props.currentDirection ? 'activeDirection' : 'inactiveDirection'}>
+                                <span value="DESC" title="Descending" className={props.currentDirection === 'DESC' ? 'activeDirection' : 'inactiveDirection'}>
                                     Descending
                                 </span>
                             </div>
@@ -223,15 +196,13 @@ export default function MainToolbar(props) {
                                 {contactSortOptions.map((option, index) => {
                                     return (
                                         <RadioEntry key={index}>
-                                            <input checked={option.value === props.currentOrder} type="radio" className="hidden" id={index} name="inputs" onClick={event => props.handleOrderUpdate(contactSortOptions[event.target.id].value)} />
+                                            <input readonly checked={option.value === props.currentOrder} type="radio" id={index} name="inputs" onClick={event => props.handleOrderUpdate(contactSortOptions[event.target.id].value)} />
                                             <label className="entry" for={index}>
-                                                <div className="circle"></div>
                                                 <div className="entry-label">{option.label}</div>
                                             </label>
                                         </RadioEntry>
                                     )
                                 })}
-                                <div className="highlight" style={{'transform': `translateY(${contactSortOptions.map(option => option.value).indexOf(props.currentOrder) * 3}em);`}}></div>
                             </RadioList>
                         </PopoverContainer>
                     }
@@ -256,6 +227,6 @@ MainToolbar.propTypes = {
     type: PropTypes.string.isRequired,
     currentOrder: PropTypes.string.isRequired,
     handleOrderUpdate: PropTypes.func.isRequired,
-    currentDirection: PropTypes.bool.isRequired,
+    currentDirection: PropTypes.string.isRequired,
     handleDirectionUpdate: PropTypes.func.isRequired,
 }
