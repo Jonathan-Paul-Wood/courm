@@ -50,7 +50,7 @@ export default function ContactCard(props) {
                     {contact.profilePicture ? contact.profilePicture : icons['personCard']}
                 </div>
                 <div id="contact-name" className="limit-content" title={contact.firstName+' '+contact.lastName}>
-                    <b>{contact.firstName}</b>, {contact.lastName}
+                    <b>{contact.firstName}</b> {contact.lastName}
                 </div>
                 <Button
                     label="View"

@@ -84,47 +84,46 @@ export default function ContactsBrowse(props) {
     return (
         <>
             <CollectionTitleHeader title="View Contacts" />
-            {(isContactListPending || isContactListMetadataPending) ? (
-                <LoadingSpinner type="spinner" />
+            <ContentWrapper>
+                <MainToolbar
+                    type="Contact"
+                    className="main-toolbar"
+                    searchTerm={searchTerm}
+                    updateSearchTerm={setSearchTerm}
+                    handleSearchEntry={handleSearchEntry}
+                    currentOrder={searchOrderBy}
+                    handleOrderUpdate={setSearchOrderBy}
+                    currentDirection={direction}
+                    handleDirectionUpdate={setDirection}
+                />
+                <ScrollContainer className="scroll-container">
+                {(isContactListPending || isContactListMetadataPending) ? (
+                    <LoadingSpinner type="spinner" />
                 ) : (
-                    <ContentWrapper>
-                        <MainToolbar
-                            type="Contact"
-                            className="main-toolbar"
-                            searchTerm={searchTerm}
-                            updateSearchTerm={setSearchTerm}
-                            handleSearchEntry={handleSearchEntry}
-                            currentOrder={searchOrderBy}
-                            handleOrderUpdate={setSearchOrderBy}
-                            currentDirection={direction}
-                            handleDirectionUpdate={setDirection}
-                        />
-                        <ScrollContainer className="scroll-container">
-                            {contacts.length ? (
-                                contacts.map(contact => {
-                                    return (
-                                        <ContactCard key={contact.id} contact={contact} />
-                                    )
-                                })
-                            ) : (
-                            <NoResultsMessage className="warningMessage">
-                                Sorry, no results to display{(Object.keys(activeFilters).length || searchTerm) ? ' for your applied search filters' : ''}
-                            </NoResultsMessage>
-                            )}
-                        </ScrollContainer>
-                        {cardTotal > RESULTS_PER_PAGE && (
-                            <Paginate
-                                className="paginate"
-                                total={cardTotal}
-                                page={page}
-                                cardsPerPage={RESULTS_PER_PAGE}
-                                count={contacts.length}
-                                updatePage={setPage}
-                            />
-                        )}
-                    </ContentWrapper>
-                )
-            }
+                    contacts.length ? (
+                        contacts.map(contact => {
+                            return (
+                                <ContactCard key={contact.id} contact={contact} />
+                            )
+                        })
+                    ) : (
+                    <NoResultsMessage className="warningMessage">
+                        Sorry, no results to display{(Object.keys(activeFilters).length || searchTerm) ? ' for your applied search filters' : ''}
+                    </NoResultsMessage>
+                    )
+                )}
+                </ScrollContainer>
+                {cardTotal > RESULTS_PER_PAGE && (
+                    <Paginate
+                        className="paginate"
+                        total={cardTotal}
+                        page={page}
+                        cardsPerPage={RESULTS_PER_PAGE}
+                        count={contacts.length}
+                        updatePage={setPage}
+                    />
+                )}
+            </ContentWrapper>
         </>
     );
 }

@@ -80,7 +80,6 @@ const RadioList = styled.div`
         position: absolute;
         top: 14px;
         transition: transform 400ms cubic-bezier(0.175, 0.885, 0.32, 1.2);
-        transform: translateY(-50px);
         width: 12px;
     }
 `;
@@ -199,7 +198,6 @@ export default function MainToolbar(props) {
                     type="secondary"
                 />
                 <Input
-                    type='search'
                     placeholder="Search"
                     label="Search"
                     value={props.searchTerm}
@@ -233,7 +231,7 @@ export default function MainToolbar(props) {
                                         </RadioEntry>
                                     )
                                 })}
-                                <div className="highlight"></div>
+                                <div className="highlight" style={{'transform': `translateY(${contactSortOptions.map(option => option.value).indexOf(props.currentOrder) * 3}em);`}}></div>
                             </RadioList>
                         </PopoverContainer>
                     }

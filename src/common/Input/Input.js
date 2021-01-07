@@ -151,7 +151,7 @@ const StyleContainer = styled.div`
 
 
 export default function Input(props) {
-    const { type, placeholder, value, onChange, error, label, locked, secondary, height, onEnter } = props;
+    const { placeholder, value, onChange, error, label, locked, secondary, height, onEnter } = props;
     const [active, setActive] = useState(false);
 
     const fieldClassName = `${secondary ? 'secondary-field' : 'field'} ${active ? "active" : ''} ${(locked && !active) ? "locked" : ''}`;
@@ -166,7 +166,7 @@ export default function Input(props) {
         <StyleContainer className="input-field" title={value}>
             <div className={fieldClassName} style={{height: `${height}`}}>
                 <input
-                    type={type}
+                    type="text"
                     placeholder={placeholder}
                     value={value}
                     onChange={onChange}
@@ -183,7 +183,6 @@ export default function Input(props) {
 }
 
 Input.defaultProps = {
-    type: "text",
     placeholder: '',
     value: '',
     error: '',
