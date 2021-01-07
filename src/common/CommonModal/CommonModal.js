@@ -9,11 +9,20 @@ const IconContainer = styled.span`
     margin-right: 0.5rem;
 `;
 
+const ModalContainer = styled(Modal)`
+    .close {
+        margin-top: 1rem;
+    }
+    Button {
+        margin: 0 0.5rem;
+    }
+`;
+
 export default function CommonModal(props) {
   const { icon, title, onClose, onSubmit, isSubmitVisible, isCancelVisible, isCloseVisible, submitText, children, show } = props;
 
   return (
-      <Modal.Dialog show={show} onHide={onClose} centered scrollable>
+      <ModalContainer show={show} onHide={onClose} centered scrollable>
         <Modal.Header closeButton={isCloseVisible}>
           <Modal.Title>
               <IconContainer>
@@ -33,7 +42,7 @@ export default function CommonModal(props) {
                 }
             </Modal.Footer>
         )}
-      </Modal.Dialog>
+      </ModalContainer>
   );
 }
 

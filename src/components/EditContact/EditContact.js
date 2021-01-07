@@ -454,7 +454,7 @@ export default function ViewContact(props) {
             </ScrollContainer>
         
             <CommonModal 
-                show={showDeleteModal || isContactDeletePending}
+                show={isContactDeletePending || showDeleteModal}
                 icon={'trashCan'}
                 title={'Please Confirm Contact Deletion'}
                 onClose={() => setShowDeleteModal(false)}

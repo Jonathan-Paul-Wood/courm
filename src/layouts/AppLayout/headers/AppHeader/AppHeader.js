@@ -6,7 +6,7 @@ const HeaderWrapper = styled.div`
     position: fixed;
     top: 0;
     width: 100%;
-    height: 3em;
+    height: 4em;
     display: flex;
     background-color: black;
     margin: auto 0rem;
