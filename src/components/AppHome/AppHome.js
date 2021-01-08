@@ -4,6 +4,13 @@ import styled from 'styled-components';
 
 const HomeWrapper = styled.div`
     padding: 0 1em;
+
+    .action-list {
+        li:hover {
+            cursor: pointer;
+            background-color: #f2f2f2;
+        }
+    }
 `;
 
 export default function AppHome() {
@@ -25,11 +32,11 @@ export default function AppHome() {
             <h2>Welcome</h2>
             <h4>Use this personal CRM / Address Book to keep track of your contacts!</h4>
             <h2>Actions</h2>
-            <ul>
-                <li><a onClick={() => history.push('/contacts/new')}>Create Contact</a></li>
-                <li><a onClick={() => history.push('/interactions/new')}>Record Interaction</a></li>
-                <li><a onClick={() => history.push('/contacts')}>View & Search Contacts</a></li>
-                <li><a onClick={() => history.push('/interactions')}>View & Search Interactions</a></li>
+            <ul className="action-list">
+                <li onClick={() => history.push('/contacts/new')}>Create Contact</li>
+                <li onClick={() => history.push('/interactions/new')}>Record Interaction</li>
+                <li onClick={() => history.push('/contacts')}>View & Search Contacts</li>
+                <li onClick={() => history.push('/interactions')}>View & Search Interactions</li>
             </ul>
         </HomeWrapper>
     );
