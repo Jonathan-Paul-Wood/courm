@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import Input from '../../common/Input/Input';
 import Button from '../../common/Button/Button';
 import Tooltip from '../Tooltip/Tooltip';
+import { exportJSON } from '../../common/Utilities/utilities';
 
 const ContentWrapper = styled.div`
 
@@ -151,7 +152,10 @@ export default function MainToolbar(props) {
         },
     ]
 
-    const exportEndpoint = props.type === 'Contact' ? `http://localhost:8080/api/contacts/all` : `http://localhost:8080/api/interactions/all`;
+    function exportList() {
+        const list = props.type === 'Contact' ? props.contactList : 'interactionList';
+        exportJSON(list, `contactList`);
+    }
 
     return (
         <ContentWrapper>
@@ -163,7 +167,7 @@ export default function MainToolbar(props) {
                 />
                 <Button 
                     label={`Export ${props.type}s`}
-                    onClick={() => window.open(exportEndpoint, '_blank')}
+                    onClick={exportList}
                 />
             </ControlContainer>
             <ControlContainer>
@@ -172,7 +176,7 @@ export default function MainToolbar(props) {
                     type="secondary"
                 />
                 <Input
-                    placeholder="Search"
+                    placeholder="Search (3 character minimum)"
                     label="Search"
                     value={props.searchTerm}
                     onChange={event => props.updateSearchTerm(event.target.value)}
@@ -182,7 +186,7 @@ export default function MainToolbar(props) {
                     content={
                         <PopoverContainer>
                             <div id="popover-header" label="Select Sort Field & Direction">
-                                Select Sort Field & Direction
+                                Sort Field & Direction
                             </div>
                             <div id="order-direction" onClick={event => props.handleDirectionUpdate(event.target.attributes.value.value)}>
                                 <span value="ASC" title="Ascending" className={props.currentDirection === 'ASC' ? 'activeDirection' : 'inactiveDirection'}>
@@ -229,4 +233,6 @@ MainToolbar.propTypes = {
     handleOrderUpdate: PropTypes.func.isRequired,
     currentDirection: PropTypes.string.isRequired,
     handleDirectionUpdate: PropTypes.func.isRequired,
+    contactList: PropTypes.object.isRequired,
+    //interactionList: PropTypes.object.isRequired,
 }
