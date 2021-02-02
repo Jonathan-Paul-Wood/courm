@@ -2,12 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Switch, Redirect, useParams, useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 
-import { PropTypes } from 'prop-types';
+// import { PropTypes } from 'prop-types';
 import AppLayout from '../../../layouts/AppLayout/AppLayout';
 import AppHome from '../../../components/AppHome/AppHome';
 import ContactsBrowse from '../../../components/ContactsBrowse';
 import ViewContact from '../../../components/ViewContact';
 import EditContact from '../../../components/EditContact';
+import AppConfigure from '../../../components/AppConfigure';
 
 const LoadingContainer = styled.div`
     position: absolute;
@@ -42,6 +43,7 @@ export default function AppRouter(props) {
                 <AppLayout path="/contacts/new" exact component={EditContact} {...commonRouteProps} />
                 <AppLayout path="/contacts/:contactId/edit" component={EditContact} {...commonRouteProps} />
                 <AppLayout path="/contacts/:contactId" component={ViewContact} {...commonRouteProps} />
+                <AppLayout path="/configure" component={AppConfigure} {...commonRouteProps} />
                 {/* <AppLayout path="/interactions/:interactionsId" component={Interaction} />
                 <AppLayout path="/interactions" component={InteractionsBrowse} /> */}
             </Switch>
@@ -54,6 +56,6 @@ export default function AppRouter(props) {
     // )
 }
 
-AppRouter.propTypes = {
-    appData: PropTypes.object.isRequired,
-}
+// AppRouter.propTypes = {
+//     appData: PropTypes.object.isRequired,
+// }

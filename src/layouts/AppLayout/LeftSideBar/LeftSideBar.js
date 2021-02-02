@@ -35,6 +35,11 @@ export default function LeftSidebar() {
             title: 'Contacts',
             path: '/contacts',
         },
+        {
+            icon: 'tools',
+            title: 'Configure',
+            path: '/configure',
+        }
     ];
 
     return (
