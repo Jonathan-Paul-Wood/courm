@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory, useLocation, useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import EntityTitleHeader from '../../common/EntityTitleHeader/EntityTitleHeader';
-import Button from '../../common/Button/Button';
+import Button from '../../common/Button';
 import Input from '../../common/Input/Input';
 import DateInput from '../../common/DateInput/DateInput';
 import TextArea from '../../common/TextArea/TextArea';
@@ -72,26 +72,21 @@ export default function ViewContact(props) {
     } = props;
     const [entityType, setEntityType] = useState('');
     const [firstLoad, setFirstLoad] = useState(true);
-    const history = useHistory();
 
     useEffect(() => {
         //initial GET of contact
         if(contactId) {
             getContact(contactId);
         }
-    }, []);
+    }, [contactId]);
 
     useEffect(() => {
         setFirstLoad(false);
         setEntityType(contact.entityType);
     }, [contact]);
 
-    function handleNavigation(path) {
-        history.push(`/${path}`);
-    }
-
     function exportContact() {
-        exportJSON(contact, `contact-${contactId}`);
+        exportJSON([contact], `contact-${contactId}`);
     }
 
     //TODO: handle loading state, 404s and errors
@@ -186,12 +181,12 @@ export default function ViewContact(props) {
                             <div className="tagsRow">
 
                             </div>
-                            <div className="InteractionsRow">
+                            {/* <div className="InteractionsRow">
                                 <h3>Recent Interactions (<Button label="view all" type="link" />)</h3>
                                 <div>
                                     cards go here, or none available message...
                                 </div>
-                            </div>
+                            </div> */}
                         </GridWrapper>
                     </ScrollContainer>
                 )}

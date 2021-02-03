@@ -6,6 +6,7 @@ export default class ContactListService {
     }
 
     static getContactList(results, page, searchTerm, order, direction) {
+        //to GET all contacts, pass results = number of total contacts, and page = 1
         results = results || 5;
         page = page || 1;
         order = order || 'firstName';

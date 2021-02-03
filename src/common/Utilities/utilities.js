@@ -8,7 +8,13 @@ export function downloadContent(content, fileName, contentType) {
 //example: downloadContent(jsonData, 'json.txt', 'text/plain');
 
 export function exportJSON(json, name) {
-    const content = JSON.stringify(json);
     const time = new Date();
+    const data = {
+        version: 'beta',
+        total: json.length,
+        timestamp: time.toISOString(),
+        data: json,
+    }
+    const content = JSON.stringify(data);
     downloadContent(content, `${name}_${time.toISOString().replace(/\:/g, '-')}.json`, 'text/json')
 }

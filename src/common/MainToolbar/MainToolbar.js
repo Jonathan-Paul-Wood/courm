@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Input from '../../common/Input/Input';
-import Button from '../../common/Button/Button';
+import Button from '../../common/Button';
 import Tooltip from '../Tooltip/Tooltip';
 import { exportJSON } from '../../common/Utilities/utilities';
 
@@ -166,7 +166,7 @@ export default function MainToolbar(props) {
                     onClick={() => history.push('/contacts/new')}
                 />
                 <Button 
-                    label={`Export ${props.type}s`}
+                    label={`Export Page Results`}
                     onClick={exportList}
                 />
             </ControlContainer>
@@ -174,6 +174,7 @@ export default function MainToolbar(props) {
                 <Button 
                     label="Filter"
                     type="secondary"
+                    onClick={() => {}}
                 />
                 <Input
                     placeholder="Search (3 character minimum)"
@@ -217,6 +218,7 @@ export default function MainToolbar(props) {
                     <Button 
                         label={`Sort`}
                         type="secondary"
+                        onClick={() => {}}
                     />
                 </Tooltip>
             </ControlContainer>
