@@ -146,7 +146,7 @@ const StyleContainer = styled.div`
         width: 100%;
     }
 
-    input + label.error {
+    .error {
         color: red;
     }
 `;

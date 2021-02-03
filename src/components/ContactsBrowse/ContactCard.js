@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
-import Button from '../../common/Button/Button';
+import Button from '../../common/Button';
 import icons from '../../assets/icons/bootstrapIcons';
 
 const CardWrapper = styled.div`

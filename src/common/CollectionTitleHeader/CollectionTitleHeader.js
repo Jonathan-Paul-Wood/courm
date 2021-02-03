@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
-import Button from '../Button/Button';
+import Button from '../Button';
 
 const ContentWrapper = styled.div`
     position: fixed;
@@ -36,7 +36,7 @@ const ContentWrapper = styled.div`
 
 export default function CollectionTitleHeader(props) {
     const history = useHistory();
-    const [listMode, setListMode] = useState(true);
+    // const [listMode, setListMode] = useState(true);
 
     return (
         <ContentWrapper>
@@ -47,7 +47,7 @@ export default function CollectionTitleHeader(props) {
             />
             <h2 id="header-title">{props.title}</h2>
             <div id="header-right">
-                {listMode ? (
+                {/* {listMode ? (
                     <div className="switch">
                         <label>
                         List
@@ -57,7 +57,7 @@ export default function CollectionTitleHeader(props) {
                     </div>
                 ) : (
                     <button>Edit</button>
-                )}
+                )} */}
             </div>
         </ContentWrapper>
     );

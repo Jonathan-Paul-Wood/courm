@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import icons from '../../assets/icons/bootstrapIcons';
 import Modal from 'react-bootstrap/Modal';
-import Button from '../Button/Button';
+import Button from '../Button';
 
 const IconContainer = styled.span`
     margin-right: 0.5rem;

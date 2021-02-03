@@ -5,7 +5,6 @@ import MainToolbar from '../../common/MainToolbar';
 import ContactCard from './ContactCard';
 import Paginate from './Paginate/Paginate';
 import {RESULTS_PER_PAGE} from '../../common/constants/constants';
-import Tooltip from '../../common/Tooltip/Tooltip';
 import LoadingSpinner from '../../common/LoadingSpinner/LoadingSpinner';
 
 const ContentWrapper = styled.div`

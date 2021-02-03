@@ -34,9 +34,9 @@ export default function AppHome() {
             <h2>Actions</h2>
             <ul className="action-list">
                 <li onClick={() => history.push('/contacts/new')}>Create Contact</li>
-                <li onClick={() => history.push('/interactions/new')}>Record Interaction</li>
+                {/* <li onClick={() => history.push('/interactions/new')}>Record Interaction</li> */}
                 <li onClick={() => history.push('/contacts')}>View & Search Contacts</li>
-                <li onClick={() => history.push('/interactions')}>View & Search Interactions</li>
+                {/* <li onClick={() => history.push('/interactions')}>View & Search Interactions</li> */}
             </ul>
         </HomeWrapper>
     );
