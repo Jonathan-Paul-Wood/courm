@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Button from '../../common/Button';
@@ -10,7 +10,6 @@ const ConfigureWrapper = styled.div`
 `;
 
 export default function AppConfigure(props) {
-
     const {
         getContactListMetadata,
         getContactList,
@@ -28,6 +27,8 @@ export default function AppConfigure(props) {
         contactDeleteError,
     } = props;
 
+    const [pendingUpload, setPendingUpload] = useState(null);
+
     useEffect(() => {
         getContactListMetadata('');
     }, []);
@@ -38,6 +39,31 @@ export default function AppConfigure(props) {
 
     function handleContactListExport() {
         exportJSON(contacts, `contactList`);
+    }
+
+    function captureUpload(event) {
+        let reader = new FileReader();
+        reader.readAsText(event.target.files[0]);
+        setPendingUpload(reader);
+    }
+
+    function handleAddContacts() {
+        const uploadedJSON = JSON.parse(pendingUpload.result);
+        console.log(uploadedJSON);
+        uploadedJSON.data.forEach(contact => {
+            console.log(contact);
+            let newContact = {
+                ...contact,
+                lastModifiedOn: new Date().toISOString(),
+            }
+            delete newContact['id'];
+            postContact(newContact);
+        });
+    }
+
+    function handleRestoreContacts() {
+        contacts.forEach(contact => deleteContact(contact.id));
+        handleAddContacts();
     }
 
     return (
@@ -58,11 +84,11 @@ export default function AppConfigure(props) {
                         <div className="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                             <h4>Import</h4>
                             <p>Upload your saved JSON files, then restore or add the contacts.</p>
-                            <input type="file" name="contactFile" id="contactFile" accept="application/json" />
+                            <input type="file" name="contactFile" id="contactFile" accept="application/json" onChange={e => captureUpload(e)} />
                             <p>Adding contacts will create new records. This does not check for duplicates of existing contacts.</p>
-                            <Button label="Add Contacts" type="secondary" onClick={() => {}} />
+                            <Button label="Add Contacts" type="secondary" onClick={handleAddContacts} />
                             <p>Restoring contacts will remove all existing contacts and replace them with those in the uploaded file.</p>
-                            <Button label="Restore Contacts" type="secondary" onClick={() => {}} />
+                            <Button label="Restore Contacts" type="secondary" onClick={handleRestoreContacts} />
                         </div>
                     </div>
                 </>
