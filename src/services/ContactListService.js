@@ -10,6 +10,8 @@ export default class ContactListService {
         results = results || 5;
         page = page || 1;
         order = order || 'firstName';
+        direction = direction || 'ASC';
+        searchTerm = searchTerm || '';
         return axios.get(`/contacts?results=${results}&page=${page}&order=${order}&direction=${direction}&searchTerm=${searchTerm}`);
     }
 }

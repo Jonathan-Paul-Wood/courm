@@ -52,7 +52,6 @@ export default function ContactsBrowse(props) {
     const [activeFilters, setActiveFilters] = useState({});
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
-    const [flipSearchSwitch, setFlipSearchSwitch] = useState(false);
     const [cardTotal, setCardTotal] = useState(0);
     const [searchOrderBy, setSearchOrderBy] = useState('firstName');
     const [direction, setDirection] = useState("ASC"); //ASC if ascending, DESC if descending
@@ -62,22 +61,28 @@ export default function ContactsBrowse(props) {
     }, [contactsMetadata]);
 
     useEffect(() => {
-        getContactList(RESULTS_PER_PAGE);
+        getContactList(RESULTS_PER_PAGE, 1, "", 'firstName', 'ASC');
         getContactListMetadata(); // call again when filters changes
     }, []);
 
-    useEffect(() => {
-        getContactList(RESULTS_PER_PAGE, page, searchTerm);
-    }, [page]);
+    function updatePage(value) {
+        setPage(value);
+        getContactList(RESULTS_PER_PAGE, value, searchTerm);
+    }
 
-    useEffect(() => {
-        //todo: apply delay to search term
-        getContactList(RESULTS_PER_PAGE, 1, searchTerm, searchOrderBy, direction);
-        getContactListMetadata(searchTerm);
-    }, [flipSearchSwitch, searchOrderBy, direction]);
+    function updateSearchOrder(value) {
+        setSearchOrderBy(value);
+        getContactList(RESULTS_PER_PAGE, 1, searchTerm, value, direction);
+    }
+
+    function updateDirection(value) {
+        setDirection(value);
+        getContactList(RESULTS_PER_PAGE, 1, searchTerm, searchOrderBy, value);
+    }
 
     function handleSearchEntry() {
-        setFlipSearchSwitch(!flipSearchSwitch);
+        getContactList(RESULTS_PER_PAGE, 1, searchTerm, searchOrderBy, direction);
+        getContactListMetadata(searchTerm);
     }
 
     return (
@@ -91,9 +96,9 @@ export default function ContactsBrowse(props) {
                     updateSearchTerm={setSearchTerm}
                     handleSearchEntry={handleSearchEntry}
                     currentOrder={searchOrderBy}
-                    handleOrderUpdate={setSearchOrderBy}
+                    handleOrderUpdate={updateSearchOrder}
                     currentDirection={direction}
-                    handleDirectionUpdate={setDirection}
+                    handleDirectionUpdate={updateDirection}
                 />
                 <ScrollContainer className="scroll-container">
                 {(isContactListPending || isContactListMetadataPending) ? (
@@ -119,7 +124,7 @@ export default function ContactsBrowse(props) {
                         page={page}
                         cardsPerPage={RESULTS_PER_PAGE}
                         count={contacts.length}
-                        updatePage={setPage}
+                        updatePage={updatePage}
                     />
                 )}
             </ContentWrapper>
