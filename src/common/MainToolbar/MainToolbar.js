@@ -157,6 +157,15 @@ export default function MainToolbar(props) {
         exportJSON(list, `contactList`);
     }
 
+    function handleDirectionClick(event) {
+        if (event.target.attributes.value &&
+            event.target.attributes.value.value !== props.currentDirection) {
+            //validate that the click is not on the edge (css might make some area clickable that doesn't have value)
+            //and validate something is actually changing
+            props.handleDirectionUpdate(event.target.attributes.value.value);
+        }
+    }
+
     return (
         <ContentWrapper>
             <ControlContainer>
@@ -189,7 +198,7 @@ export default function MainToolbar(props) {
                             <div id="popover-header" label="Select Sort Field & Direction">
                                 Sort Field & Direction
                             </div>
-                            <div id="order-direction" onClick={event => props.handleDirectionUpdate(event.target.attributes.value.value)}>
+                            <div id="order-direction" onClick={event => handleDirectionClick(event)}>
                                 <span value="ASC" title="Ascending" className={props.currentDirection === 'ASC' ? 'activeDirection' : 'inactiveDirection'}>
                                     Ascending
                                 </span>
