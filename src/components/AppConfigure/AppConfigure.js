@@ -34,7 +34,9 @@ export default function AppConfigure(props) {
     }, []);
 
     useEffect(() => {
-        getContactList(contactsMetadata.total, 1, '', 'firstName', 'ASC');
+        if(!isContactListMetadataPending && contactsMetadata.total) {
+            getContactList(contactsMetadata.total, 1, '', 'firstName', 'ASC'); //TODO: how to stop double calls
+        }
     }, [contactsMetadata]);
 
     function handleContactListExport() {
@@ -79,16 +81,16 @@ export default function AppConfigure(props) {
                         <div className="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                             <h4>Export</h4>
                             <p>You can make backups by saving JSON files.</p>
-                            <Button label="Export All Contacts" type="secondary" onClick={handleContactListExport} />
+                            <Button icon="download" label="Export All Contacts" type="secondary" onClick={handleContactListExport} />
                         </div>
                         <div className="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                             <h4>Import</h4>
                             <p>Upload your saved JSON files, then restore or add the contacts.</p>
                             <input type="file" name="contactFile" id="contactFile" accept="application/json" onChange={e => captureUpload(e)} />
                             <p>Adding contacts will create new records. This does not check for duplicates of existing contacts.</p>
-                            <Button label="Add Contacts" type="secondary" onClick={handleAddContacts} />
+                            <Button icon="upload" label="Add Contacts" type="secondary" onClick={handleAddContacts} />
                             <p>Restoring contacts will remove all existing contacts and replace them with those in the uploaded file.</p>
-                            <Button label="Restore Contacts" type="secondary" onClick={handleRestoreContacts} />
+                            <Button icon="upload" label="Restore Contacts" type="secondary" onClick={handleRestoreContacts} />
                         </div>
                     </div>
                 </>

@@ -175,6 +175,7 @@ export default function MainToolbar(props) {
                     onClick={() => history.push('/contacts/new')}
                 />
                 <Button 
+                    icon="download"
                     label={`Export Page Results`}
                     onClick={exportList}
                 />
