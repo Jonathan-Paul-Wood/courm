@@ -8,7 +8,7 @@ import DateInput from '../../common/DateInput/DateInput';
 import TextArea from '../../common/TextArea/TextArea';
 import icons from '../../assets/icons/bootstrapIcons';
 import LoadingSpinner from '../../common/LoadingSpinner/LoadingSpinner';
-import { exportJSON } from '../../common/Utilities/utilities';
+import { exportContactList } from '../../common/Utilities/utilities';
 
 const ContentWrapper = styled.div`
     margin-top: 4em;
@@ -86,7 +86,7 @@ export default function ViewContact(props) {
     }, [contact]);
 
     function exportContact() {
-        exportJSON([contact], `contact-${contactId}`);
+        exportContactList([contact], `contact-${contactId}`);
     }
 
     //TODO: handle loading state, 404s and errors

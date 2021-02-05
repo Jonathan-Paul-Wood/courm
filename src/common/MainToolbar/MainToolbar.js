@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import Input from '../../common/Input/Input';
 import Button from '../../common/Button';
 import Tooltip from '../Tooltip/Tooltip';
-import { exportJSON } from '../../common/Utilities/utilities';
+import { exportContactList } from '../../common/Utilities/utilities';
 
 const ContentWrapper = styled.div`
 
@@ -154,7 +154,7 @@ export default function MainToolbar(props) {
 
     function exportList() {
         const list = props.type === 'Contact' ? props.contactList : 'interactionList';
-        exportJSON(list, `contactList`);
+        exportContactList(list, `contactList`);
     }
 
     function handleDirectionClick(event) {

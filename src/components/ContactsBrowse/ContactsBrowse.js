@@ -62,7 +62,7 @@ export default function ContactsBrowse(props) {
 
     useEffect(() => {
         getContactList(RESULTS_PER_PAGE, 1, "", 'firstName', 'ASC');
-        getContactListMetadata(); // call again when filters changes
+        getContactListMetadata(searchTerm); // call again when filters changes
     }, []);
 
     function updatePage(value) {

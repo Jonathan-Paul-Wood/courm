@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Button from '../../common/Button';
-import { exportJSON } from '../../common/Utilities/utilities';
+import { exportJSON, exportContactList } from '../../common/Utilities/utilities';
 import LoadingSpinner from '../../common/LoadingSpinner';
 
 const ConfigureWrapper = styled.div`
@@ -40,7 +40,7 @@ export default function AppConfigure(props) {
     }, [contactsMetadata]);
 
     function handleContactListExport() {
-        exportJSON(contacts, `contactList`);
+        exportContactList(contacts, `contactList`);
     }
 
     function captureUpload(event) {
@@ -52,7 +52,7 @@ export default function AppConfigure(props) {
     function handleAddContacts() {
         const uploadedJSON = JSON.parse(pendingUpload.result);
         console.log(uploadedJSON);
-        uploadedJSON.data.forEach(contact => {
+        uploadedJSON.data.contacts.data.forEach(contact => {
             console.log(contact);
             let newContact = {
                 ...contact,
@@ -93,6 +93,21 @@ export default function AppConfigure(props) {
                             <Button icon="upload" label="Restore Contacts" type="secondary" onClick={handleRestoreContacts} />
                         </div>
                     </div>
+                    {/*
+                    TODO: add confirm modal
+                        validate shape of upload
+                        determine upload type (contact, notes, etc)
+                        state if invalid format
+                        CONFIRM that you want to (DELETE (XXX contacts) (and) (XXX notes) and) (ADD (XXX contacts) (and) (XXX notes)
+
+                        NEW Export Shape:
+                            timestamp: new Date()
+                            version: string
+                            data: {
+                                contacts: [],
+                                notes: [],
+                            }
+                    */}
                 </>
             )}
         </ConfigureWrapper>

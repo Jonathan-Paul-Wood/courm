@@ -7,11 +7,20 @@ export function downloadContent(content, fileName, contentType) {
 }
 //example: downloadContent(jsonData, 'json.txt', 'text/plain');
 
+export function exportContactList(array, name) {
+    exportJSON({
+        'contacts': {
+            'total': array.length,
+            'data': array,   
+        }}, 
+        name
+    );
+}
+
 export function exportJSON(json, name) {
     const time = new Date();
     const data = {
-        version: 'beta',
-        total: json.length,
+        version: 2,
         timestamp: time.toISOString(),
         data: json,
     }
