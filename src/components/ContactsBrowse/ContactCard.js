@@ -15,6 +15,12 @@ const CardWrapper = styled.div`
     overflow: hidden;
     text-overflow: ellipsis;
 
+    :hover {
+        cursor: pointer;
+        background-color: #e6e6e6;
+        box-shadow: 4px 6px 4px #cccccc;
+    }
+
     #head-wrapper {
         display: flex;
         justify-content: space-between;
@@ -44,7 +50,7 @@ export default function ContactCard(props) {
     const history = useHistory();
 
     return (
-        <CardWrapper>
+        <CardWrapper className="a-cursor-pointer" onClick={() => history.push(`/contacts/${contact.id}`)}>
             <div id="head-wrapper">
                 <div id="profile-picture">
                     {contact.profilePicture ? contact.profilePicture : icons['personCard']}
@@ -52,10 +58,7 @@ export default function ContactCard(props) {
                 <div id="contact-name" className="limit-content" title={contact.firstName+' '+contact.lastName}>
                     <b>{contact.firstName}</b> {contact.lastName}
                 </div>
-                <Button
-                    label="View"
-                    onClick={() => history.push(`/contacts/${contact.id}`)}
-                />
+                <div>{/*TODO: link to contacts' notes, or something; for now this placeholder centers the name*/}</div>
             </div>
 
             <div id="communcate-wrapper" className="card-content">
