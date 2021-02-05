@@ -112,7 +112,7 @@ export default function ViewContact(props) {
                                 <div id="profile-picture">
                                     {contact.profilePicture ? contact.profilePicture : icons['personCard']}
                                 </div>
-                                <Button label="Export" onClick={exportContact}/>
+                                <Button icon="download" label="Export" onClick={exportContact}/>
                             </div>
                             <div className="metadataRow">
                                 <div id="nameData" className="inputRow rowMargin">
