@@ -99,7 +99,7 @@ const StyleContainer = styled.div`
         width: 100%;
         min-height: 28px;
         position: relative;
-        padding: 14px 16px 8px 16px;
+        padding: 20px 16px 8px 16px;
         border: none;
         border-radius: 4px;
         font-size: 16px;
@@ -127,7 +127,7 @@ const StyleContainer = styled.div`
         color: #a6a6a6;
     }
 
-    .field input + label {
+    label {
         position: absolute;
         left: 16px;
         font-size: 12px;
@@ -167,7 +167,7 @@ export default function DateInput(props) {
                 <DatePicker
                     placeholderText={placeholder}
                     selected={(value && value !== "null") ? new Date(value) : ''}
-                    onChange={date => onChange(date)}
+                    onChange={date => onChange(date ? date.toISOString() : date)}
                     onClickOutside={() => {}}
                     showYearDropdown={true}
                     showMonthDropdown={true}
