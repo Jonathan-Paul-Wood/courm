@@ -1,0 +1,11 @@
+export const BLACK = '#000000';
+export const WHITE = '#ffffff';
+export const BLUE = '#4da6ff';
+export const BLUE_FOCUS = '#0066cc';
+export const GREEN = '#00ff00';
+export const GREEN_FOCUS = '#00e600';
+export const RED = '#ff3333';
+export const RED_FOCUS = '#e63900';
+export const YELLOW = '#ffff4d';
+export const YELLOW_FOCUS = '#e6e619';
+export const GREY = '#e6e6e6';

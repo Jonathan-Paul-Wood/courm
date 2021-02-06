@@ -3,26 +3,27 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import icons from '../../assets/icons/bootstrapIcons';
 import LoadingLoop from '../LoadingLoop/LoadingLoop';
+import {BLACK, WHITE, BLUE, BLUE_FOCUS, GREY, GREEN, GREEN_FOCUS, RED, RED_FOCUS, YELLOW, YELLOW_FOCUS} from '../../assets/colorsConstants';
 
 const StyleContainer = styled.div`
     margin: auto 0;
     display: flex;
     align-content: center;
 
-    --text-dark: #000000;
-    --text-dark-hover: #000000;
-    --text-white: #ffffff;
-    --text-light-hover: #ffffff;
-    --primary-color: #4da6ff;
-    --primary-color-hover: #0066cc;
-    --secondary-color: #ffffff;
-    --secondary-color-hover: #e6e6e6;
-    --success-color: #00ff00;
-    --success-color-hover: #00e600;
-    --danger-color: #ff3333;
-    --danger-color-hover: #e63900;
-    --warning-color: #ffff4d;
-    --warning-color-hover: #e6e619;
+    --text-dark: ${BLACK};
+    --text-dark-hover: ${BLACK};
+    --text-white: ${WHITE};
+    --text-light-hover: ${WHITE};
+    --primary-color: ${BLUE};
+    --primary-color-hover: ${BLUE_FOCUS};
+    --secondary-color: ${WHITE};
+    --secondary-color-hover: ${GREY};
+    --success-color: ${GREEN};
+    --success-color-hover: ${GREEN_FOCUS};
+    --danger-color: ${RED};
+    --danger-color-hover: ${RED_FOCUS};
+    --warning-color: ${YELLOW};
+    --warning-color-hover: ${YELLOW_FOCUS};
       
       .btn {
         padding: 0.5em 1em;
