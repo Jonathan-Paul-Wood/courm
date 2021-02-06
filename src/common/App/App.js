@@ -83,6 +83,7 @@ export default function App(props) {
                     <AppRouter path="/contacts/new" component={AppRouter} />
                     <AppRouter path="/contacts" component={AppRouter} />
                     <AppRouter path="/configure" component={AppRouter} />
+                    <AppRouter path="/faq" component={AppRouter} />
                     {/*<Route path="/interactions/:interactionId" component={App} /> */}
                     {/* <Route path="/interactions" component={App} /> */}
                     {/* <Route exact path="/statistics" component={App} /> */}

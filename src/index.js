@@ -20,6 +20,7 @@ ReactDOM.render(
         <Route path="/interactions/:interactionId" component={App} />
         <Route path="/interactions" component={App} />
         <Route path="/configure" component={App} />
+        <Route path="/faq" component={App} />
         {/* <Route path="/statistics" component={App} /> */}
         {/* <Route component={PageNotFound} /> */}
       </Switch>

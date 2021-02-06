@@ -9,6 +9,7 @@ import ContactsBrowse from '../../../components/ContactsBrowse';
 import ViewContact from '../../../components/ViewContact';
 import EditContact from '../../../components/EditContact';
 import AppConfigure from '../../../components/AppConfigure';
+import FaqHome from '../../../components/FaqHome';
 
 const LoadingContainer = styled.div`
     position: absolute;
@@ -44,6 +45,7 @@ export default function AppRouter(props) {
                 <AppLayout path="/contacts/:contactId/edit" component={EditContact} {...commonRouteProps} />
                 <AppLayout path="/contacts/:contactId" component={ViewContact} {...commonRouteProps} />
                 <AppLayout path="/configure" component={AppConfigure} {...commonRouteProps} />
+                <AppLayout path="/faq" component={FaqHome} {...commonRouteProps} />
                 {/* <AppLayout path="/interactions/:interactionsId" component={Interaction} />
                 <AppLayout path="/interactions" component={InteractionsBrowse} /> */}
             </Switch>

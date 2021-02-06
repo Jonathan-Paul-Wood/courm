@@ -39,6 +39,11 @@ export default function LeftSidebar() {
             icon: 'tools',
             title: 'Configure',
             path: '/configure',
+        },
+        {
+            icon: 'question',
+            title: 'FAQ',
+            path: '/faq',
         }
     ];
 
