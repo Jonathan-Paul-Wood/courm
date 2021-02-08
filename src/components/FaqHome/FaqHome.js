@@ -69,6 +69,36 @@ export default function FaqHome() {
                     </p>
                 </div>
             </div>
+            <div className="section">
+                <div className="question">
+                    How do I block trackers?
+                </div>
+                <div className="answer">
+                    <p>
+                        Great news! CourM does not track you at all. Since this is a locally run application, everything you need is on your own machine.
+                        We don't install any cookies or other trackers on your device, we don't serve ads, and we don't collect any data to send to third parties.
+                    </p>
+                    <p>
+                        CourM is private by design, so you and only you are in control of your data. We do not collect or store any of your data.
+                    </p>
+                </div>
+            </div>
+            <div className="section">
+                <div className="question">
+                    What about software updates?
+                </div>
+                <div className="answer">
+                    <p>
+                        You are in control of your data, as such CourM will not update automatically. From the 'Configuration' page you can 'Check for Updates'. This will ping our server (the only time this application communicates with us)
+                        and we will send you the current version number, along with the link to the latest download. Your application will then compare the latest version number with your own, and if there
+                        is a new version available display the download link to you.
+                    </p>
+                    <p>
+                        You will then be able to download the latest version and start using it immediately. Your data can be ported over to the new version by using the Export and Import features
+                        in the 'Configuration' page (these features will always be tested for compatibility with at least the previous two versions, if not more).
+                    </p>
+                </div>
+            </div>
         </ConfigureWrapper>
     );
 }
