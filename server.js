@@ -9,7 +9,9 @@ var db = new sqlite3.Database('main.db', (err) => {
 }); //TODO: run such that it won't stop program on ERRORs (set .bail to OFF), otherwise bugs force users to restart program...
 //TODO: someway to save DB backup on either user input or on application close
 const app = express();
-const { ERROR_CODE, SUCCESS_CODE, NOT_FOUND_CODE } = require('./responseStatusCodes.js');
+const ERROR_CODE = 500;
+const SUCCESS_CODE = 200;
+const NOT_FOUND_CODE = 404;
 
 var corsOptions = {
     origin: "http://localhost:3000"
@@ -38,6 +40,7 @@ function initializeDB() {
             dateOfBirth TEXT,
             tags TEXT,
             interactions TEXT,
+            bio TEXT,
             createdBy TEXT,
             createdOn TEXT NOT NULL,
             lastModifiedBy TEXT,
@@ -87,6 +90,7 @@ app.post('/api/contacts/new', (req, res) => {
             dateOfBirth,
             tags,
             interactions,
+            bio,
             createdBy,
             createdOn,
             lastModifiedBy,
@@ -106,6 +110,7 @@ app.post('/api/contacts/new', (req, res) => {
             '${req.body.dateOfBirth}',
             '${req.body.tags}',
             '${req.body.interactions}',
+            '${req.body.bio}',
             '${req.body.createdBy}',
             '${req.body.createdOn}',
             '${req.body.lastModifiedBy}',
@@ -173,22 +178,6 @@ app.get("/api/contacts", (req, res) => {
     });
 });
 
-app.get("/api/contacts/all", (req, res) => {
-    const sql = `SELECT * FROM contacts`;
-    db.all(sql, (err, rows) => {
-        if (err) {
-            res.status = ERROR_CODE;
-            res.json(err);
-        } else if (!rows) {
-            res.status = NOT_FOUND_CODE;
-            return;
-        } else {
-            res.status = SUCCESS_CODE;
-            res.json(rows);
-        }
-    });
-});
-
 app.get("/api/contacts/metadata", (req, res) => {
     const { searchTerm } = req.query;
     let sql = `SELECT COUNT(*) FROM contacts`;
@@ -212,12 +201,12 @@ app.get("/api/contacts/metadata", (req, res) => {
 app.get("/api/contacts/:id", (req, res) => {
     const sql = `SELECT * FROM contacts WHERE id = ${req.params.id}`;
     db.get(sql, (err, row) => {
+        console.log('row: ', row);
+        console.log('err: ', err);
         if (err) {
-            res.status = ERROR_CODE;
-            return console.error(err.message);
+            res.status(ERROR_CODE).send({message: err.message});
         } else if (!row) {
-            res.status = NOT_FOUND_CODE;
-            return;
+            res.status(NOT_FOUND_CODE).send({message: 'No such contact'});
         } else {
             res.status = SUCCESS_CODE;
             res.json(row);
