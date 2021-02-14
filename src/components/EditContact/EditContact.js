@@ -2,11 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import EntityTitleHeader from '../../common/EntityTitleHeader/EntityTitleHeader';
-import Button from '../../common/Button/Button';
+import Button from '../../common/Button';
 import Input from '../../common/Input/Input';
 import DateInput from '../../common/DateInput/DateInput';
-import TextArea from '../../common/TextArea/TextArea';
-import icons from '../../assets/icons/bootstrapIcons';
 import CommonModal from '../../common/CommonModal/CommonModal';
 
 const ScrollContainer = styled.div`
@@ -27,7 +25,6 @@ const GridWrapper = styled.div`
         }
 
         #picture-upload {
-            display: none;
         }
 
         img {
@@ -141,7 +138,11 @@ input:checked + .slider:before {
 
 .slider.round:before {
   border-radius: 50%;
-} 
+}
+
+.hidden {
+    display: none; //TODO: make class global
+}
 `;
 
 export default function ViewContact(props) {
@@ -177,17 +178,7 @@ export default function ViewContact(props) {
     }
     const [entityIsOrganization, setEntityIsOrganization] = useState(false);
     const [pendingChanges, setPendingChanges] = useState(defaultChanges);
-    const [error, setError] = useState({
-        firstName: '',
-        lastName: '',
-        email: '',
-        phoneNumber: '',
-        firm: '',
-        industry: '',
-        address: '',
-        dateOfBirth: '',
-        bio: '',
-    });
+    const [error, setError] = useState(defaultChanges);
     const history = useHistory();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [pageLoaded, setPageLoaded] = useState(false);
@@ -203,11 +194,11 @@ export default function ViewContact(props) {
 
     useEffect(() => {
         //update page when GET returns
-        const dob = contact.dateOfBirth ? contact.dateOfBirth.split('T')[0] : "null";
+        const dob = contact.dateOfBirth ? contact.dateOfBirth.split('T')[0] : "";
         const newValues = {...contact, dateOfBirth: dob}
         //TODO: handle 404, and Errors
         setPendingChanges(newValues);
-        setEntityIsOrganization(contact.entityType);
+        setEntityIsOrganization(contact.entityType === 'organization');
     }, [contact]);
 
     //only after the page is first loaded, a post/put/delete changing from pending to success requires a redirect
@@ -243,6 +234,7 @@ export default function ViewContact(props) {
     }
 
     function handleSaveContact() {
+        console.log('attempted save');
         //validate inputs, error messages if needed TODO
         let valid = true;
         if (!pendingChanges.firstName) {
@@ -257,7 +249,12 @@ export default function ViewContact(props) {
             valid = false;
             setError({...error, ...{phoneNumber: 'Expected format: ###-###-####'}});
         }
-        if (!entityIsOrganization && pendingChanges.dateOfBirth && !pendingChanges.dateOfBirth.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}Z$/g)) {
+        if (!entityIsOrganization && 
+                pendingChanges.dateOfBirth && 
+                (pendingChanges.dateOfBirth &&
+                    !pendingChanges.dateOfBirth.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}Z$/g)
+                )
+            ) {
             valid = false;
             setError({...error, ...{dateOfBirth: 'Expect format: YYYY-MM-DD'}});
         }
@@ -280,6 +277,7 @@ export default function ViewContact(props) {
             if (isNewContact) {
                 postContact(submitChanges);
             } else {
+                console.log('putting')
                 putContact(contactId, submitChanges);
             }
         }
@@ -290,12 +288,9 @@ export default function ViewContact(props) {
         deleteContact(contactId);
     }
 
-    function handleProfileImage() {
-        console.log('image clicked')
-    }
-
-    function handlePictureUpload(data) {
-        console.log(data)
+    function handlePictureUpload(e) {
+        console.log(e.target.files[0]);
+        console.log(e);
     }
 
     //TODO: handle loading state, 404s and errors
@@ -315,8 +310,9 @@ export default function ViewContact(props) {
                 <GridWrapper>
                     <div className="imageRow">
                         <div id="profile-picture">
-                            <input id="picture-upload" type="file" onChange={() => handlePictureUpload(this)} capture />
-                            <img src={contact.profilePicture ? `../../assets/images/contact-${contactId}-picture/` : '../../assets/images/default-profile.png'} alt="profile picture" onClick={() => handleProfileImage()}/>
+                            <img src={contact.profilePicture ? `../../assets/images/contact-${contactId}-picture/` : '../../assets/images/default-profile.png'} alt="profile picture"/>
+                            <br/>
+                            <input id="picture-upload" type="file" accept="image/*" onChange={(event) => handlePictureUpload(event)} capture />
                         </div>
                         <ToggleSwitch>
                             <span>
@@ -324,7 +320,7 @@ export default function ViewContact(props) {
                                     ? 'Organization'
                                     : 'Person'}
                             </span>
-                            <label className="switch">
+                            <label className={`switch ${isNewContact ? '' : 'hidden'}`}>
                                 <input
                                     active={`${entityIsOrganization}`}
                                     type="checkbox"
@@ -393,7 +389,7 @@ export default function ViewContact(props) {
                                     label="Date of Birth"
                                     locked={false}
                                     error={error.dateOfBirth}
-                                    onChange={(event) => updateData('dateOfBirth', event.toISOString())}
+                                    onChange={(event) => updateData('dateOfBirth', event)}
                                     maxLength={11}
                                 />
                             </div>
@@ -434,12 +430,12 @@ export default function ViewContact(props) {
                     <div className="tagsRow">
 
                     </div>
-                    <div className="InteractionsRow">
-                        <h3>Recent Interactions (<Button label="view all" type="link" />)</h3>
+                    {/* <div className="InteractionsRow">
+                        <h3>Recent Interactions</h3>
                         <div>
                             cards go here, or none available message...
                         </div>
-                    </div>
+                    </div> */}
                     {!isNewContact && <div id="dangerRow">
                         <div></div>
                         <Button 

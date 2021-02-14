@@ -136,7 +136,7 @@ export default function MainToolbar(props) {
         },
         {
             label: 'Date Of Birth',
-            value: 'dob'
+            value: 'dateOfBirth'
         },
         {
             label: 'Date Created',
@@ -146,10 +146,10 @@ export default function MainToolbar(props) {
             label: 'Date of Last Change',
             value: 'lastModifiedOn'
         },
-        {
-            label: 'Recently Interacted',
-            value: 'lastInteractedOn'
-        },
+        // {
+        //     label: 'Recently Interacted',
+        //     value: 'lastInteractedOn'
+        // },
     ]
 
     function exportList() {

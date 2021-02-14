@@ -171,7 +171,7 @@ export default function ViewContact(props) {
                                 {/*TODO: have all the fields as inputs, dis-/en-abled based on editState*/}
                             </div>
                             <div className="bioRow">
-                                <Input
+                                <TextArea
                                     value={contact.bio}
                                     label="Bio"
                                     locked={true}

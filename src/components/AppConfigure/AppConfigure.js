@@ -51,7 +51,6 @@ export default function AppConfigure(props) {
 
     function handleAddContacts() {
         const uploadedJSON = JSON.parse(pendingUpload.result);
-        console.log(uploadedJSON);
         uploadedJSON.data.contacts.data.forEach(contact => {
             console.log(contact);
             let newContact = {

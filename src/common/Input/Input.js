@@ -31,13 +31,13 @@ const StyleContainer = styled.div`
         pointer-events: none;
     }
 
-    .secondary-field input {
+    input {
         overflow: hidden;
         text-overflow: ellipsis;
         width: calc(100% - 32px); //tied to left+right padding
         min-height: 56px;
         position: relative;
-        padding: 24px 16px 8px 16px;
+        padding: 14px 16px 8px 16px;
         border: none;
         border-radius: 4px;
         font-size: 16px;
@@ -65,7 +65,7 @@ const StyleContainer = styled.div`
         color: rgba(255, 255, 255, 0.8);
     }
 
-    .secondary-field input + label {
+    input + label {
         position: absolute;
         left: 16px;
         font-size: 12px;
@@ -98,27 +98,6 @@ const StyleContainer = styled.div`
         pointer-events: none;
     }
 
-    .field input {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        width: calc(100% - 32px); //tied to left+right padding
-        min-height: 56px;
-        position: relative;
-        padding: 14px 16px 8px 16px;
-        border: none;
-        border-radius: 4px;
-        font-size: 16px;
-        font-weight: 400;
-        line-height: normal;
-        background-color: transparent;
-        color: #282828;
-        outline: none;
-        box-shadow: 0px 4px 20px 0px transparent;
-        transition: 0.3s background-color ease-in-out, 0.3s box-shadow ease-in-out,
-            0.1s padding ease-in-out;
-        -webkit-appearance: none;
-    }
-
     .field input::-webkit-input-placeholder {
         color: #a6a6a6;
     }
@@ -132,18 +111,6 @@ const StyleContainer = styled.div`
         color: #a6a6a6;
     }
 
-    .field input + label {
-        position: absolute;
-        left: 16px;
-        font-size: 12px;
-        font-weight: 600;
-        line-height: 24px;
-        top: 4px;
-        opacity: 1;
-        color: #512da8;
-        pointer-events: none;
-    }
-
     input + label.error {
         color: red;
     }
@@ -151,7 +118,7 @@ const StyleContainer = styled.div`
 
 
 export default function Input(props) {
-    const { placeholder, value, onChange, error, label, locked, secondary, height, onEnter } = props;
+    const { placeholder, value, onChange, error, label, locked, secondary, onEnter } = props;
     const [active, setActive] = useState(false);
 
     const fieldClassName = `${secondary ? 'secondary-field' : 'field'} ${active ? "active" : ''} ${(locked && !active) ? "locked" : ''}`;
@@ -164,7 +131,7 @@ export default function Input(props) {
 
     return (
         <StyleContainer className="input-field" title={value}>
-            <div className={fieldClassName} style={{height: `${height}`}}>
+            <div className={fieldClassName} style={{height: `56px`}}>
                 <input
                     type="text"
                     placeholder={placeholder}
@@ -183,12 +150,12 @@ export default function Input(props) {
 }
 
 Input.defaultProps = {
+    type: 'text',
     placeholder: '',
     value: '',
     error: '',
     locked: false,
     secondary: false, //by default (for white backgrounds)
-    height: '56px',
     maxLength: 140,
     onChange: () => {},
     onEnter: () => {},
@@ -199,11 +166,10 @@ Input.propTypes = {
     placeholder: PropTypes.string,
     value: PropTypes.string,
     label: PropTypes.string.isRequired,
-    onChange: PropTypes.func,
     error: PropTypes.string,
     locked: PropTypes.bool,
     secondary: PropTypes.bool, //if true, will be white/transparent (for colored backgrounds)
-    height: PropTypes.string,
     maxLength: PropTypes.number,
     onEnter: PropTypes.func,
+    onChange: PropTypes.func,
 }
