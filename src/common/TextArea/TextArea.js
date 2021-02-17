@@ -32,9 +32,9 @@ width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     width: calc(100% - 32px); //tied to left+right padding
-    min-height: 56px;
+    min-height: 6em;
     position: relative;
-    padding: 24px 16px 8px 16px;
+    padding: 1em 1em 0.5em 1em;
     border: none;
     border-radius: 4px;
     font-size: 16px;
@@ -60,18 +60,6 @@ width: 100%;
 }
 .secondary-field textarea:-moz-placeholder {
     color: rgba(255, 255, 255, 0.8);
-}
-
-.secondary-field textarea + label {
-    position: absolute;
-    left: 16px;
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 24px;
-    top: 4px;
-    opacity: 1;
-    color: #512da8;
-    pointer-events: none;
 }
 
 .field {
@@ -100,9 +88,9 @@ width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     width: calc(100% - 32px); //tied to left+right padding
-    min-height: 56px;
+    min-height: 6em;
     position: relative;
-    padding: 14px 16px 8px 16px;
+    padding: 1em 1em 0.5em 1em;
     border: none;
     border-radius: 4px;
     font-size: 16px;
@@ -130,13 +118,13 @@ width: 100%;
     color: #a6a6a6;
 }
 
-.field textarea + label {
+textarea + label {
     position: absolute;
     left: 16px;
+    top: -4px;
     font-size: 12px;
     font-weight: 600;
     line-height: 24px;
-    top: 4px;
     opacity: 1;
     color: #512da8;
     pointer-events: none;
