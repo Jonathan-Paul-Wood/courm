@@ -8,7 +8,6 @@ import {RESULTS_PER_PAGE} from '../../common/constants/constants';
 import LoadingSpinner from '../../common/LoadingSpinner/LoadingSpinner';
 
 const ContentWrapper = styled.div`
-    margin-top: 4em;
     padding: 0 1em;
 
     display: grid;

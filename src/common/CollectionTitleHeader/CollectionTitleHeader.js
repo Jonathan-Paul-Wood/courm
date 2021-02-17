@@ -4,10 +4,7 @@ import styled from 'styled-components';
 import Button from '../Button';
 
 const ContentWrapper = styled.div`
-    position: fixed;
-    top: 4em; //tied to height of header bar
     height: 4em;
-    width: calc(100% - 10em);
     background-color: #ffffff;
     z-index: 700;
     padding: 0 1em;

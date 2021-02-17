@@ -11,7 +11,6 @@ import LoadingSpinner from '../../common/LoadingSpinner/LoadingSpinner';
 import { exportContactList } from '../../common/Utilities/utilities';
 
 const ContentWrapper = styled.div`
-    margin-top: 4em;
     padding: 0 1em;
 `;
 

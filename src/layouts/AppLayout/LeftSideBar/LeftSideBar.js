@@ -5,9 +5,8 @@ import { useLocation } from 'react-router-dom';
 
 const LeftSideBarWrapper = styled.div`
     position: fixed;
-    top: 4em;
     width: 8em;
-    height: calc(100% - 4em);
+    height: 100%;
     display: flex;
     background-color: #4d4d4d;
     color: white;
