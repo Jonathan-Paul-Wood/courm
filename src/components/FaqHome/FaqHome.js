@@ -62,7 +62,7 @@ export default function FaqHome() {
                 </div>
                 <div className="answer">
                     <p>
-                        Simply visit <a target="_blank" href="">CourM's public repository</a> and open a ticket. Here's a good guide for <a target="_blank" href="">how to write constructive tickets</a>.
+                        Simply visit <a target="_blank" rel="noreferrer" href="">CourM's public repository</a> and open a ticket. Here's a good guide for <a target="_blank"  rel="noreferrer" href="">how to write constructive tickets</a>.
                     </p>
                     <p>
                         When you do create a ticket, please first check existing tickets to make sure you're not creating a duplicate.
