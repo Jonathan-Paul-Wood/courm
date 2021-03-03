@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+//var path = require('path');
 var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database('main.db', (err) => {
     if(err) {
@@ -24,6 +25,13 @@ app.use(bodyParser.json());
 
 // parse requests of content-type - application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// parse requests of content-type - text/
+// app.use(bodyParser.text());
+
+// const breadcrumbtrail = path.join(__dirname, '../pb-ui/build/');
+// console.log('path: ', breadcrumbtrail);
+// app.use('/app', express.static(breadcrumbtrail));
 
 function initializeDB() {
     db.serialize(function() {
