@@ -4,7 +4,6 @@ import { Switch, Route, Redirect } from 'react-router-dom';
 import styled from 'styled-components';
 import './App.css';
 import '../../../node_modules/bootstrap/scss/bootstrap.scss';
-import {firebase} from "../../../node_modules/firebase/firebase.js";
 
 import PropTypes from 'prop-types';
 import axiosSingleton from '../../configs/axiosSingleton';
@@ -60,18 +59,6 @@ export default function App(props) {
     function onSessionTimeout() {
         //window.location.assign(urlPath);
     }
-
-    //TODO: this var needs to be a piece of state so accessible to other components, or pass prop
-    // var firebaseConfig = {
-    //     apiKey: "AIzaSyCbOFXJEKiJ2wtX1_HlnCwdD7JJBB8Aoxs",
-    //     authDomain: "c-our-m.firebaseapp.com",
-    //     databaseURL: "https://c-our-m-default-rtdb.firebaseio.com",
-    //     projectId: "c-our-m",
-    //     storageBucket: "c-our-m.appspot.com",
-    //     messagingSenderId: "57532612460",
-    //     appId: "1:57532612460:web:8a97e206b50ac502c4bd49"
-    // };
-    // firebase.initializeApp(firebaseConfig);
 
     return isSetupComplete ? (
         <div>
