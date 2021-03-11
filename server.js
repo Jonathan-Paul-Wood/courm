@@ -1,7 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-//var path = require('path');
+var path = require('path');
 var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database('main.db', (err) => {
     if(err) {
@@ -15,7 +15,7 @@ const SUCCESS_CODE = 200;
 const NOT_FOUND_CODE = 404;
 
 var corsOptions = {
-    origin: "http://localhost:3000"
+    origin: "http://localhost:3000",
 };
 
 app.use(cors(corsOptions));
@@ -27,11 +27,15 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // parse requests of content-type - text/
-// app.use(bodyParser.text());
+//app.use(bodyParser.text());
 
-// const breadcrumbtrail = path.join(__dirname, '../pb-ui/build/');
-// console.log('path: ', breadcrumbtrail);
-// app.use('/app', express.static(breadcrumbtrail));
+
+// If running in production mode enter here
+const breadcrumbtrail = path.join(__dirname, 'build/');
+app.use('/', express.static(breadcrumbtrail));
+app.get('/', function(req, res) {
+    res.sendFile(path.join(__dirname, 'build/', 'index.html'));
+});
 
 function initializeDB() {
     db.serialize(function() {
@@ -67,11 +71,6 @@ function closeDB() {
         }
     });
 }
-
-// simple route
-app.get("/", (req, res) => {
-    res.json({message: "Welcome to your CRM / Address Book!"});
-});
 
 app.post("/api/initialize", (req, res) => {
     initializeDB();
@@ -267,7 +266,7 @@ app.delete("/api/contacts/:id", (req, res) => {
 });
   
 // set port, listen for requests
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}.`);
 });
