@@ -181,11 +181,30 @@ export default function MainToolbar(props) {
                 />
             </ControlContainer>
             <ControlContainer>
-                <Button 
-                    label="Filter"
-                    type="secondary"
-                    onClick={() => {}}
-                />
+            <Tooltip
+                    content={
+                        <PopoverContainer>
+                            <div id="popover-header" label="Filters">
+                                Filters
+                            </div>
+                            <div id="search-filters">
+                                <h4>Search on fields:</h4>
+                                <div>
+                                    
+                                </div>
+                            </div>
+                        </PopoverContainer>
+                    }
+                    style={{
+                        'margin': 'auto 0',
+                    }}
+                >
+                    <Button 
+                        label="Filter"
+                        type="secondary"
+                        onClick={() => {}}
+                    />
+                </Tooltip>
                 <Input
                     placeholder="Search (3 character minimum)"
                     label="Search"

@@ -23,11 +23,11 @@ function getContactListError(error) {
     }
 }
 
-export function getContactList(results, page, searchTerm, order, direction) { //todo: add filter
+export function getContactList(results, page, searchTerm, order, direction, filters=[]) {
     return async dispatch => {
         dispatch(getContactListLoading());
         try {
-            const response = await ContactListService.getContactList(results, page, searchTerm, order, direction);
+            const response = await ContactListService.getContactList(results, page, searchTerm, order, direction, filters);
             dispatch(getContactListSuccess(response));
         } catch (e) {
             dispatch(getContactListError(e));
