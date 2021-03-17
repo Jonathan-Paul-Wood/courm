@@ -9,10 +9,11 @@ package-lock.json
 # testing
 coverage
 junit\.xml
-
 # production
 build
 statistics.html
+require.js
+pb-backend-*
 
 #logs
 *.logs*
