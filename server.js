@@ -1,7 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
-const open = require('open');
 var path = require('path');
 var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database('main.db', (err) => {
@@ -35,7 +34,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const breadcrumbtrail = path.join(__dirname, 'build/');
 app.use('/', express.static(breadcrumbtrail));
 app.get('/', function(req, res) {
-    res.sendFile(path.join(breadcrumbtrail, 'index.html'));
+    res.sendFile(path.join(__dirname, 'build/', 'index.html'));
 });
 
 function initializeDB() {
@@ -144,7 +143,7 @@ app.post('/api/contacts/new', (req, res) => {
         );
 });
 
-//accepts requests of the form: /api/contacts?order=id?results=3&page=1?direction=[ASC|DESC]?search=string
+//accepts requests of the form: localhost:8080/api/contacts?order=id?results=3&page=1?direction=[ASC|DESC]?search=string
 app.get("/api/contacts", (req, res) => {
     const { results, page, order, direction, searchTerm } = req.query;
     // const filters = req.body;
@@ -156,15 +155,22 @@ app.get("/api/contacts", (req, res) => {
 
     //apply search
     if(searchTerm) {
-        console.log(searchTerm);
-        sql = sql+` WHERE firstName LIKE '%${searchTerm}%' OR lastName LIKE '%${searchTerm}%' OR email LIKE '%${searchTerm}%'`;
-        sql = sql+` OR phoneNumber LIKE '%${searchTerm}%' OR address LIKE '%${searchTerm}%' OR firm LIKE '%${searchTerm}%' or industry LIKE '%${searchTerm}%'`;
+        //sql = sql+` WHERE (firstName,lastName) GLOB '*${searchTerm}*'`;
+        sql = sql+` WHERE firstName LIKE '%${searchTerm}%'`;
+        //sql = sql+` or WHERE lastName LIKE '%${searchTerm}%'`;
+        // sql = sql+` or SELECT FROM contacts WHERE firm LIKE '%${searchTerm}%'`;
+        // sql = sql+` or SELECT FROM contacts WHERE phoneNumber LIKE '%${searchTerm}%'`;
+        // sql = sql+` or SELECT FROM contacts WHERE email LIKE '%${searchTerm}%'`;
+        // sql = sql+` or SELECT FROM contacts WHERE address LIKE '%${searchTerm}%'`;
+        // sql = sql+` or SELECT FROM contacts WHERE industry LIKE '%${searchTerm}%'`;
+        // sql = sql+` or SELECT FROM contacts WHERE tags LIKE '%${searchTerm}%'`;
         
         // use % to match >=0 chars before and after search term
     }
 
     //apply sort order and pagination
     sql = sql+` ORDER BY ${order} ${direction} LIMIT ${results} OFFSET ((${page - 1})* ${results})`;
+    console.log(sql);
     db.all(sql, (err, rows) => {
         if (err) {
             res.status = ERROR_CODE;
@@ -202,6 +208,8 @@ app.get("/api/contacts/metadata", (req, res) => {
 app.get("/api/contacts/:id", (req, res) => {
     const sql = `SELECT * FROM contacts WHERE id = ${req.params.id}`;
     db.get(sql, (err, row) => {
+        console.log('row: ', row);
+        console.log('err: ', err);
         if (err) {
             res.status(ERROR_CODE).send({message: err.message});
         } else if (!row) {
@@ -224,7 +232,10 @@ app.put("/api/contacts/:id", (req, res) => {
         }
     });
     sql = sql+` WHERE id=${req.params.id}`;
+    console.log(sql);
     db.run(sql, (err, row) => {
+        console.log(err);
+        console.log(row);
         if (err) {
             res.status = ERROR_CODE;
             res.json(err);
@@ -257,8 +268,5 @@ app.delete("/api/contacts/:id", (req, res) => {
 // set port, listen for requests
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server is running... if your default browser does not open automatically, visit http://localhost:${PORT}/ to access the application.`);
-
-    // opens the url in the default browser 
-    open(`http://localhost:${PORT}/`);
+    console.log(`Server is running on port ${PORT}.`);
 });
