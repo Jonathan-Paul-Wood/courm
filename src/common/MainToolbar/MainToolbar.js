@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -7,6 +7,7 @@ import Button from '../../common/Button';
 import Tooltip from '../Tooltip/Tooltip';
 import SortOrderControls from './SortOrderControls';
 import { exportContactList } from '../../common/Utilities/utilities';
+import FilterControls from './FilterControls';
 
 const ContentWrapper = styled.div`
 
@@ -80,6 +81,44 @@ const PopoverContainer = styled.div`
 
 export default function MainToolbar(props) {
     const history = useHistory();
+    const [selectedSearchFields, setSelectedSearchFields] = useState([
+        {
+            label: 'First Name',
+            value: 'firstName',
+            selected: false
+        },
+        {
+            label: 'Last Name',
+            value: 'lastName',
+            selected: false
+        },
+        {
+            label: 'Email',
+            value: 'email',
+            selected: false
+        },
+        {
+            label: 'Phone Number',
+            value: 'phoneNumber',
+            selected: false
+        },
+        {
+            label: 'Address',
+            value: 'address',
+            selected: false
+        },
+        {
+            label: 'Firm',
+            value: 'firm',
+            selected: false
+        },
+        {
+            label: 'Industry',
+            value: 'industry',
+            selected: false
+        },
+    ]);
+
     const {
         searchTerm,
         updateSearchTerm,
@@ -114,17 +153,10 @@ export default function MainToolbar(props) {
             <ControlContainer>
                 <Tooltip
                     content={
-                        <PopoverContainer>
-                            <div id="popover-header" label="Filters">
-                                Filters
-                            </div>
-                            <div id="search-filters">
-                                <h4>Search on fields:</h4>
-                                <div>
-
-                                </div>
-                            </div>
-                        </PopoverContainer>
+                        <FilterControls
+                            currentSelections={selectedSearchFields}
+                            updateSelections={setSelectedSearchFields}
+                        />
                     }
                     style={{
                         'margin': 'auto 0',
