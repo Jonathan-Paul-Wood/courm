@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import Input from '../../common/Input/Input';
 import Button from '../../common/Button';
 import Tooltip from '../Tooltip/Tooltip';
+import SortOrderControls from './SortOrderControls';
 import { exportContactList } from '../../common/Utilities/utilities';
 
 const ContentWrapper = styled.div`
@@ -25,7 +26,7 @@ const PopoverContainer = styled.div`
     background-color: #ffffff;
     width: 20vw;
     min-width: 275px;
-    max-height: 40vh;
+    max-height: 45vh;
     min-height: 150px;
     border: solid black 1px;
     border-radius: 4px;
@@ -76,94 +77,24 @@ const PopoverContainer = styled.div`
 
 `;
 
-const RadioList = styled.div`
-    .section-header {
-        font-size: 14px;
-    }
-    
-    .highlight {
-        background: #4D98EF;
-        border-radius: 50%;
-        height: 12px;
-        left: 14px;
-        pointer-events: none;
-        position: absolute;
-        top: 14px;
-        transition: transform 400ms cubic-bezier(0.175, 0.885, 0.32, 1.2);
-        width: 12px;
-    }
-`;
-
-const RadioEntry = styled.div`
-    display: block;
-    width: 100%;
-    height: 1em;
-    line-height: 1em;
-    margin: 0.25em 0 0.75em 1em;
-    position: relative;
-    
-    .entry {
-        height: 2em;
-        position: absolute;
-        width: 100%;
-    }
-    .entry-label {
-        cursor: pointer;
-        padding-left: 0.5em;
-        user-select: none;
-        -moz-user-select: none;
-    }
-    input:checked {
-        border-color: #4D98EF;
-    }
-    input:hover {
-        cursor: pointer;
-    }
-`;
-
 
 export default function MainToolbar(props) {
     const history = useHistory();
-
-    const contactSortOptions = [
-        {
-            label: 'First Name',
-            value: 'firstName'
-        },
-        {
-            label: 'Last Name',
-            value: 'lastName'
-        },
-        {
-            label: 'Date Of Birth',
-            value: 'dateOfBirth'
-        },
-        {
-            label: 'Date Created',
-            value: 'createdOn'
-        },
-        {
-            label: 'Date of Last Change',
-            value: 'lastModifiedOn'
-        },
-        // {
-        //     label: 'Recently Interacted',
-        //     value: 'lastInteractedOn'
-        // },
-    ]
+    const {
+        searchTerm,
+        updateSearchTerm,
+        handleDirectionUpdate,
+        handleOrderUpdate,
+        handleSearchEntry,
+        type,
+        currentDirection,
+        currentOrder,
+        contactList
+    } = props;
 
     function exportList() {
-        const list = props.type === 'Contact' ? props.contactList : 'interactionList';
+        const list = type === 'Contact' ? contactList : 'interactionList';
         exportContactList(list, `contactList`);
-    }
-
-    function handleDirectionClick(event) {
-        if (event.target.attributes.value &&
-            event.target.attributes.value.value !== props.currentDirection) {
-            //validate that the click is not on the edge (css might make some area clickable that doesn't have value)
-            //and validate something is actually changing
-            props.handleDirectionUpdate(event.target.attributes.value.value);
-        }
     }
 
     return (
@@ -171,17 +102,17 @@ export default function MainToolbar(props) {
             <ControlContainer>
                 <Button
                     icon="plusCircle"
-                    label={`Add ${props.type}`}
+                    label={`Add ${type}`}
                     onClick={() => history.push('/contacts/new')}
                 />
-                <Button 
+                <Button
                     icon="download"
                     label={`Export Page Results`}
                     onClick={exportList}
                 />
             </ControlContainer>
             <ControlContainer>
-            <Tooltip
+                <Tooltip
                     content={
                         <PopoverContainer>
                             <div id="popover-header" label="Filters">
@@ -190,7 +121,7 @@ export default function MainToolbar(props) {
                             <div id="search-filters">
                                 <h4>Search on fields:</h4>
                                 <div>
-                                    
+
                                 </div>
                             </div>
                         </PopoverContainer>
@@ -199,55 +130,36 @@ export default function MainToolbar(props) {
                         'margin': 'auto 0',
                     }}
                 >
-                    <Button 
+                    <Button
                         label="Filter"
                         type="secondary"
-                        onClick={() => {}}
+                        onClick={() => { }}
                     />
                 </Tooltip>
                 <Input
                     placeholder="Search (3 character minimum)"
                     label="Search"
-                    value={props.searchTerm}
-                    onChange={event => props.updateSearchTerm(event.target.value)}
-                    onEnter={() => props.handleSearchEntry()}
+                    value={searchTerm}
+                    onChange={event => updateSearchTerm(event.target.value)}
+                    onEnter={() => handleSearchEntry()}
                 />
                 <Tooltip
                     content={
-                        <PopoverContainer>
-                            <div id="popover-header" label="Select Sort Field & Direction">
-                                Sort Field & Direction
-                            </div>
-                            <div id="order-direction" onClick={event => handleDirectionClick(event)}>
-                                <span value="ASC" title="Ascending" className={props.currentDirection === 'ASC' ? 'activeDirection' : 'inactiveDirection'}>
-                                    Ascending
-                                </span>
-                                <span value="DESC" title="Descending" className={props.currentDirection === 'DESC' ? 'activeDirection' : 'inactiveDirection'}>
-                                    Descending
-                                </span>
-                            </div>
-                            <RadioList>
-                                {contactSortOptions.map((option, index) => {
-                                    return (
-                                        <RadioEntry key={index}>
-                                            <input readonly checked={option.value === props.currentOrder} type="radio" id={index} name="inputs" onClick={event => props.handleOrderUpdate(contactSortOptions[event.target.id].value)} />
-                                            <label className="entry" for={index}>
-                                                <div className="entry-label">{option.label}</div>
-                                            </label>
-                                        </RadioEntry>
-                                    )
-                                })}
-                            </RadioList>
-                        </PopoverContainer>
+                        <SortOrderControls
+                            currentOrder={currentOrder}
+                            handleOrderUpdate={handleOrderUpdate}
+                            currentDirection={currentDirection}
+                            handleDirectionUpdate={handleDirectionUpdate}
+                        />
                     }
                     style={{
                         'margin': 'auto 0',
                     }}
                 >
-                    <Button 
+                    <Button
                         label={`Sort`}
                         type="secondary"
-                        onClick={() => {}}
+                        onClick={() => { }}
                     />
                 </Tooltip>
             </ControlContainer>
