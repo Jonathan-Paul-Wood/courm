@@ -13,6 +13,7 @@ junit\.xml
 # production
 build
 statistics.html
+pb-backend-*
 
 #logs
 *.logs*
