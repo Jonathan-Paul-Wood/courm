@@ -145,7 +145,6 @@ app.post('/api/contacts/new', (req, res) => {
 //accepts requests of the form: /api/contacts?order=id?results=3&page=1?direction=[ASC|DESC]?search=string
 app.get("/api/contacts", (req, res) => {
     const { results, page, order, direction, searchTerm } = req.query;
-    // const filters = req.body;
     let sql = `SELECT * FROM contacts`;
     //apply clause for each filter
     // if(filters.entityType) {
