@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
 var path = require('path');
+const open = require('open');
 var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database('main.db', (err) => {
     if(err) {
@@ -34,7 +35,8 @@ app.use(bodyParser.urlencoded({ extended: true }));
 const breadcrumbtrail = path.join(__dirname, 'build/');
 app.use('/', express.static(breadcrumbtrail));
 app.get('/', function(req, res) {
-    res.sendFile(path.join(__dirname, 'build/', 'index.html'));
+    console.log(req);
+    res.sendFile(path.join(breadcrumbtrail, 'index.html'));
 });
 
 function initializeDB() {
@@ -269,4 +271,5 @@ app.delete("/api/contacts/:id", (req, res) => {
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}.`);
+    open(`http://localhost:${PORT}`);
 });
