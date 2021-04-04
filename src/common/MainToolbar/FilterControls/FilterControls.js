@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
@@ -58,12 +58,57 @@ overflow-x: hidden;
 `;
 
 export default function FilterControls(props) {
-    const { currentSelections, updateSelections } = props;
+    const { updateActiveFilters } = props;
+    const [selectedSearchFields, setSelectedSearchFields] = useState([
+        {
+            label: 'First Name',
+            value: 'firstName',
+            selected: false
+        },
+        {
+            label: 'Last Name',
+            value: 'lastName',
+            selected: false
+        },
+        {
+            label: 'Email',
+            value: 'email',
+            selected: false
+        },
+        {
+            label: 'Phone Number',
+            value: 'phoneNumber',
+            selected: false
+        },
+        {
+            label: 'Address',
+            value: 'address',
+            selected: false
+        },
+        {
+            label: 'Firm',
+            value: 'firm',
+            selected: false
+        },
+        {
+            label: 'Industry',
+            value: 'industry',
+            selected: false
+        },
+    ]);
 
     function handleSelectionChange(index) {
-        const newSelections = currentSelections;
+        const newSelections = selectedSearchFields;
         newSelections[index].selected = !newSelections[index].selected;
-        updateSelections(newSelections);
+        setSelectedSearchFields(newSelections);
+        
+        const selectedFields = [];
+        newSelections.forEach(filter => {
+            if (filter.selected) {
+                selectedFields.push(filter.value);
+            }
+        });
+        updateActiveFilters(selectedFields);
     }
 
     return (
@@ -73,18 +118,26 @@ export default function FilterControls(props) {
             </div>
             <div id="search-filters">
                 <strong>Search on fields:</strong>
-                <div>
-                    {currentSelections.forEach((field, index) => {
+                <div id="search-field-list">
+                    {selectedSearchFields.forEach((field, index) => {
                         return (
                             <div key={index} class="form-check">
-                                <input class="form-check-input" type="checkbox" checked={field.checked} value={field.value} onClick={() => handleSelectionChange(index)} />
-                                <label class="form-check-label">
+                                <input
+                                    class="form-check-input"
+                                    type="checkbox"
+                                    id={`checkbox-filter-${field.value}`}
+                                    checked={field.selected}
+                                    value={field.value}
+                                    name="inputs"
+                                    onClick={() => handleSelectionChange(index)}
+                                />
+                                <label class="form-check-label" for={`checkbox-filter-${field.value}`}>
                                     {field.label}
                                 </label>
                             </div>
                         )
                     })}
-                            </div>
+                </div>
             </div>
         </PopoverContainer>
     )
@@ -92,6 +145,5 @@ export default function FilterControls(props) {
 
 
 FilterControls.propTypes = {
-    currentSelections: PropTypes.array.isRequired,
-    updateSelections: PropTypes.func.isRequired,
+    updateActiveFilters: PropTypes.func.isRequired,
 }

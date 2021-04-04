@@ -162,7 +162,14 @@ export default function SortOrderControls(props) {
                 {contactSortOptions.map((option, index) => {
                     return (
                         <RadioEntry key={index}>
-                            <input readonly checked={option.value === currentOrder} type="radio" id={index} name="inputs" onClick={event => handleOrderUpdate(contactSortOptions[event.target.id].value)} />
+                            <input
+                                readonly
+                                checked={option.value === currentOrder}
+                                type="radio"
+                                id={index}
+                                name="inputs"
+                                onClick={event => handleOrderUpdate(contactSortOptions[event.target.id].value)}
+                            />
                             <label className="entry" for={index}>
                                 <div className="entry-label">{option.label}</div>
                             </label>

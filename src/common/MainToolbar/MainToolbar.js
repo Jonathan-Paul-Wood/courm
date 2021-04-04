@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -81,45 +81,9 @@ const PopoverContainer = styled.div`
 
 export default function MainToolbar(props) {
     const history = useHistory();
-    const [selectedSearchFields, setSelectedSearchFields] = useState([
-        {
-            label: 'First Name',
-            value: 'firstName',
-            selected: false
-        },
-        {
-            label: 'Last Name',
-            value: 'lastName',
-            selected: false
-        },
-        {
-            label: 'Email',
-            value: 'email',
-            selected: false
-        },
-        {
-            label: 'Phone Number',
-            value: 'phoneNumber',
-            selected: false
-        },
-        {
-            label: 'Address',
-            value: 'address',
-            selected: false
-        },
-        {
-            label: 'Firm',
-            value: 'firm',
-            selected: false
-        },
-        {
-            label: 'Industry',
-            value: 'industry',
-            selected: false
-        },
-    ]);
 
     const {
+        updateActiveFilters,
         searchTerm,
         updateSearchTerm,
         handleDirectionUpdate,
@@ -154,8 +118,7 @@ export default function MainToolbar(props) {
                 <Tooltip
                     content={
                         <FilterControls
-                            currentSelections={selectedSearchFields}
-                            updateSelections={setSelectedSearchFields}
+                            updateActiveFilters={updateActiveFilters}
                         />
                     }
                     style={{
@@ -200,6 +163,8 @@ export default function MainToolbar(props) {
 }
 
 MainToolbar.propTypes = {
+    activeFilters: PropTypes.array.isRequired,
+    updateActiveFilters: PropTypes.func.isRequired,
     searchTerm: PropTypes.string.isRequired,
     updateSearchTerm: PropTypes.func.isRequired,
     handleSearchEntry: PropTypes.func.isRequired,

@@ -48,7 +48,7 @@ export default function ContactsBrowse(props) {
         isContactListMetadataError, 
         getContactListMetadata 
     } = props;
-    const [activeFilters, setActiveFilters] = useState({});
+    const [activeFilters, setActiveFilters] = useState([]);
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
     const [cardTotal, setCardTotal] = useState(0);
@@ -91,6 +91,8 @@ export default function ContactsBrowse(props) {
                 <MainToolbar
                     type="Contact"
                     className="main-toolbar"
+                    activeFilters={activeFilters}
+                    updateActiveFilters={setActiveFilters}
                     searchTerm={searchTerm}
                     updateSearchTerm={setSearchTerm}
                     handleSearchEntry={handleSearchEntry}
@@ -111,7 +113,7 @@ export default function ContactsBrowse(props) {
                         })
                     ) : (
                     <NoResultsMessage className="warningMessage">
-                        Sorry, no results to display{(Object.keys(activeFilters).length || searchTerm) ? ' for your applied search filters' : ''}
+                        Sorry, no results to display{(activeFilters.length || searchTerm) ? ' for your applied search filters' : ''}
                     </NoResultsMessage>
                     )
                 )}
