@@ -144,7 +144,7 @@ app.post('/api/contacts/new', (req, res) => {
 
 //accepts requests of the form: /api/contacts?order=id?results=3&page=1?direction=[ASC|DESC]?search=string
 app.get("/api/contacts", (req, res) => {
-    const { results, page, order, direction, searchTerm } = req.query;
+    const { results, page, order, direction, searchTerm, filters } = req.query;
     let sql = `SELECT * FROM contacts`;
     //apply clause for each filter
     // if(filters.entityType) {
@@ -154,6 +154,7 @@ app.get("/api/contacts", (req, res) => {
     //apply search
     if(searchTerm) {
         console.log(searchTerm);
+        console.log('filters: ', filters);
         sql = sql+` WHERE firstName LIKE '%${searchTerm}%' OR lastName LIKE '%${searchTerm}%' OR email LIKE '%${searchTerm}%'`;
         sql = sql+` OR phoneNumber LIKE '%${searchTerm}%' OR address LIKE '%${searchTerm}%' OR firm LIKE '%${searchTerm}%' or industry LIKE '%${searchTerm}%'`;
         
