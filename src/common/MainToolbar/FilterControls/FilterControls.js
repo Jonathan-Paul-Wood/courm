@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
@@ -23,38 +23,6 @@ overflow-x: hidden;
     text-overflow: ellipsis;
     justify-content: right;
 }
-
-#order-direction {
-    margin: 0.5em 2.5%;
-    display: flex;
-    justify-content: space-around;
-    border: 0.1em solid #e2e2e2;
-    border-radius: 5px;
-}
-
-.activeDirection {
-    width: 100%;
-    text-align: center;
-    cursor: default;
-    color: white;
-    background-color: #4da6ff;
-    border-radius: 5px;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    padding: 0 0.5rem;
-}
-.inactiveDirection {
-    width: 100%;
-    text-align: center;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    padding: 0 0.5rem;
-}
-.inactiveDirection:hover {
-    cursor: pointer;
-    background-color: #f2f2f2;
-}
-
 `;
 
 export default function FilterControls(props) {
@@ -94,5 +62,6 @@ export default function FilterControls(props) {
 
 
 FilterControls.propTypes = {
+    activeFilters: PropTypes.array.isRequired,
     updateActiveFilters: PropTypes.func.isRequired,
 }
