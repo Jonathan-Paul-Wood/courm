@@ -152,14 +152,23 @@ app.get("/api/contacts", (req, res) => {
     // }
 
     //apply search
-    if(searchTerm) {
+    if(searchTerm && filters) {
+        const searchFilters = filters.split(',');
         console.log(searchTerm);
-        console.log('filters: ', filters);
-        sql = sql+` WHERE firstName LIKE '%${searchTerm}%' OR lastName LIKE '%${searchTerm}%' OR email LIKE '%${searchTerm}%'`;
-        sql = sql+` OR phoneNumber LIKE '%${searchTerm}%' OR address LIKE '%${searchTerm}%' OR firm LIKE '%${searchTerm}%' or industry LIKE '%${searchTerm}%'`;
+        console.log('filters: ', searchFilters);
+        sql = sql + ` WHERE ${searchFilters[0]} LIKE '%${searchTerm}%'`;
+        searchFilters.forEach((filter, index) => {
+            if(index) {
+                sql = sql + ` OR ${filter} LIKE '%${searchTerm}%'`
+            }
+        })
+        // sql = sql+` WHERE firstName LIKE '%${searchTerm}%' OR lastName LIKE '%${searchTerm}%' OR email LIKE '%${searchTerm}%'`;
+        // sql = sql+` OR phoneNumber LIKE '%${searchTerm}%' OR address LIKE '%${searchTerm}%' OR firm LIKE '%${searchTerm}%' or industry LIKE '%${searchTerm}%'`;
         
         // use % to match >=0 chars before and after search term
     }
+
+    const sql_metadata = sql;
 
     //apply sort order and pagination
     sql = sql+` ORDER BY ${order} ${direction} LIMIT ${results} OFFSET ((${page - 1})* ${results})`;
@@ -171,28 +180,26 @@ app.get("/api/contacts", (req, res) => {
             res.status = NOT_FOUND_CODE;
             res.json({message: 'NOT FOUND'});
         } else {
-            res.status = SUCCESS_CODE;
-            res.json(rows);
-        }
-    });
-});
-
-app.get("/api/contacts/metadata", (req, res) => {
-    const { searchTerm } = req.query;
-    let sql = `SELECT COUNT(*) FROM contacts`;
-    if (searchTerm) {
-        sql=sql+` WHERE firstName LIKE '%${searchTerm}%'`;
-    }
-    db.get(sql, (err, result) => {
-        if (err) {
-            res.status = ERROR_CODE;
-            return console.error(err.message);
-        } else if (!result) {
-            res.status = NOT_FOUND_CODE;
-            return;
-        } else {
-            res.status = SUCCESS_CODE;
-            res.json({total: result['COUNT(*)']});
+            console.log('meta: ', sql_metadata);
+            db.all(sql_metadata, (err, result) => {
+                if (err) {
+                    res.status = ERROR_CODE;
+                    return console.error(err.message);
+                } else if (!result) {
+                    res.status = NOT_FOUND_CODE;
+                    return;
+                } else {
+                    totalResults = result.length;
+                    res.json({
+                        results: rows,
+                        resultCount: rows.length,
+                        pageSize: parseInt(results),
+                        totalCount: totalResults,
+                        pageCount: Math.ceil(totalResults / parseInt(results)),
+                        currentPage: parseInt(page),
+                    });
+                }
+            });
         }
     });
 });
