@@ -163,7 +163,7 @@ export default function SortOrderControls(props) {
                     return (
                         <RadioEntry key={index}>
                             <input
-                                readonly
+                                readOnly
                                 checked={option.value === currentOrder}
                                 type="radio"
                                 id={index}

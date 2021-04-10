@@ -42,46 +42,41 @@ export default function ContactsBrowse(props) {
         contacts,
         isContactListPending, 
         contactListError, 
-        getContactList, 
-        contactsMetadata, 
-        isContactListMetadataPending, 
-        isContactListMetadataError, 
-        getContactListMetadata 
+        getContactList,
     } = props;
     const [activeFilters, setActiveFilters] = useState([]);
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
-    const [cardTotal, setCardTotal] = useState(0);
     const [searchOrderBy, setSearchOrderBy] = useState('firstName');
     const [direction, setDirection] = useState("ASC"); //ASC if ascending, DESC if descending
 
     useEffect(() => {
-        setCardTotal(contactsMetadata.total);
-    }, [contactsMetadata]);
-
-    useEffect(() => {
-        getContactList(RESULTS_PER_PAGE, 1, "", 'firstName', 'ASC');
-        getContactListMetadata(searchTerm); // call again when filters changes
+        initiateSearch();
     }, []);
 
-    function updatePage(value) {
-        setPage(value);
-        getContactList(RESULTS_PER_PAGE, value, searchTerm);
-    }
+    useEffect(() => {
+        initiateSearch();
+    }, [page, searchOrderBy, direction]);
 
-    function updateSearchOrder(value) {
-        setSearchOrderBy(value);
-        getContactList(RESULTS_PER_PAGE, 1, searchTerm, value, direction);
-    }
+    useEffect(() => {
+        if(searchTerm !== '') {
+            initiateSearch();
+        }
+    }, [activeFilters]);
 
-    function updateDirection(value) {
-        setDirection(value);
-        getContactList(RESULTS_PER_PAGE, 1, searchTerm, searchOrderBy, value);
-    }
+    useEffect(() => {
+        if (searchTerm !== '') {
+            const timer = setTimeout(() => {
+                initiateSearch();
+            }, 500);
+            return () => clearTimeout(timer);
+        }
+        
+        initiateSearch();
+    }, [searchTerm]);
 
-    function handleSearchEntry() {
-        getContactList(RESULTS_PER_PAGE, 1, searchTerm, searchOrderBy, direction);
-        getContactListMetadata(searchTerm);
+    function initiateSearch() {
+        getContactList(RESULTS_PER_PAGE, page, searchTerm, searchOrderBy, direction, activeFilters);
     }
 
     return (
@@ -91,22 +86,20 @@ export default function ContactsBrowse(props) {
                 <MainToolbar
                     type="Contact"
                     className="main-toolbar"
-                    activeFilters={activeFilters}
                     updateActiveFilters={setActiveFilters}
                     searchTerm={searchTerm}
                     updateSearchTerm={setSearchTerm}
-                    handleSearchEntry={handleSearchEntry}
                     currentOrder={searchOrderBy}
-                    handleOrderUpdate={updateSearchOrder}
+                    handleOrderUpdate={setSearchOrderBy}
                     currentDirection={direction}
-                    handleDirectionUpdate={updateDirection}
+                    handleDirectionUpdate={setDirection}
                 />
                 <ScrollContainer className="scroll-container">
-                {(isContactListPending || isContactListMetadataPending) ? (
+                {isContactListPending ? (
                     <LoadingSpinner type="spinner" />
                 ) : (
-                    contacts.length ? (
-                        contacts.map(contact => {
+                    contacts.results.length ? (
+                        contacts.results.map(contact => {
                             return (
                                 <ContactCard key={contact.id} contact={contact} />
                             )
@@ -118,14 +111,14 @@ export default function ContactsBrowse(props) {
                     )
                 )}
                 </ScrollContainer>
-                {cardTotal > RESULTS_PER_PAGE && (
+                {contacts.totalCount > RESULTS_PER_PAGE && (
                     <Paginate
                         className="paginate"
-                        total={cardTotal}
+                        total={contacts.totalCount}
                         page={page}
                         cardsPerPage={RESULTS_PER_PAGE}
-                        count={contacts.length}
-                        updatePage={updatePage}
+                        count={contacts.resultCount}
+                        updatePage={setPage}
                     />
                 )}
             </ContentWrapper>

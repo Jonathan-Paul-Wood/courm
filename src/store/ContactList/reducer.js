@@ -1,14 +1,9 @@
 import * as types from './types';
 
 export const initialState = {
-    contacts: [],
+    contacts: {},
     isContactListPending: true,
     contactListError: '',
-    contactsMetadata: {
-        total: 0,
-    },
-    isContactListMetadataPending: true,
-    contactListMetadataError: '',
 }
 
 export default function contact(state = initialState, action) {
@@ -19,12 +14,6 @@ export default function contact(state = initialState, action) {
             return { ...state, isContactListPending: false, contactListError: action.error }
         case types.GET_CONTACT_LIST_SUCCESS:
             return { ...state, isContactListPending: false, contactListError: '', contacts: action.payload.data }
-        case types.GET_CONTACT_LIST_METADATA_PENDING:
-            return { ...state, isContactListMetadataPending: true, contactListMetadataError: '' };
-        case types.GET_CONTACT_LIST_METADATA_ERROR:
-            return { ...state, isContactListMetadataPending: false, contactListMetadataError: action.error }
-        case types.GET_CONTACT_LIST_METADATA_SUCCESS:
-            return { ...state, isContactListMetadataPending: false, contactListMetadataError: '', contactsMetadata: action.payload.data }
         default:
             return state;
     }

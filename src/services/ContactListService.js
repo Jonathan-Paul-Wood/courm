@@ -1,10 +1,6 @@
 import axios from '../configs/axiosBasic';
 
 export default class ContactListService {
-    static getContactListMetadata(searchTerm) {
-        return axios.get(`/contacts/metadata?searchTerm=${searchTerm}`);
-    }
-
     static getContactList(results, page, searchTerm, order, direction, filters) {
         //to GET all contacts, pass results = number of total contacts, and page = 1
         results = results || 5;

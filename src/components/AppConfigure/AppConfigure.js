@@ -11,16 +11,12 @@ const ConfigureWrapper = styled.div`
 
 export default function AppConfigure(props) {
     const {
-        getContactListMetadata,
         getContactList,
         postContact,
         deleteContact,
         contacts,
         isContactListPending,
         contactListError,
-        contactsMetadata,
-        isContactListMetadataPending,
-        isContactListMetadataError,
         isContactPostPending,
         contactPostError,
         isContactDeletePending,
@@ -30,17 +26,12 @@ export default function AppConfigure(props) {
     const [pendingUpload, setPendingUpload] = useState(null);
 
     useEffect(() => {
-        getContactListMetadata('');
+        //TODO: replace with getAll endpoint
+        getContactList(100000, 1, '', 'firstName', 'ASC'); //TODO: how to stop double calls
     }, []);
 
-    useEffect(() => {
-        if(!isContactListMetadataPending && contactsMetadata.total) {
-            getContactList(contactsMetadata.total, 1, '', 'firstName', 'ASC'); //TODO: how to stop double calls
-        }
-    }, [contactsMetadata]);
-
     function handleContactListExport() {
-        exportContactList(contacts, `contactList`);
+        exportContactList(contacts.results, `contactList`);
     }
 
     function captureUpload(event) {
@@ -71,7 +62,7 @@ export default function AppConfigure(props) {
         <ConfigureWrapper>
             <h2>Configure Application</h2>
             <hr/>
-            {isContactListPending || isContactListMetadataPending ? (
+            {isContactListPending ? (
                 <LoadingSpinner />
             ) : (
                 <>
@@ -114,16 +105,12 @@ export default function AppConfigure(props) {
 }
 
 AppConfigure.propTypes = {
-    getContactListMetadata: PropTypes.func.isRequired,
     getContactList: PropTypes.func.isRequired,
     postContact: PropTypes.func.isRequired,
     deleteContact: PropTypes.func.isRequired,
     contacts: PropTypes.object.isRequired,
     isContactListPending: PropTypes.bool.isRequired,
     contactListError: PropTypes.string.isRequired,
-    contactsMetadata: PropTypes.object.isRequired,
-    isContactListMetadataPending: PropTypes.bool.isRequired,
-    isContactListMetadataError: PropTypes.string.isRequired,
     isContactPostPending: PropTypes.bool.isRequired,
     contactPostError: PropTypes.object.isRequired,
     isContactDeletePending: PropTypes.bool.isRequired,

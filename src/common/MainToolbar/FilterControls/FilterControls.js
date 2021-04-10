@@ -58,58 +58,7 @@ overflow-x: hidden;
 `;
 
 export default function FilterControls(props) {
-    const { updateActiveFilters } = props;
-    const [selectedSearchFields, setSelectedSearchFields] = useState([
-        {
-            label: 'First Name',
-            value: 'firstName',
-            selected: false
-        },
-        {
-            label: 'Last Name',
-            value: 'lastName',
-            selected: false
-        },
-        {
-            label: 'Email',
-            value: 'email',
-            selected: false
-        },
-        {
-            label: 'Phone Number',
-            value: 'phoneNumber',
-            selected: false
-        },
-        {
-            label: 'Address',
-            value: 'address',
-            selected: false
-        },
-        {
-            label: 'Firm',
-            value: 'firm',
-            selected: false
-        },
-        {
-            label: 'Industry',
-            value: 'industry',
-            selected: false
-        },
-    ]);
-
-    function handleSelectionChange(index) {
-        const newSelections = selectedSearchFields;
-        newSelections[index].selected = !newSelections[index].selected;
-        setSelectedSearchFields(newSelections);
-        
-        const selectedFields = [];
-        newSelections.forEach(filter => {
-            if (filter.selected) {
-                selectedFields.push(filter.value);
-            }
-        });
-        updateActiveFilters(selectedFields);
-    }
+    const { updateActiveFilters, activeFilters } = props;
 
     return (
         <PopoverContainer>
@@ -119,19 +68,19 @@ export default function FilterControls(props) {
             <div id="search-filters">
                 <strong>Search on fields:</strong>
                 <div id="search-field-list">
-                    {selectedSearchFields.forEach((field, index) => {
+                    {activeFilters.map((field, index) => {
                         return (
-                            <div key={index} class="form-check">
+                            <div key={index} className="form-check">
                                 <input
-                                    class="form-check-input"
+                                    className="form-check-input"
                                     type="checkbox"
                                     id={`checkbox-filter-${field.value}`}
                                     checked={field.selected}
                                     value={field.value}
                                     name="inputs"
-                                    onClick={() => handleSelectionChange(index)}
+                                    onChange={() => updateActiveFilters(index)}
                                 />
-                                <label class="form-check-label" for={`checkbox-filter-${field.value}`}>
+                                <label className="form-check-label" for={`checkbox-filter-${field.value}`}>
                                     {field.label}
                                 </label>
                             </div>

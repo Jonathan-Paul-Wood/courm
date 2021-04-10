@@ -151,7 +151,7 @@ export default function TextArea(props) {
                     onChange={onChange}
                     maxlength={max}
                     required={required}
-                    readonly={locked}
+                    readOnly={locked}
                     onFocus={() => !locked && setActive(true)}
                     onBlur={() => !locked && setActive(false)}
                     resize="none"

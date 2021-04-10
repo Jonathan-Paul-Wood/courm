@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
@@ -81,6 +81,43 @@ const PopoverContainer = styled.div`
 
 export default function MainToolbar(props) {
     const history = useHistory();
+    const [selectedSearchFields, setSelectedSearchFields] = useState([
+        {
+            label: 'First Name',
+            value: 'firstName',
+            selected: false
+        },
+        {
+            label: 'Last Name',
+            value: 'lastName',
+            selected: false
+        },
+        {
+            label: 'Email',
+            value: 'email',
+            selected: false
+        },
+        {
+            label: 'Phone Number',
+            value: 'phoneNumber',
+            selected: false
+        },
+        {
+            label: 'Address',
+            value: 'address',
+            selected: false
+        },
+        {
+            label: 'Firm',
+            value: 'firm',
+            selected: false
+        },
+        {
+            label: 'Industry',
+            value: 'industry',
+            selected: false
+        },
+    ]);
 
     const {
         updateActiveFilters,
@@ -88,7 +125,6 @@ export default function MainToolbar(props) {
         updateSearchTerm,
         handleDirectionUpdate,
         handleOrderUpdate,
-        handleSearchEntry,
         type,
         currentDirection,
         currentOrder,
@@ -98,6 +134,21 @@ export default function MainToolbar(props) {
     function exportList() {
         const list = type === 'Contact' ? contactList : 'interactionList';
         exportContactList(list, `contactList`);
+    }
+
+    
+    function handleSelectionChange(index) {
+        const newSelections = selectedSearchFields;
+        newSelections[index].selected = !newSelections[index].selected;
+        setSelectedSearchFields(newSelections);
+        
+        const selectedFields = [];
+        newSelections.forEach(filter => {
+            if (filter.selected) {
+                selectedFields.push(filter.value);
+            }
+        });
+        updateActiveFilters(selectedFields);
     }
 
     return (
@@ -118,7 +169,8 @@ export default function MainToolbar(props) {
                 <Tooltip
                     content={
                         <FilterControls
-                            updateActiveFilters={updateActiveFilters}
+                            updateActiveFilters={handleSelectionChange}
+                            activeFilters={selectedSearchFields}
                         />
                     }
                     style={{
@@ -136,7 +188,6 @@ export default function MainToolbar(props) {
                     label="Search"
                     value={searchTerm}
                     onChange={event => updateSearchTerm(event.target.value)}
-                    onEnter={() => handleSearchEntry()}
                 />
                 <Tooltip
                     content={
@@ -163,16 +214,14 @@ export default function MainToolbar(props) {
 }
 
 MainToolbar.propTypes = {
-    activeFilters: PropTypes.array.isRequired,
     updateActiveFilters: PropTypes.func.isRequired,
     searchTerm: PropTypes.string.isRequired,
     updateSearchTerm: PropTypes.func.isRequired,
-    handleSearchEntry: PropTypes.func.isRequired,
     type: PropTypes.string.isRequired,
     currentOrder: PropTypes.string.isRequired,
     handleOrderUpdate: PropTypes.func.isRequired,
     currentDirection: PropTypes.string.isRequired,
     handleDirectionUpdate: PropTypes.func.isRequired,
-    contactList: PropTypes.object.isRequired,
+    contactList: PropTypes.array.isRequired,
     //interactionList: PropTypes.object.isRequired,
 }
