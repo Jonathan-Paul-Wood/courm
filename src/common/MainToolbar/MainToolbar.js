@@ -132,7 +132,7 @@ export default function MainToolbar(props) {
     } = props;
 
     function exportList() {
-        const list = type === 'Contact' ? contactList : 'interactionList';
+        const list = type === 'Contact' ? contactList.results : 'interactionList';
         exportContactList(list, `contactList`);
     }
 
