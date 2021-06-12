@@ -8,9 +8,9 @@
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "sqlite3": "^5.0.0",
+    "open": "^8.0.2",
     "sequelize": "^6.3.5",
-    "open": "^8.0.2"
+    "sqlite3": "^5.0.0"
   },
   "devDependencies": {},
   "scripts": {
@@ -32,9 +32,9 @@
     ],
     "assets": [
       "main.db",
-      "./build/*",
+      "build/*",
       "LICENSE.txt",
-      "./node_modules/*"
+      "node_modules/*"
     ]
   },
   "author": "Jonathan Paul Wood",

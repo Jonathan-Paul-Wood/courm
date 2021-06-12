@@ -32,12 +32,12 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 
 // If running in production mode enter here
-const breadcrumbtrail = path.join(__dirname, 'build/');
-app.use('/', express.static(breadcrumbtrail));
-app.get('/', function(req, res) {
-    console.log(req);
-    res.sendFile(path.join(breadcrumbtrail, 'index.html'));
-});
+// const breadcrumbtrail = path.join(__dirname, 'build/');
+// app.use('/', express.static(breadcrumbtrail));
+// app.get('/', function(req, res) {
+//     console.log(req);
+//     res.sendFile(path.join(breadcrumbtrail, 'index.html'));
+// });
 
 function initializeDB() {
     db.serialize(function() {
@@ -145,10 +145,9 @@ app.post('/api/contacts/new', (req, res) => {
         );
 });
 
-//accepts requests of the form: localhost:8080/api/contacts?order=id?results=3&page=1?direction=[ASC|DESC]?search=string
+//accepts requests of the form: /api/contacts?order=id?results=3&page=1?direction=[ASC|DESC]?search=string
 app.get("/api/contacts", (req, res) => {
-    const { results, page, order, direction, searchTerm } = req.query;
-    // const filters = req.body;
+    const { results, page, order, direction, searchTerm, filters } = req.query;
     let sql = `SELECT * FROM contacts`;
     //apply clause for each filter
     // if(filters.entityType) {
@@ -156,23 +155,26 @@ app.get("/api/contacts", (req, res) => {
     // }
 
     //apply search
-    if(searchTerm) {
-        //sql = sql+` WHERE (firstName,lastName) GLOB '*${searchTerm}*'`;
-        sql = sql+` WHERE firstName LIKE '%${searchTerm}%'`;
-        //sql = sql+` or WHERE lastName LIKE '%${searchTerm}%'`;
-        // sql = sql+` or SELECT FROM contacts WHERE firm LIKE '%${searchTerm}%'`;
-        // sql = sql+` or SELECT FROM contacts WHERE phoneNumber LIKE '%${searchTerm}%'`;
-        // sql = sql+` or SELECT FROM contacts WHERE email LIKE '%${searchTerm}%'`;
-        // sql = sql+` or SELECT FROM contacts WHERE address LIKE '%${searchTerm}%'`;
-        // sql = sql+` or SELECT FROM contacts WHERE industry LIKE '%${searchTerm}%'`;
-        // sql = sql+` or SELECT FROM contacts WHERE tags LIKE '%${searchTerm}%'`;
+    if(searchTerm && filters) {
+        const searchFilters = filters.split(',');
+        console.log(searchTerm);
+        console.log('filters: ', searchFilters);
+        sql = sql + ` WHERE ${searchFilters[0]} LIKE '%${searchTerm}%'`;
+        searchFilters.forEach((filter, index) => {
+            if(index) {
+                sql = sql + ` OR ${filter} LIKE '%${searchTerm}%'`
+            }
+        })
+        // sql = sql+` WHERE firstName LIKE '%${searchTerm}%' OR lastName LIKE '%${searchTerm}%' OR email LIKE '%${searchTerm}%'`;
+        // sql = sql+` OR phoneNumber LIKE '%${searchTerm}%' OR address LIKE '%${searchTerm}%' OR firm LIKE '%${searchTerm}%' or industry LIKE '%${searchTerm}%'`;
         
         // use % to match >=0 chars before and after search term
     }
 
+    const sql_metadata = sql;
+
     //apply sort order and pagination
     sql = sql+` ORDER BY ${order} ${direction} LIMIT ${results} OFFSET ((${page - 1})* ${results})`;
-    console.log(sql);
     db.all(sql, (err, rows) => {
         if (err) {
             res.status = ERROR_CODE;
@@ -181,28 +183,25 @@ app.get("/api/contacts", (req, res) => {
             res.status = NOT_FOUND_CODE;
             res.json({message: 'NOT FOUND'});
         } else {
-            res.status = SUCCESS_CODE;
-            res.json(rows);
-        }
-    });
-});
-
-app.get("/api/contacts/metadata", (req, res) => {
-    const { searchTerm } = req.query;
-    let sql = `SELECT COUNT(*) FROM contacts`;
-    if (searchTerm) {
-        sql=sql+` WHERE firstName LIKE '%${searchTerm}%'`;
-    }
-    db.get(sql, (err, result) => {
-        if (err) {
-            res.status = ERROR_CODE;
-            return console.error(err.message);
-        } else if (!result) {
-            res.status = NOT_FOUND_CODE;
-            return;
-        } else {
-            res.status = SUCCESS_CODE;
-            res.json({total: result['COUNT(*)']});
+            db.all(sql_metadata, (err, result) => {
+                if (err) {
+                    res.status = ERROR_CODE;
+                    return console.error(err.message);
+                } else if (!result) {
+                    res.status = NOT_FOUND_CODE;
+                    return;
+                } else {
+                    totalResults = result.length;
+                    res.json({
+                        results: rows,
+                        resultCount: rows.length,
+                        pageSize: parseInt(results),
+                        totalCount: totalResults,
+                        pageCount: Math.ceil(totalResults / parseInt(results)),
+                        currentPage: parseInt(page),
+                    });
+                }
+            });
         }
     });
 });
@@ -210,8 +209,6 @@ app.get("/api/contacts/metadata", (req, res) => {
 app.get("/api/contacts/:id", (req, res) => {
     const sql = `SELECT * FROM contacts WHERE id = ${req.params.id}`;
     db.get(sql, (err, row) => {
-        console.log('row: ', row);
-        console.log('err: ', err);
         if (err) {
             res.status(ERROR_CODE).send({message: err.message});
         } else if (!row) {
@@ -234,10 +231,7 @@ app.put("/api/contacts/:id", (req, res) => {
         }
     });
     sql = sql+` WHERE id=${req.params.id}`;
-    console.log(sql);
     db.run(sql, (err, row) => {
-        console.log(err);
-        console.log(row);
         if (err) {
             res.status = ERROR_CODE;
             res.json(err);
@@ -268,8 +262,10 @@ app.delete("/api/contacts/:id", (req, res) => {
 });
   
 // set port, listen for requests
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}.`);
-    open(`http://localhost:${PORT}`);
+    console.log(`Server is running... if your default browser does not open, visit http://localhost:${PORT}/ to access the application.`);
+
+    // if in production mode: opens the url in the default browser 
+    open(`http://localhost:${PORT}/`);
 });
