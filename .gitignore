@@ -9,18 +9,12 @@ package-lock.json
 # testing
 coverage
 junit\.xml
-<<<<<<< HEAD
 
-# production
-build
-statistics.html
-=======
 # production
 build
 statistics.html
 require.js
 pb-backend-*
->>>>>>> 1023610e91bec7eb93f8e236fb0d5a91601f6e03
 
 #logs
 *.logs*
