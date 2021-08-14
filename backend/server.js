@@ -229,7 +229,7 @@ app.put("/api/contacts/:id", (req, res) => {
     Object.keys(b).map(key => {
         if(key !== 'id' && key !== 'firstName') {
             sql = sql+`, ${key}='${b[key]}'`
-        } else if (key === 'firstName') { //TODO: CHECK THIS CHANGE
+        } else if (key === 'firstName') {
             sql = sql+` ${key}='${b[key]}'`
         }
     });
