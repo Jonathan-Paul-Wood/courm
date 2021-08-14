@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 
@@ -13,7 +13,8 @@ const HomeWrapper = styled.div`
     }
 `;
 
-export default function AppHome() {
+export default function AppHome(props) {
+    const { initializeDB, isInitializingDB, initializeDBError } = props;
     const history = useHistory();
 
     function handleActionSelection(action, object) {
@@ -26,6 +27,11 @@ export default function AppHome() {
                 console.log('error, invalid action: ', action);
         }
     }
+
+    useEffect(() => {
+        //initialize the DB on startup - ensures tables exist if not already created
+        initializeDB();
+    }, []);
 
     return (
         <HomeWrapper>

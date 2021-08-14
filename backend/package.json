@@ -15,7 +15,9 @@
   "devDependencies": {},
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "start": "node server.js",
+    "db-init-win": "fsutil file createnew main.db 0",
+    "db-init-lin": "touch maind.db"
   },
   "keywords": [
     "nodejs",
