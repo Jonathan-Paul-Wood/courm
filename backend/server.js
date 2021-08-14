@@ -157,8 +157,8 @@ app.get("/api/contacts", (req, res) => {
     //apply search
     if(searchTerm && filters) {
         const searchFilters = filters.split(',');
-        console.log(searchTerm);
-        console.log('filters: ', searchFilters);
+        //console.log(searchTerm);
+        //console.log('filters: ', searchFilters);
         sql = sql + ` WHERE ${searchFilters[0]} LIKE '%${searchTerm}%'`;
         searchFilters.forEach((filter, index) => {
             if(index) {
@@ -175,14 +175,17 @@ app.get("/api/contacts", (req, res) => {
 
     //apply sort order and pagination
     sql = sql+` ORDER BY ${order} ${direction} LIMIT ${results} OFFSET ((${page - 1})* ${results})`;
+    //console.log('fetch: ', sql);
     db.all(sql, (err, rows) => {
         if (err) {
+            //console.log(err);
             res.status = ERROR_CODE;
             res.json(err);
         } else if (!rows) {
             res.status = NOT_FOUND_CODE;
             res.json({message: 'NOT FOUND'});
         } else {
+            //console.log(rows);
             db.all(sql_metadata, (err, result) => {
                 if (err) {
                     res.status = ERROR_CODE;
@@ -226,7 +229,7 @@ app.put("/api/contacts/:id", (req, res) => {
     Object.keys(b).map(key => {
         if(key !== 'id' && key !== 'firstName') {
             sql = sql+`, ${key}='${b[key]}'`
-        } if (key === 'firstName') {
+        } else if (key === 'firstName') { //TODO: CHECK THIS CHANGE
             sql = sql+` ${key}='${b[key]}'`
         }
     });
@@ -264,8 +267,8 @@ app.delete("/api/contacts/:id", (req, res) => {
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
-    console.log(`Server is running... if your default browser does not open, visit http://localhost:${PORT}/ to access the application.`);
+    console.log(`Server is running...`);
 
     // if in production mode: opens the url in the default browser 
-    open(`http://localhost:${PORT}/`);
+    //open(`http://localhost:${PORT}/`);
 });
