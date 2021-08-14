@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 import { Route } from 'react-router-dom';
 import LeftSidebar from '../../layouts/AppLayout/LeftSideBar/LeftSideBar';
 
@@ -30,3 +31,7 @@ export default function AppLayout ({ component: Component, ...props }) {
         />
     );
 }
+
+AppLayout.propTypes = {
+    component: PropTypes.object
+};

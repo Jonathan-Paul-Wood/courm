@@ -1,6 +1,7 @@
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
+import PropTypes from 'prop-types';
 import icons from '../../../../assets/icons/bootstrapIcons';
 
 const ItemWrapper = styled.div`
@@ -50,3 +51,9 @@ export default function LeftSidebar (props) {
         </ItemWrapper>
     );
 }
+
+LeftSidebar.propTypes = {
+    path: PropTypes.string,
+    icon: PropTypes.object,
+    title: PropTypes.string
+};
