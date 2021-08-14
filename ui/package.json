@@ -9,6 +9,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "lint": "eslint ./src",
+    "lint-fix": "eslint ./src --fix",
+    "lint-fix-dry-run": "eslint ./src --fix-dry-run",
     "eject": "react-scripts eject"
   },
   "dependencies": {
