@@ -37,8 +37,31 @@ In order to create new build files of the UI to host off of the backend and run 
 And then move the resulting file into /backend/build
 
 Next, update the file /backend/server.js.
-- uncomment line 31, lines 35 - 40, and line 274
-- on line 265, change the port from 8080 to 3000
+
+### uncomment line 31
+This will enable bodyParser, to help the backend serve the built ui files
+
+    app.use(bodyParser.text());
+
+### uncomment lines 35 - 40
+This will retrieve the ui files from the `build` directory
+
+    const breadcrumbtrail = path.join(__dirname, 'build/');
+    app.use('/', express.static(breadcrumbtrail));
+    app.get('/', function(req, res) {
+        console.log(req);
+        res.sendFile(path.join(breadcrumbtrail, 'index.html'));
+    });
+
+### uncomment line 274
+This will ensure the app automatically opens in your default browser on startup. Otherwise you can navigate directly to it.
+
+    open(`http://localhost:${PORT}/`);
+
+### on line 268, change the port from 8080 to 3000
+Not strictly needed, but for consistency to access the application from localhost:3000
+
+    const PORT = process.env.PORT || 3000;
 
 Now when you run `npm start` in the /backend directory, the backend will serve the built UI files from localhost:3000
 
