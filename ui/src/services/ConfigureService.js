@@ -5,4 +5,8 @@ export default class ConfigureService {
         console.log(json);
         return axios.post(`/configure/contacts/add?contacts=${json}`);
     }
+
+    static initializeDB() {
+        return axios.post('/initialize');
+    }
 }

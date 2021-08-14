@@ -4,7 +4,7 @@ import styled from 'styled-components';
 
 // import { PropTypes } from 'prop-types';
 import AppLayout from '../../../layouts/AppLayout/AppLayout';
-import AppHome from '../../../components/AppHome/AppHome';
+import AppHome from '../../../components/AppHome';
 import ContactsBrowse from '../../../components/ContactsBrowse';
 import ViewContact from '../../../components/ViewContact';
 import EditContact from '../../../components/EditContact';
