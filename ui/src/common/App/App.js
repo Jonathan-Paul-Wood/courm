@@ -13,9 +13,9 @@ import appConfig from '../../configs/appConfig';
 import AppRouter from '../routers/AppRouter/AppRouter';
 
 const ErrorBoundary = styled.div`
-`;//todo: make it's own component. Wraps around and overlays screen if there is an error message
+`;// todo: make it's own component. Wraps around and overlays screen if there is an error message
 
-export default function App(props) {
+export default function App (props) {
     const [isSetupComplete, setIsSetupComplete] = useState(false);
     const [timeoutInterval, setTimeoutInterval] = useState(null);
 
@@ -51,13 +51,13 @@ export default function App(props) {
     //     )
     // }, [props.user.lastTimstamp]);
 
-    function handleTimeoutConfirm() {
-        //ping server or something to keep session alive
-        //reset timer
+    function handleTimeoutConfirm () {
+        // ping server or something to keep session alive
+        // reset timer
     }
 
-    function onSessionTimeout() {
-        //window.location.assign(urlPath);
+    function onSessionTimeout () {
+        // window.location.assign(urlPath);
     }
 
     return isSetupComplete ? (
@@ -71,7 +71,7 @@ export default function App(props) {
                     <AppRouter path="/contacts" component={AppRouter} />
                     <AppRouter path="/configure" component={AppRouter} />
                     <AppRouter path="/faq" component={AppRouter} />
-                    {/*<Route path="/interactions/:interactionId" component={App} /> */}
+                    {/* <Route path="/interactions/:interactionId" component={App} /> */}
                     {/* <Route path="/interactions" component={App} /> */}
                     {/* <Route exact path="/statistics" component={App} /> */}
                 </Switch>
@@ -91,5 +91,5 @@ export default function App(props) {
         </div>
     ) : (
         <></>
-    ) //todo: make loading spinner
+    ); // todo: make loading spinner
 }

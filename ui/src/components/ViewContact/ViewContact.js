@@ -59,22 +59,22 @@ const GridWrapper = styled.div`
     }
 `;
 
-export default function ViewContact(props) {
+export default function ViewContact (props) {
     const location = useLocation();
     const isNewContact = !!location.pathname.match('/new');
     const { contactId } = useParams();
-    const { 
+    const {
         contact,
         isContactPending,
-        contactError, 
-        getContact,
+        contactError,
+        getContact
     } = props;
     const [entityType, setEntityType] = useState('');
     const [firstLoad, setFirstLoad] = useState(true);
 
     useEffect(() => {
-        //initial GET of contact
-        if(contactId) {
+        // initial GET of contact
+        if (contactId) {
             getContact(contactId);
         }
     }, [contactId]);
@@ -84,114 +84,114 @@ export default function ViewContact(props) {
         setEntityType(contact.entityType);
     }, [contact]);
 
-    function exportContact() {
+    function exportContact () {
         exportContactList([contact], `contact-${contactId}`);
     }
 
-    //TODO: handle loading state, 404s and errors
+    // TODO: handle loading state, 404s and errors
     return (
-         <>
-         {contactError ? (
-            <ContentWrapper>
-                 <p>No such contact exists. (TODO, options to go back or create new, and address header...</p>
-            </ContentWrapper>
-         ) : (
-             <>
-                <EntityTitleHeader
-                    title={isNewContact ? 'New Contact' : `${contact.firstName} ${contact.lastName}`}
-                    editMode={false}
-                />
+        <>
+            {contactError ? (
                 <ContentWrapper>
-                {(isContactPending || firstLoad) ? (
-                    <LoadingSpinner />
-                ) : (
-                    <ScrollContainer>
-                        <GridWrapper>
-                            <div className="imageRow">
-                                <div id="profile-picture">
-                                    {contact.profilePicture ? contact.profilePicture : icons['personCard']}
-                                </div>
-                                <Button icon="download" label="Export" onClick={exportContact}/>
-                            </div>
-                            <div className="metadataRow">
-                                <div id="nameData" className="inputRow rowMargin">
-                                    <Input
-                                        value={contact.firstName}
-                                        label={entityType === 'organization' ? 'Firm Name' : 'First Name'}
-                                        locked={true}
-                                    />
-                                    <Input
-                                        value={contact.lastName}
-                                        label={entityType === 'organization' ? 'Firm Type' : 'Last Name'}
-                                        locked={true}
-                                    />
-                                </div>
+                    <p>No such contact exists. (TODO, options to go back or create new, and address header...</p>
+                </ContentWrapper>
+            ) : (
+                <>
+                    <EntityTitleHeader
+                        title={isNewContact ? 'New Contact' : `${contact.firstName} ${contact.lastName}`}
+                        editMode={false}
+                    />
+                    <ContentWrapper>
+                        {(isContactPending || firstLoad) ? (
+                            <LoadingSpinner />
+                        ) : (
+                            <ScrollContainer>
+                                <GridWrapper>
+                                    <div className="imageRow">
+                                        <div id="profile-picture">
+                                            {contact.profilePicture ? contact.profilePicture : icons.personCard}
+                                        </div>
+                                        <Button icon="download" label="Export" onClick={exportContact}/>
+                                    </div>
+                                    <div className="metadataRow">
+                                        <div id="nameData" className="inputRow rowMargin">
+                                            <Input
+                                                value={contact.firstName}
+                                                label={entityType === 'organization' ? 'Firm Name' : 'First Name'}
+                                                locked={true}
+                                            />
+                                            <Input
+                                                value={contact.lastName}
+                                                label={entityType === 'organization' ? 'Firm Type' : 'Last Name'}
+                                                locked={true}
+                                            />
+                                        </div>
 
-                                <div id="contactData" className="inputRow rowMargin">
-                                    <Input
-                                        value={contact.email}
-                                        label="Email"
-                                        locked={true}
-                                    />
-                                    <Input
-                                        value={contact.phoneNumber}
-                                        label="Phone Number"
-                                        locked={true}
-                                    />
-                                </div>
+                                        <div id="contactData" className="inputRow rowMargin">
+                                            <Input
+                                                value={contact.email}
+                                                label="Email"
+                                                locked={true}
+                                            />
+                                            <Input
+                                                value={contact.phoneNumber}
+                                                label="Phone Number"
+                                                locked={true}
+                                            />
+                                        </div>
 
-                                {entityType === 'person' && (
-                                    <div id="personOnlyData" className="inputRow rowMargin">
-                                        <Input
-                                            value={contact.firm}
-                                            label="Firm"
+                                        {entityType === 'person' && (
+                                            <div id="personOnlyData" className="inputRow rowMargin">
+                                                <Input
+                                                    value={contact.firm}
+                                                    label="Firm"
+                                                    locked={true}
+                                                />
+                                                <DateInput
+                                                    value={contact.dateOfBirth}
+                                                    label="Date of Birth"
+                                                    locked={true}
+                                                />
+                                            </div>
+                                        )}
+
+                                        <div id="placementData" className="inputRow rowMargin">
+                                            <Input
+                                                value={contact.address}
+                                                label="Address"
+                                                locked={true}
+                                            />
+                                            <Input
+                                                value={contact.industry}
+                                                label="Industry"
+                                                locked={true}
+                                            />
+                                        </div>
+                                        {/* TODO: have all the fields as inputs, dis-/en-abled based on editState */}
+                                    </div>
+                                    <div className="bioRow">
+                                        <TextArea
+                                            value={contact.bio}
+                                            label="Bio"
                                             locked={true}
-                                        />
-                                        <DateInput
-                                            value={contact.dateOfBirth}
-                                            label="Date of Birth"
-                                            locked={true}
+                                            height="18vh"
                                         />
                                     </div>
-                                )}
+                                    <div className="tagsRow">
 
-                                <div id="placementData" className="inputRow rowMargin">                                
-                                    <Input
-                                        value={contact.address}
-                                        label="Address"
-                                        locked={true}
-                                    />
-                                    <Input
-                                        value={contact.industry}
-                                        label="Industry"
-                                        locked={true}
-                                    />
-                                </div>
-                                {/*TODO: have all the fields as inputs, dis-/en-abled based on editState*/}
-                            </div>
-                            <div className="bioRow">
-                                <TextArea
-                                    value={contact.bio}
-                                    label="Bio"
-                                    locked={true}
-                                    height="18vh"
-                                />
-                            </div>
-                            <div className="tagsRow">
-
-                            </div>
-                            {/* <div className="InteractionsRow">
+                                    </div>
+                                    {/* <div className="InteractionsRow">
                                 <h3>Recent Interactions (<Button label="view all" type="link" />)</h3>
                                 <div>
                                     cards go here, or none available message...
                                 </div>
                             </div> */}
-                        </GridWrapper>
-                    </ScrollContainer>
-                )}
-            </ContentWrapper>
-            </>
-         )}
+                                </GridWrapper>
+                            </ScrollContainer>
+                        )}
+                    </ContentWrapper>
+                </>
+            )}
         </>
-);
+    );
 }

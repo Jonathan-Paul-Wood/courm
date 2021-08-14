@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 
-
 const StyleContainer = styled.div`
 width: 100%;
 
@@ -135,12 +134,11 @@ textarea + label.error {
 }
 `;
 
-
-export default function TextArea(props) {
+export default function TextArea (props) {
     const { placeholder, value, onChange, error, label, locked, max, required, secondary } = props;
     const [active, setActive] = useState(false);
 
-    const fieldClassName = `${secondary ? 'secondary-field' : 'field'} ${active ? "active" : ''}`;
+    const fieldClassName = `${secondary ? 'secondary-field' : 'field'} ${active ? 'active' : ''}`;
     return (
         <StyleContainer>
             <div className={fieldClassName}>
@@ -149,14 +147,14 @@ export default function TextArea(props) {
                     placeholder={placeholder}
                     value={value}
                     onChange={onChange}
-                    maxlength={max}
+                    maxLength={max}
                     required={required}
                     readOnly={locked}
                     onFocus={() => !locked && setActive(true)}
                     onBlur={() => !locked && setActive(false)}
                     resize="none"
                 />
-                <label className={error ? "error" : ''}>
+                <label className={error ? 'error' : ''}>
                     {error || label}
                 </label>
             </div>
@@ -169,11 +167,11 @@ TextArea.defaultProps = {
     value: '',
     error: '',
     locked: false,
-    secondary: false, //by default (for white backgrounds)
+    secondary: false, // by default (for white backgrounds)
     maxLength: 140,
     onChange: () => {},
-    onEnter: () => {},
-}
+    onEnter: () => {}
+};
 
 TextArea.propTypes = {
     placeholder: PropTypes.string,
@@ -181,8 +179,8 @@ TextArea.propTypes = {
     label: PropTypes.string.isRequired,
     error: PropTypes.string,
     locked: PropTypes.bool,
-    secondary: PropTypes.bool, //if true, will be white/transparent (for colored backgrounds)
+    secondary: PropTypes.bool, // if true, will be white/transparent (for colored backgrounds)
     maxLength: PropTypes.number,
     onEnter: PropTypes.func,
-    onChange: PropTypes.func,
-}
+    onChange: PropTypes.func
+};

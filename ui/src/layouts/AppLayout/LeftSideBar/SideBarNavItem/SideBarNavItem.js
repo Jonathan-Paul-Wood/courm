@@ -34,10 +34,10 @@ const ItemContainer = styled.div`
     }
 `;
 
-export default function LeftSidebar(props) {
+export default function LeftSidebar (props) {
     const history = useHistory();
 
-    function handleNavigation(path) {
+    function handleNavigation (path) {
         history.push(`${path}`);
     }
 

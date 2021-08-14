@@ -31,7 +31,7 @@ const ContentWrapper = styled.div`
     }
 `;
 
-export default function CollectionTitleHeader(props) {
+export default function CollectionTitleHeader (props) {
     const history = useHistory();
     // const [listMode, setListMode] = useState(true);
 

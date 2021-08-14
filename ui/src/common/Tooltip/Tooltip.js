@@ -3,8 +3,8 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { Manager, Reference, Popper } from 'react-popper';
 
-export default function Tooltip(props) {
-    const {trigger, style, placement, content, children} = props;
+export default function Tooltip (props) {
+    const { trigger, style, placement, content, children } = props;
     const [showPopup, setPopup] = useState(false);
     return (
         <Manager>
@@ -24,19 +24,21 @@ export default function Tooltip(props) {
             </Reference>
             <Popper placement="bottom">
                 {({ ref, style, placement, arrowProps }) =>
-                    showPopup ? (
-                    <div
-                        className="popper"
-                        ref={ref}
-                        style={style}
-                        data-placement={placement}
-                    >
-                        {content}
-                        <div ref={arrowProps.ref} style={arrowProps.style} />
-                    </div>
-                    ) : (
-                    ""
-                    )
+                    showPopup
+                        ? (
+                            <div
+                                className="popper"
+                                ref={ref}
+                                style={style}
+                                data-placement={placement}
+                            >
+                                {content}
+                                <div ref={arrowProps.ref} style={arrowProps.style} />
+                            </div>
+                        )
+                        : (
+                            ''
+                        )
                 }
             </Popper>
         </Manager>
@@ -46,13 +48,13 @@ export default function Tooltip(props) {
 Tooltip.defaultProps = {
     trigger: 'click',
     placement: 'auto',
-    style: {},
-}
+    style: {}
+};
 
 Tooltip.propTypes = {
     trigger: PropTypes.string,
     placement: PropTypes.string,
     content: PropTypes.object.isRequired,
     children: PropTypes.object.isRequired,
-    style: PropTypes.object,
-}
+    style: PropTypes.object
+};

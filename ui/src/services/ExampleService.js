@@ -1,7 +1,7 @@
 import { axiosInstance } from '../configs/axiosSingleton';
 
 export default class ExampleService {
-    static getExample() {
+    static getExample () {
         return axiosInstance.get('/app/api/example');
     }
 }

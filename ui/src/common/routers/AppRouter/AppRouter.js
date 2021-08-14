@@ -18,13 +18,13 @@ const LoadingContainer = styled.div`
     top: 40%;
 `;
 
-export default function AppRouter(props) {
+export default function AppRouter (props) {
     const [showAccessWarning, setShowAccessWarning] = useState(false);
     const history = useHistory();
 
     useEffect(() => {
         document.title = 'Personal CRM';
-        //TODO: get appData
+        // TODO: get appData
     }, []);
 
     /**
@@ -32,8 +32,8 @@ export default function AppRouter(props) {
      */
 
     const commonRouteProps = {
-        showWarning: setShowAccessWarning,
-    }
+        showWarning: setShowAccessWarning
+    };
 
     return (
         <React.Fragment>
@@ -50,8 +50,8 @@ export default function AppRouter(props) {
                 <AppLayout path="/interactions" component={InteractionsBrowse} /> */}
             </Switch>
         </React.Fragment>
-    )
-    //change 'return' to 'return props.appData ?' ...  : (
+    );
+    // change 'return' to 'return props.appData ?' ...  : (
     //     <LoadingContainer>
     //         {/*LoadingSpinner*/}
     //     </LoadingContainer>

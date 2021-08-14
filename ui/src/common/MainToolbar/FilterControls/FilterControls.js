@@ -25,7 +25,7 @@ overflow-x: hidden;
 }
 `;
 
-export default function FilterControls(props) {
+export default function FilterControls (props) {
     const { updateActiveFilters, activeFilters } = props;
 
     return (
@@ -48,20 +48,19 @@ export default function FilterControls(props) {
                                     name="inputs"
                                     onChange={() => updateActiveFilters(index)}
                                 />
-                                <label className="form-check-label" for={`checkbox-filter-${field.value}`}>
+                                <label className="form-check-label" htmlFor={`checkbox-filter-${field.value}`}>
                                     {field.label}
                                 </label>
                             </div>
-                        )
+                        );
                     })}
                 </div>
             </div>
         </PopoverContainer>
-    )
+    );
 }
-
 
 FilterControls.propTypes = {
     activeFilters: PropTypes.array.isRequired,
-    updateActiveFilters: PropTypes.func.isRequired,
-}
+    updateActiveFilters: PropTypes.func.isRequired
+};

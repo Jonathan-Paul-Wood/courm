@@ -1,26 +1,26 @@
 import * as types from './types';
 import ServiceError from '../ServiceError';
 import ConfigureService from '../../services/ConfigureService';
-//todo: import notification toasts success/error
+// todo: import notification toasts success/error
 
-function addContactsLoading() {
+function addContactsLoading () {
     return {
-        type: types.ADD_CONTACTS_PENDING,
-    }
+        type: types.ADD_CONTACTS_PENDING
+    };
 }
-function addContactsSuccess(payload) {
+function addContactsSuccess (payload) {
     return {
         type: types.ADD_CONTACTS_SUCCESS,
-        payload,
-    }
+        payload
+    };
 }
-function addContactsError(error) {
+function addContactsError (error) {
     return {
         type: types.ADD_CONTACTS_ERROR,
         error: new ServiceError('add contacts error ', error)
-    }
+    };
 }
-export function addContacts(json) {
+export function addContacts (json) {
     return async dispatch => {
         dispatch(addContactsLoading());
         try {
@@ -29,26 +29,26 @@ export function addContacts(json) {
         } catch (e) {
             dispatch(addContactsError(e));
         }
-    }
+    };
 }
 
-function initializeDBLoading() {
+function initializeDBLoading () {
     return {
-        type: types.INITIALIZE_DB_PENDING,
-    }
+        type: types.INITIALIZE_DB_PENDING
+    };
 }
-function initializeDBSuccess() {
+function initializeDBSuccess () {
     return {
-        type: types.INITIALIZE_DB_SUCCESS,
-    }
+        type: types.INITIALIZE_DB_SUCCESS
+    };
 }
-function initializeDBError(error) {
+function initializeDBError (error) {
     return {
         type: types.INITIALIZE_DB_ERROR,
         error: new ServiceError('Error initializing the database: ', error)
-    }
+    };
 }
-export function initializeDB() {
+export function initializeDB () {
     return async dispatch => {
         dispatch(initializeDBLoading());
         try {
@@ -57,5 +57,5 @@ export function initializeDB() {
         } catch (e) {
             dispatch(initializeDBError(e));
         }
-    }
+    };
 }

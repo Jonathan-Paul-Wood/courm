@@ -13,20 +13,20 @@ const AppWrapper = styled.div`
         width: calc(100% - 10em);
     }
 `;
- 
-export default function AppLayout({component: Component, ...props}) {
+
+export default function AppLayout ({ component: Component, ...props }) {
     return (
-    <Route
-        {...props}
-        render={matchProps => (
-            <AppWrapper>
-                <LeftSidebar />
-                <div className="content">
-                    <Component {...matchProps} />
-                    <div id="layout-footer"></div>
-                </div>
-            </AppWrapper>
-        )}
-    />
-)
+        <Route
+            {...props}
+            render={matchProps => (
+                <AppWrapper>
+                    <LeftSidebar />
+                    <div className="content">
+                        <Component {...matchProps} />
+                        <div id="layout-footer"></div>
+                    </div>
+                </AppWrapper>
+            )}
+        />
+    );
 }

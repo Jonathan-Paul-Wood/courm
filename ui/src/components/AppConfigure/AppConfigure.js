@@ -9,7 +9,7 @@ const ConfigureWrapper = styled.div`
     padding: 0 1em;
 `;
 
-export default function AppConfigure(props) {
+export default function AppConfigure (props) {
     const {
         getContactList,
         postContact,
@@ -20,40 +20,40 @@ export default function AppConfigure(props) {
         isContactPostPending,
         contactPostError,
         isContactDeletePending,
-        contactDeleteError,
+        contactDeleteError
     } = props;
 
     const [pendingUpload, setPendingUpload] = useState(null);
 
     useEffect(() => {
-        //TODO: replace with getAll endpoint
-        getContactList(100000, 1, '', 'firstName', 'ASC'); //TODO: how to stop double calls
+        // TODO: replace with getAll endpoint
+        getContactList(100000, 1, '', 'firstName', 'ASC'); // TODO: how to stop double calls
     }, []);
 
-    function handleContactListExport() {
-        exportContactList(contacts.results, `contactList`);
+    function handleContactListExport () {
+        exportContactList(contacts.results, 'contactList');
     }
 
-    function captureUpload(event) {
-        let reader = new FileReader();
+    function captureUpload (event) {
+        const reader = new FileReader();
         reader.readAsText(event.target.files[0]);
         setPendingUpload(reader);
     }
 
-    function handleAddContacts() {
+    function handleAddContacts () {
         const uploadedJSON = JSON.parse(pendingUpload.result);
         uploadedJSON.data.contacts.data.forEach(contact => {
             console.log(contact);
-            let newContact = {
+            const newContact = {
                 ...contact,
-                lastModifiedOn: new Date().toISOString(),
-            }
-            delete newContact['id'];
+                lastModifiedOn: new Date().toISOString()
+            };
+            delete newContact.id;
             postContact(newContact);
         });
     }
 
-    function handleRestoreContacts() {
+    function handleRestoreContacts () {
         contacts.forEach(contact => deleteContact(contact.id));
         handleAddContacts();
     }
@@ -114,5 +114,5 @@ AppConfigure.propTypes = {
     isContactPostPending: PropTypes.bool.isRequired,
     contactPostError: PropTypes.object.isRequired,
     isContactDeletePending: PropTypes.bool.isRequired,
-    contactDeleteError: PropTypes.string.isRequired,
-}
+    contactDeleteError: PropTypes.string.isRequired
+};

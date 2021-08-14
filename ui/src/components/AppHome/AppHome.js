@@ -13,23 +13,23 @@ const HomeWrapper = styled.div`
     }
 `;
 
-export default function AppHome(props) {
+export default function AppHome (props) {
     const { initializeDB, isInitializingDB, initializeDBError } = props;
     const history = useHistory();
 
-    function handleActionSelection(action, object) {
+    function handleActionSelection (action, object) {
         switch (action) {
-            case 'view':
-                history.push(`${object}`);
-            case 'create':
-                history.push(`${object}/new`);
-            default:
-                console.log('error, invalid action: ', action);
+        case 'view':
+            history.push(`${object}`);
+        case 'create':
+            history.push(`${object}/new`);
+        default:
+            console.log('error, invalid action: ', action);
         }
     }
 
     useEffect(() => {
-        //initialize the DB on startup - ensures tables exist if not already created
+        // initialize the DB on startup - ensures tables exist if not already created
         initializeDB();
     }, []);
 

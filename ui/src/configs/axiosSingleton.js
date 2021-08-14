@@ -1,19 +1,19 @@
 import axios from 'axios';
 import Cookies from 'js-cookies';
-//import { isJson } from '../Utilities'; //try catch returns bool on test JSON.parse(str)
+// import { isJson } from '../Utilities'; //try catch returns bool on test JSON.parse(str)
 
-export const axiosInstance = axios.create({ responseType : 'json' });
+export const axiosInstance = axios.create({ responseType: 'json' });
 
 class AxiosSingleton {
-    constructor() {
+    constructor () {
         this.response();
         this.listeners = [];
         this.headers = {};
     }
 
-    request() {
+    request () {
         axiosInstance.interceptors.request.use(config => {
-            //callback events
+            // callback events
             this.listeners.forEach(requestCallback => requestCallback());
 
             const { someId } = this.headers;
@@ -28,19 +28,18 @@ class AxiosSingleton {
                 return config;
             }
             return config;
-        })
+        });
     }
 
-    response() {
+    response () {
         axiosInstance.interceptors.response.use(
-            function(response) {
+            function (response) {
                 return response;
             },
-            function(error) {
+            function (error) {
                 const { response } = error;
                 if (response) {
-
-                    //TODO: add metadata to enhance error message
+                    // TODO: add metadata to enhance error message
 
                     return Promise.reject(response);
                 }
@@ -48,14 +47,14 @@ class AxiosSingleton {
                 const emptyResponse = { message: error.message };
                 return Promise.reject(emptyResponse);
             }
-        )
+        );
     }
 
-    addListener(requestCallback) {
+    addListener (requestCallback) {
         this.listeners.push(requestCallback);
     }
 
-    updateSomeHeader(id) {
+    updateSomeHeader (id) {
         this.headers.someId = id;
     }
 }

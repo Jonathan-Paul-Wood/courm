@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import DatePicker from "react-datepicker";
- 
-import "react-datepicker/dist/react-datepicker.css";
+import DatePicker from 'react-datepicker';
 
+import 'react-datepicker/dist/react-datepicker.css';
 
 const StyleContainer = styled.div`
     width: 100%;
@@ -116,22 +115,21 @@ const StyleContainer = styled.div`
     }
 `;
 
-
-export default function Input(props) {
+export default function Input (props) {
     const { placeholder, value, onChange, error, label, locked, secondary, onEnter } = props;
     const [active, setActive] = useState(false);
 
-    const fieldClassName = `${secondary ? 'secondary-field' : 'field'} ${active ? "active" : ''} ${(locked && !active) ? "locked" : ''}`;
+    const fieldClassName = `${secondary ? 'secondary-field' : 'field'} ${active ? 'active' : ''} ${(locked && !active) ? 'locked' : ''}`;
 
-    function handleKeyPress(target) {
-        if(target.charCode==13){
-            onEnter();  
-        } 
+    function handleKeyPress (target) {
+        if (target.charCode == 13) {
+            onEnter();
+        }
     }
 
     return (
         <StyleContainer className="input-field" title={value}>
-            <div className={fieldClassName} style={{height: `56px`}}>
+            <div className={fieldClassName} style={{ height: '56px' }}>
                 <input
                     type="text"
                     placeholder={placeholder}
@@ -141,7 +139,7 @@ export default function Input(props) {
                     onBlur={() => !locked && setActive(false)}
                     onKeyPress={handleKeyPress}
                 />
-                <label className={error ? "error" : ''}>
+                <label className={error ? 'error' : ''}>
                     {error || label}
                 </label>
             </div>
@@ -155,11 +153,11 @@ Input.defaultProps = {
     value: '',
     error: '',
     locked: false,
-    secondary: false, //by default (for white backgrounds)
+    secondary: false, // by default (for white backgrounds)
     maxLength: 140,
     onChange: () => {},
-    onEnter: () => {},
-}
+    onEnter: () => {}
+};
 
 Input.propTypes = {
     type: PropTypes.string,
@@ -168,8 +166,8 @@ Input.propTypes = {
     label: PropTypes.string.isRequired,
     error: PropTypes.string,
     locked: PropTypes.bool,
-    secondary: PropTypes.bool, //if true, will be white/transparent (for colored backgrounds)
+    secondary: PropTypes.bool, // if true, will be white/transparent (for colored backgrounds)
     maxLength: PropTypes.number,
     onEnter: PropTypes.func,
-    onChange: PropTypes.func,
-}
+    onChange: PropTypes.func
+};

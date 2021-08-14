@@ -23,7 +23,7 @@ const ControlContainer = styled.div`
     }
 `;
 
-export default function MainToolbar(props) {
+export default function MainToolbar (props) {
     const history = useHistory();
     const [selectedSearchFields, setSelectedSearchFields] = useState([
         {
@@ -60,7 +60,7 @@ export default function MainToolbar(props) {
             label: 'Industry',
             value: 'industry',
             selected: false
-        },
+        }
     ]);
     const [filtersApplied, setFiltersApplied] = useState(false);
 
@@ -76,19 +76,18 @@ export default function MainToolbar(props) {
         contactList
     } = props;
 
-    function exportList() {
+    function exportList () {
         const list = type === 'Contact' ? contactList.results : 'interactionList';
-        exportContactList(list, `contactList`);
+        exportContactList(list, 'contactList');
     }
 
-    
-    function handleSelectionChange(index) {
+    function handleSelectionChange (index) {
         const newSelections = selectedSearchFields;
         newSelections[index].selected = !newSelections[index].selected;
         setSelectedSearchFields(newSelections);
 
         setFiltersApplied(newSelections.filter(f => f.selected).length);
-        
+
         const selectedFields = [];
         newSelections.forEach(filter => {
             if (filter.selected) {
@@ -108,7 +107,7 @@ export default function MainToolbar(props) {
                 />
                 <Button
                     icon="download"
-                    label={`Export Page Results`}
+                    label={'Export Page Results'}
                     onClick={exportList}
                 />
             </ControlContainer>
@@ -121,7 +120,7 @@ export default function MainToolbar(props) {
                         />
                     }
                     style={{
-                        'margin': 'auto 0',
+                        margin: 'auto 0'
                     }}
                 >
                     <Button
@@ -147,11 +146,11 @@ export default function MainToolbar(props) {
                         />
                     }
                     style={{
-                        'margin': 'auto 0',
+                        margin: 'auto 0'
                     }}
                 >
                     <Button
-                        label={`Sort`}
+                        label={'Sort'}
                         type="secondary"
                         onClick={() => { }}
                     />
@@ -170,6 +169,6 @@ MainToolbar.propTypes = {
     handleOrderUpdate: PropTypes.func.isRequired,
     currentDirection: PropTypes.string.isRequired,
     handleDirectionUpdate: PropTypes.func.isRequired,
-    contactList: PropTypes.object.isRequired,
-    //interactionList: PropTypes.object.isRequired,
-}
+    contactList: PropTypes.object.isRequired
+    // interactionList: PropTypes.object.isRequired,
+};

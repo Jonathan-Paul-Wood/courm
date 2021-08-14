@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import DatePicker from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 const StyleContainer = styled.div`
     width: 100%;
@@ -151,22 +150,21 @@ const StyleContainer = styled.div`
     }
 `;
 
-
-export default function DateInput(props) {
+export default function DateInput (props) {
     const { placeholder, value, onChange, error, label, locked, secondary, height, isDate } = props;
     const [active, setActive] = useState(false);
 
-    const fieldClassName = `${secondary ? 'secondary-field' : 'field'} ${active ? "active" : ''} ${(locked && !active) ? "locked" : ''}`;
+    const fieldClassName = `${secondary ? 'secondary-field' : 'field'} ${active ? 'active' : ''} ${(locked && !active) ? 'locked' : ''}`;
 
     return (
         <StyleContainer className="input-field">
-            <div className={fieldClassName} style={{height: `${height}`}}>
-                <label className={error ? "error" : ''}>
+            <div className={fieldClassName} style={{ height: `${height}` }}>
+                <label className={error ? 'error' : ''}>
                     {error || label}
                 </label>
                 <DatePicker
                     placeholderText={placeholder}
-                    selected={(value && value !== "null") ? new Date(value) : ''}
+                    selected={(value && value !== 'null') ? new Date(value) : ''}
                     onChange={date => onChange(date ? date.toISOString() : date)}
                     onClickOutside={() => {}}
                     showYearDropdown={true}
@@ -183,11 +181,11 @@ DateInput.defaultProps = {
     value: '',
     error: '',
     locked: false,
-    secondary: false, //by default (for white backgrounds)
+    secondary: false, // by default (for white backgrounds)
     height: '56px',
     maxLength: 140,
-    onChange: () => {},
-}
+    onChange: () => {}
+};
 
 DateInput.propTypes = {
     placeholder: PropTypes.string,
@@ -196,7 +194,7 @@ DateInput.propTypes = {
     onChange: PropTypes.func,
     error: PropTypes.string,
     locked: PropTypes.bool,
-    secondary: PropTypes.bool, //if true, will be white/transparent (for colored backgrounds)
+    secondary: PropTypes.bool, // if true, will be white/transparent (for colored backgrounds)
     height: PropTypes.string,
-    maxLength: PropTypes.number,
-}
+    maxLength: PropTypes.number
+};

@@ -36,26 +36,26 @@ display: inline-block;
       }
 `;
 
-export default function LoadingLoop(props) {
-  const { type, styleGroup, size } = props;
+export default function LoadingLoop (props) {
+    const { type, styleGroup, size } = props;
 
-  return (
-    <LoadingContainer>
-      <div className={`bubbles ${styleGroup} ${size}`}>
-        <div></div>
-        <div></div>
-        <div></div>
-      </div>
-    </LoadingContainer>
-  );
+    return (
+        <LoadingContainer>
+            <div className={`bubbles ${styleGroup} ${size}`}>
+                <div></div>
+                <div></div>
+                <div></div>
+            </div>
+        </LoadingContainer>
+    );
 }
 
 LoadingLoop.defaultProps = {
     styleGroup: 'primary',
     size: 'lg'
-}
+};
 
 LoadingLoop.propTypes = {
     styleGroup: PropTypes.string,
-    size: PropTypes.string,
-}
+    size: PropTypes.string
+};

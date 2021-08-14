@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { getContact, putContact, postContact, deleteContact } from '../../store/Contact/actions';
 
-function mapStateToProps(state) {
+function mapStateToProps (state) {
     return {
         contact: state.contact.contact,
         isContactPending: state.contact.isContactPending,
@@ -13,7 +13,7 @@ function mapStateToProps(state) {
         isContactPutPending: state.contact.isContactPutPending,
         contactPutError: state.contact.contactPutError,
         isContactDeletePending: state.contact.isContactDeletePending,
-        contactDeleteError: state.contact.contactDeleteError,
+        contactDeleteError: state.contact.contactDeleteError
     };
 }
 

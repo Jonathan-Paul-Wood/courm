@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 
-
 const PopoverContainer = styled.div`
 background-color: #ffffff;
 width: 20vw;
@@ -58,7 +57,6 @@ overflow-x: hidden;
 
 `;
 
-
 const RadioList = styled.div`
     .section-header {
         font-size: 14px;
@@ -104,7 +102,7 @@ const RadioEntry = styled.div`
     }
 `;
 
-export default function SortOrderControls(props) {
+export default function SortOrderControls (props) {
     const { currentDirection, currentOrder, handleOrderUpdate, handleDirectionUpdate } = props;
 
     const contactSortOptions = [
@@ -127,20 +125,18 @@ export default function SortOrderControls(props) {
         {
             label: 'Date of Last Change',
             value: 'lastModifiedOn'
-        },
+        }
         // {
         //     label: 'Recently Interacted',
         //     value: 'lastInteractedOn'
         // },
-    ]
+    ];
 
-
-
-    function handleDirectionClick(event) {
+    function handleDirectionClick (event) {
         if (event.target.attributes.value &&
             event.target.attributes.value.value !== currentDirection) {
-            //validate that the click is not on the edge (css might make some area clickable that doesn't have value)
-            //and validate something is actually changing
+            // validate that the click is not on the edge (css might make some area clickable that doesn't have value)
+            // and validate something is actually changing
             handleDirectionUpdate(event.target.attributes.value.value);
         }
     }
@@ -149,14 +145,14 @@ export default function SortOrderControls(props) {
         <PopoverContainer>
             <div id="popover-header" label="Select Sort Field & Direction">
                 Sort Field & Direction
-                            </div>
+            </div>
             <div id="order-direction" onClick={event => handleDirectionClick(event)}>
                 <span value="ASC" title="Ascending" className={currentDirection === 'ASC' ? 'activeDirection' : 'inactiveDirection'}>
                     Ascending
-                                </span>
+                </span>
                 <span value="DESC" title="Descending" className={currentDirection === 'DESC' ? 'activeDirection' : 'inactiveDirection'}>
                     Descending
-                                </span>
+                </span>
             </div>
             <RadioList>
                 {contactSortOptions.map((option, index) => {
@@ -170,22 +166,21 @@ export default function SortOrderControls(props) {
                                 name="inputs"
                                 onClick={event => handleOrderUpdate(contactSortOptions[event.target.id].value)}
                             />
-                            <label className="entry" for={index}>
+                            <label className="entry" htmlFor={index}>
                                 <div className="entry-label">{option.label}</div>
                             </label>
                         </RadioEntry>
-                    )
+                    );
                 })}
             </RadioList>
         </PopoverContainer>
-    )
+    );
 }
-
 
 SortOrderControls.propTypes = {
     currentOrder: PropTypes.string.isRequired,
     handleOrderUpdate: PropTypes.func.isRequired,
     currentDirection: PropTypes.string.isRequired,
-    handleDirectionUpdate: PropTypes.func.isRequired,
-    //interactionList: PropTypes.object.isRequired,
-}
+    handleDirectionUpdate: PropTypes.func.isRequired
+    // interactionList: PropTypes.object.isRequired,
+};
