@@ -45,7 +45,7 @@ function initializeDBSuccess() {
 function initializeDBError(error) {
     return {
         type: types.INITIALIZE_DB_ERROR,
-        error: new ServiceError('add contacts error ', error)
+        error: new ServiceError('Error initializing the database: ', error)
     }
 }
 export function initializeDB() {
