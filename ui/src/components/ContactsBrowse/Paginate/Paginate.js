@@ -18,7 +18,7 @@ const PaginateWrapper = styled.div`
     }
 `;
 
-export default function Paginate(props) {
+export default function Paginate (props) {
     const { total, page, cardsPerPage, count, updatePage } = props;
 
     let max = total / cardsPerPage;
@@ -26,7 +26,7 @@ export default function Paginate(props) {
         max++;
     }
 
-    function handlePageUpdate(newPage) {
+    function handlePageUpdate (newPage) {
         if (newPage >= 1 && newPage <= max) {
             updatePage(newPage);
             window.scrollTo(0, 0);
@@ -61,5 +61,5 @@ Paginate.propTypes = {
     page: PropTypes.number.isRequired,
     cardsPerPage: PropTypes.number.isRequired,
     count: PropTypes.number.isRequired,
-    updatePage: PropTypes.func.isRequired,
-}
+    updatePage: PropTypes.func.isRequired
+};

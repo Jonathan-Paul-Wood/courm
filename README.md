@@ -77,6 +77,10 @@ Now when you run `npm start` in the /backend directory, the backend will serve t
 
 Contributions are welcome! Simply make a branch, push your changes, and create a Pull Request.
 
+Before committing contributions, always check styling conformity in the UI project by running
+
+    npm run lint
+
 Pull Requests should contain, at a minimum:
 - An explanation of what changes were made
 - An explanation of why those changes were made

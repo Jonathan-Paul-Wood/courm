@@ -2,58 +2,53 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Button from '../../common/Button';
-import { exportJSON, exportContactList } from '../../common/Utilities/utilities';
+import { exportContactList } from '../../common/Utilities/utilities';
 import LoadingSpinner from '../../common/LoadingSpinner';
 
 const ConfigureWrapper = styled.div`
     padding: 0 1em;
 `;
 
-export default function AppConfigure(props) {
+export default function AppConfigure (props) {
     const {
         getContactList,
         postContact,
         deleteContact,
         contacts,
-        isContactListPending,
-        contactListError,
-        isContactPostPending,
-        contactPostError,
-        isContactDeletePending,
-        contactDeleteError,
+        isContactListPending
     } = props;
 
     const [pendingUpload, setPendingUpload] = useState(null);
 
     useEffect(() => {
-        //TODO: replace with getAll endpoint
-        getContactList(100000, 1, '', 'firstName', 'ASC'); //TODO: how to stop double calls
+        // TODO: replace with getAll endpoint once made
+        getContactList(100000, 1, '', 'firstName', 'ASC'); // TODO: how to stop double calls
     }, []);
 
-    function handleContactListExport() {
-        exportContactList(contacts.results, `contactList`);
+    function handleContactListExport () {
+        exportContactList(contacts.results, 'contactList');
     }
 
-    function captureUpload(event) {
-        let reader = new FileReader();
+    function captureUpload (event) {
+        const reader = new FileReader();
         reader.readAsText(event.target.files[0]);
         setPendingUpload(reader);
     }
 
-    function handleAddContacts() {
+    function handleAddContacts () {
         const uploadedJSON = JSON.parse(pendingUpload.result);
         uploadedJSON.data.contacts.data.forEach(contact => {
             console.log(contact);
-            let newContact = {
+            const newContact = {
                 ...contact,
-                lastModifiedOn: new Date().toISOString(),
-            }
-            delete newContact['id'];
+                lastModifiedOn: new Date().toISOString()
+            };
+            delete newContact.id;
             postContact(newContact);
         });
     }
 
-    function handleRestoreContacts() {
+    function handleRestoreContacts () {
         contacts.forEach(contact => deleteContact(contact.id));
         handleAddContacts();
     }
@@ -62,10 +57,9 @@ export default function AppConfigure(props) {
         <ConfigureWrapper>
             <h2>Configure Application</h2>
             <hr/>
-            {isContactListPending ? (
-                <LoadingSpinner />
-            ) : (
-                <>
+            {isContactListPending
+                ? (<LoadingSpinner />)
+                : (<>
                     <h3>Manage Contacts</h3>
                     <div className="row">
                         <div className="col-lg-6 col-md-6 col-sm-12 col-xs-12">
@@ -98,8 +92,8 @@ export default function AppConfigure(props) {
                                 notes: [],
                             }
                     */}
-                </>
-            )}
+                </>)
+            }
         </ConfigureWrapper>
     );
 }
@@ -114,5 +108,5 @@ AppConfigure.propTypes = {
     isContactPostPending: PropTypes.bool.isRequired,
     contactPostError: PropTypes.object.isRequired,
     isContactDeletePending: PropTypes.bool.isRequired,
-    contactDeleteError: PropTypes.string.isRequired,
-}
+    contactDeleteError: PropTypes.string.isRequired
+};
