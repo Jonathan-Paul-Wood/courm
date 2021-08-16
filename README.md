@@ -2,6 +2,11 @@
 
 This is an open source project to create a powerful CRM for personal use. At the moment the features are more limited to an address book, see below for details on how to install and use the project, contribute, and an overview of future development goals.
 
+## WHY
+This tool was born of a frustration with the default assumption of nearly every data processing tool on the market: That you have no privacy and your data is the toll levied against your use of the platform - even if you already paid to subscribe.
+
+CouRM is open source and built to be run 100% locally, so that you have full control over your use of the tool and the data you put in it. None of your information or metadata is shared outside of your machine by CouRM.
+
 ## Installation
 In each both the `ui` and `backend` directories, install dependencies
 
