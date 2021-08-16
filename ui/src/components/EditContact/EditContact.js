@@ -335,7 +335,6 @@ export default function EditContact (props) {
                                 placeholder="Enter Name"
                                 value={pendingChanges.firstName}
                                 label={entityIsOrganization ? 'Firm Name *' : 'First Name *'}
-                                locked={false}
                                 error={error.firstName}
                                 onChange={(event) => updateData('firstName', event.target.value)}
                             />
@@ -343,7 +342,6 @@ export default function EditContact (props) {
                                 placeholder={entityIsOrganization ? 'eg: LLC, Corp, 401(c)3' : 'Enter Name'}
                                 value={pendingChanges.lastName}
                                 label={entityIsOrganization ? 'Firm Type' : 'Last Name'}
-                                locked={false}
                                 error={error.lastName}
                                 onChange={(event) => updateData('lastName', event.target.value)}
                             />
@@ -354,7 +352,6 @@ export default function EditContact (props) {
                                 placeholder="mail@example.com"
                                 value={pendingChanges.email}
                                 label="Email"
-                                locked={false}
                                 error={error.email}
                                 onChange={(event) => updateData('email', event.target.value)}
                                 maxLength={254}
@@ -363,7 +360,6 @@ export default function EditContact (props) {
                                 placeholder="###-###-####"
                                 value={pendingChanges.phoneNumber}
                                 label="Phone Number"
-                                locked={false}
                                 error={error.phoneNumber}
                                 onChange={(event) => updateData('phoneNumber', event.target.value)}
                                 maxLength={12}
@@ -376,7 +372,6 @@ export default function EditContact (props) {
                                     placeholder="Company X, LLC"
                                     value={pendingChanges.firm}
                                     label="Firm"
-                                    locked={false}
                                     error={error.firm}
                                     onChange={(event) => updateData('firm', event.target.value)}
                                 />
@@ -384,7 +379,6 @@ export default function EditContact (props) {
                                     placeholder="Enter or select YYYY/MM/DD"
                                     value={pendingChanges.dateOfBirth}
                                     label="Date of Birth"
-                                    locked={false}
                                     error={error.dateOfBirth}
                                     onChange={(event) => updateData('dateOfBirth', event)}
                                     maxLength={11}
@@ -397,7 +391,6 @@ export default function EditContact (props) {
                                 placeholder="212 Oak PL, Neverland OH 12345"
                                 value={pendingChanges.address}
                                 label="Address"
-                                locked={false}
                                 error={error.address}
                                 onChange={(event) => updateData('address', event.target.value)}
                             />
@@ -405,7 +398,6 @@ export default function EditContact (props) {
                                 placeholder="eg: Retail, Academia, In School"
                                 value={pendingChanges.industry}
                                 label="Industry"
-                                locked={false}
                                 error={error.industry}
                                 onChange={(event) => updateData('industry', event.target.value)}
                             />
@@ -417,7 +409,6 @@ export default function EditContact (props) {
                             placeholder="Add biographical notes here"
                             value={pendingChanges.bio}
                             label="Bio"
-                            locked={false}
                             error={error.bio}
                             onChange={(event) => updateData('bio', event.target.value)}
                             height="18vh"
