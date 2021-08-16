@@ -45,7 +45,7 @@ export default function FaqHome () {
                 </div>
                 <div className="answer">
                     <p>
-                        CourM is an entirely local application. It runs off of the files on your own machine (even without an internet connection). As such, we do not collect ANY user information, including the contact data you input into the system.
+                        CouRM is an entirely local application. It runs off of the files on your own machine (even without an internet connection). As such, we do not collect ANY user information, including the contact data you input into the system.
                     </p>
                     <p>
                         YOU ARE ENTIRELY RESPONSIBLE FOR YOUR OWN BACKUPS AND SAVES.
@@ -61,7 +61,7 @@ export default function FaqHome () {
                 </div>
                 <div className="answer">
                     <p>
-                        Simply visit <a target="_blank" rel="noreferrer" href="">CourM's public repository</a> and open a ticket. Here's a good guide for <a target="_blank" rel="noreferrer" href="">how to write constructive tickets</a>.
+                        Simply visit <a target="_blank" rel="noreferrer" href="">CouRM's public repository</a> and open a ticket. Here's a good guide for <a target="_blank" rel="noreferrer" href="">how to write constructive tickets</a>.
                     </p>
                     <p>
                         When you do create a ticket, please first check existing tickets to make sure you're not creating a duplicate.
@@ -78,7 +78,7 @@ export default function FaqHome () {
                         We don't install any cookies or other trackers on your device, we don't serve ads, and we don't collect any data to send to third parties.
                     </p>
                     <p>
-                        CourM is private by design, so you and only you are in control of your data. We do not collect or store any of your data.
+                        CouRM is private by design, so you and only you are in control of your data. We do not collect or store any of your data.
                     </p>
                 </div>
             </div>
@@ -88,7 +88,7 @@ export default function FaqHome () {
                 </div>
                 <div className="answer">
                     <p>
-                        You are in control of your data, as such CourM will not update automatically. From the 'Configuration' page you can 'Check for Updates'. This will ping our server (the only time this application communicates with us)
+                        You are in control of your data, as such CouRM will not update automatically. From the 'Configuration' page you can 'Check for Updates'. This will ping our server (the only time this application communicates with us)
                         and we will send you the current version number, along with the link to the latest download. Your application will then compare the latest version number with your own, and if there
                         is a new version available display the download link to you.
                     </p>

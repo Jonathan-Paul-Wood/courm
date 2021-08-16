@@ -1,4 +1,4 @@
-# COURM
+# CouRM
 
 This is an open source project to create a powerful CRM for personal use. At the moment the features are more limited to an address book, see below for details on how to install and use the project, contribute, and an overview of future development goals.
 
@@ -23,7 +23,7 @@ In the `backend` directory, create a database file by running one of the followi
     npm run db-init-lin
 
 ## Use
-Courm can be run in one terminal or two.
+CouRM can be run in one terminal or two.
 
 By default, the code runs in two directories. Start the `backend` and `ui` each in their own terminal
 
