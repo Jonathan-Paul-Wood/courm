@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
-import Button from '../../common/Button';
 import icons from '../../assets/icons/bootstrapIcons';
 
 const CardWrapper = styled.div`
@@ -45,7 +44,7 @@ const CardWrapper = styled.div`
     }
 `;
 
-export default function ContactCard(props) {
+export default function ContactCard (props) {
     const { contact } = props;
     const history = useHistory();
 
@@ -53,12 +52,12 @@ export default function ContactCard(props) {
         <CardWrapper className="a-cursor-pointer" onClick={() => history.push(`/contacts/${contact.id}`)}>
             <div id="head-wrapper">
                 <div id="profile-picture">
-                    {contact.profilePicture ? contact.profilePicture : icons['personCard']}
+                    {contact.profilePicture ? contact.profilePicture : icons.personCard}
                 </div>
-                <div id="contact-name" className="limit-content" title={contact.firstName+' '+contact.lastName}>
+                <div id="contact-name" className="limit-content" title={contact.firstName + ' ' + contact.lastName}>
                     <b>{contact.firstName}</b> {contact.lastName}
                 </div>
-                <div>{/*TODO: link to contacts' notes, or something; for now this placeholder centers the name*/}</div>
+                <div>{/* TODO: link to contacts' notes, or something; for now this placeholder centers the name */}</div>
             </div>
 
             <div id="communcate-wrapper" className="card-content">
@@ -70,5 +69,5 @@ export default function ContactCard(props) {
 }
 
 ContactCard.propTypes = {
-    contact: PropTypes.object.isRequired,
-}
+    contact: PropTypes.object.isRequired
+};

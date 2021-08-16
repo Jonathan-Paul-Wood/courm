@@ -4,7 +4,8 @@ import CollectionTitleHeader from '../../common/CollectionTitleHeader/Collection
 import MainToolbar from '../../common/MainToolbar';
 import ContactCard from './ContactCard';
 import Paginate from './Paginate/Paginate';
-import {RESULTS_PER_PAGE} from '../../common/constants/constants';
+import { RESULTS_PER_PAGE } from '../../common/constants/constants';
+import PropTypes from 'prop-types';
 import LoadingSpinner from '../../common/LoadingSpinner/LoadingSpinner';
 
 const ContentWrapper = styled.div`
@@ -37,18 +38,17 @@ const NoResultsMessage = styled.div`
     padding-left: 6em;
 `;
 
-export default function ContactsBrowse(props) {
-    const { 
+export default function ContactsBrowse (props) {
+    const {
         contacts,
-        isContactListPending, 
-        contactListError, 
-        getContactList,
+        isContactListPending,
+        getContactList
     } = props;
     const [activeFilters, setActiveFilters] = useState([]);
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
     const [searchOrderBy, setSearchOrderBy] = useState('firstName');
-    const [direction, setDirection] = useState("ASC"); //ASC if ascending, DESC if descending
+    const [direction, setDirection] = useState('ASC'); // ASC if ascending, DESC if descending
 
     useEffect(() => {
         initiateSearch();
@@ -59,7 +59,7 @@ export default function ContactsBrowse(props) {
     }, [page, searchOrderBy, direction]);
 
     useEffect(() => {
-        if(searchTerm !== '') {
+        if (searchTerm !== '') {
             initiateSearch();
         }
     }, [activeFilters]);
@@ -71,11 +71,11 @@ export default function ContactsBrowse(props) {
             }, 500);
             return () => clearTimeout(timer);
         }
-        
+
         initiateSearch();
     }, [searchTerm]);
 
-    function initiateSearch() {
+    function initiateSearch () {
         getContactList(RESULTS_PER_PAGE, page, searchTerm, searchOrderBy, direction, activeFilters);
     }
 
@@ -95,21 +95,25 @@ export default function ContactsBrowse(props) {
                     handleDirectionUpdate={setDirection}
                 />
                 <ScrollContainer className="scroll-container">
-                {isContactListPending ? (
-                    <LoadingSpinner type="spinner" />
-                ) : (
-                    contacts.results.length ? (
-                        contacts.results.map(contact => {
-                            return (
-                                <ContactCard key={contact.id} contact={contact} />
-                            )
-                        })
-                    ) : (
-                    <NoResultsMessage className="warningMessage">
+                    {isContactListPending
+                        ? (
+                            <LoadingSpinner type="spinner" />
+                        )
+                        : (
+                            contacts.results.length
+                                ? (
+                                    contacts.results.map(contact => {
+                                        return (
+                                            <ContactCard key={contact.id} contact={contact} />
+                                        );
+                                    })
+                                )
+                                : (
+                                    <NoResultsMessage className="warningMessage">
                         Sorry, no results to display{(activeFilters.length || searchTerm) ? ' for your applied search filters' : ''}
-                    </NoResultsMessage>
-                    )
-                )}
+                                    </NoResultsMessage>
+                                )
+                        )}
                 </ScrollContainer>
                 {contacts.totalCount > RESULTS_PER_PAGE && (
                     <Paginate
@@ -125,3 +129,10 @@ export default function ContactsBrowse(props) {
         </>
     );
 }
+
+ContactsBrowse.propTypes = {
+    contacts: PropTypes.object.isRequired,
+    isContactListPending: PropTypes.bool.isRequired,
+    contactListError: PropTypes.string.isRequired,
+    getContactList: PropTypes.func.isRequired
+};

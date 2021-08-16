@@ -18,32 +18,32 @@ const ModalContainer = styled(Modal)`
     }
 `;
 
-export default function CommonModal(props) {
-  const { icon, title, onClose, onSubmit, isSubmitVisible, isCancelVisible, isCloseVisible, submitText, children, show } = props;
+export default function CommonModal (props) {
+    const { icon, title, onClose, onSubmit, isSubmitVisible, isCancelVisible, isCloseVisible, submitText, children, show } = props;
 
-  return (
-      <ModalContainer show={show} onHide={onClose} centered scrollable>
-        <Modal.Header closeButton={isCloseVisible}>
-          <Modal.Title>
-              <IconContainer>
-                  {icons[icon]}
-              </IconContainer>
-              {title}
-            </Modal.Title>
-        </Modal.Header>
-        <Modal.Body>{children}</Modal.Body>
-        {(isSubmitVisible || isCancelVisible) && (
-            <Modal.Footer>
-                {isCancelVisible && 
+    return (
+        <ModalContainer show={show} onHide={onClose} centered scrollable>
+            <Modal.Header closeButton={isCloseVisible}>
+                <Modal.Title>
+                    <IconContainer>
+                        {icons[icon]}
+                    </IconContainer>
+                    {title}
+                </Modal.Title>
+            </Modal.Header>
+            <Modal.Body>{children}</Modal.Body>
+            {(isSubmitVisible || isCancelVisible) && (
+                <Modal.Footer>
+                    {isCancelVisible &&
                     <Button label='Cancel' type="secondary" onClick={onClose} />
-                }
-                {isSubmitVisible && 
+                    }
+                    {isSubmitVisible &&
                     <Button label={submitText} type="success" onClick={onSubmit} />
-                }
-            </Modal.Footer>
-        )}
-      </ModalContainer>
-  );
+                    }
+                </Modal.Footer>
+            )}
+        </ModalContainer>
+    );
 }
 
 CommonModal.defaultProps = {
@@ -51,8 +51,8 @@ CommonModal.defaultProps = {
     isSubmitVisible: true,
     isCancelVisible: true,
     isCloseVisible: true,
-    submitText: 'Submit',
-}
+    submitText: 'Submit'
+};
 
 CommonModal.propTypes = {
     icon: PropTypes.string.isRequired,
@@ -64,5 +64,5 @@ CommonModal.propTypes = {
     isCloseVisible: PropTypes.bool,
     submitText: PropTypes.string,
     children: PropTypes.object.isRequired,
-    show: PropTypes.bool.isRequired,
-}
+    show: PropTypes.bool.isRequired
+};

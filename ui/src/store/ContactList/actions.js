@@ -1,29 +1,29 @@
 import * as types from './types';
 import ServiceError from '../ServiceError';
 import ContactListService from '../../services/ContactListService';
-//todo: import notification toasts success/error
+// todo: import notification toasts success/error
 
-function getContactListLoading() {
+function getContactListLoading () {
     return {
-        type: types.GET_CONTACT_LIST_PENDING,
-    }
+        type: types.GET_CONTACT_LIST_PENDING
+    };
 }
 
-function getContactListSuccess(payload) {
+function getContactListSuccess (payload) {
     return {
         type: types.GET_CONTACT_LIST_SUCCESS,
-        payload,
-    }
+        payload
+    };
 }
 
-function getContactListError(error) {
+function getContactListError (error) {
     return {
         type: types.GET_CONTACT_LIST_ERROR,
         error: new ServiceError('get contacts list', error)
-    }
+    };
 }
 
-export function getContactList(results, page, searchTerm, order, direction, filters) {
+export function getContactList (results, page, searchTerm, order, direction, filters) {
     return async dispatch => {
         dispatch(getContactListLoading());
         try {
@@ -32,5 +32,5 @@ export function getContactList(results, page, searchTerm, order, direction, filt
         } catch (e) {
             dispatch(getContactListError(e));
         }
-    }
+    };
 }

@@ -3,18 +3,18 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { getContact } from '../../store/Contact/actions';
 
-function mapStateToProps(state) {
+function mapStateToProps (state) {
     return {
         contact: state.contact.contact,
         isContactPending: state.contact.isContactPending,
-        contactError: state.contact.contactError,
+        contactError: state.contact.contactError
     };
 }
 
 const mapDispatchToProps = dispatch =>
     bindActionCreators(
         {
-            getContact,
+            getContact
         },
         dispatch
     );

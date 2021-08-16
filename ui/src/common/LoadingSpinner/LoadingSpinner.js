@@ -69,28 +69,28 @@ const LoadingContainer = styled.div`
   }
 `;
 
-export default function LoadingSpinner(props) {
-  const { type, styleGroup, size } = props;
+export default function LoadingSpinner (props) {
+    const { type, styleGroup, size } = props;
 
-  return (
-    <LoadingContainer id="spin-loader-group">
-        <div className={`${type} ${styleGroup} ${size}`}>
-            <div>
-                <div></div>
+    return (
+        <LoadingContainer id="spin-loader-group">
+            <div className={`${type} ${styleGroup} ${size}`}>
+                <div>
+                    <div></div>
+                </div>
             </div>
-        </div>
-    </LoadingContainer>
-  );
+        </LoadingContainer>
+    );
 }
 
 LoadingSpinner.defaultProps = {
     type: 'spinner',
     styleGroup: 'primary',
     size: 'lg'
-}
+};
 
 LoadingSpinner.propTypes = {
     type: PropTypes.string,
     styleGroup: PropTypes.string,
-    size: PropTypes.string,
-}
+    size: PropTypes.string
+};

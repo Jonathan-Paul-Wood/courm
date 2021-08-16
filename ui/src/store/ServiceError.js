@@ -1,5 +1,5 @@
 export default class ServiceError {
-    constructor(action, error) {
+    constructor (action, error) {
         this.action = action;
         this.message = error.errorMessage || error.message;
         this.status = error.status;

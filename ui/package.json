@@ -8,6 +8,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "lint": "eslint ./src",
+    "lint-fix": "eslint ./src --fix",
+    "lint-fix-dry-run": "eslint ./src --fix-dry-run",
     "eject": "react-scripts eject"
   },
   "dependencies": {
@@ -65,6 +68,12 @@
     ]
   },
   "devDependencies": {
-    "@babel/plugin-proposal-export-default-from": "^7.12.1"
+    "@babel/plugin-proposal-export-default-from": "^7.12.1",
+    "eslint": "^7.32.0",
+    "eslint-config-standard": "^16.0.3",
+    "eslint-plugin-import": "^2.24.0",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^5.1.0",
+    "eslint-plugin-react": "^7.24.0"
   }
 }

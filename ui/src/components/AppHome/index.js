@@ -3,12 +3,12 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { initializeDB } from '../../store/Configure/actions';
 
-//import functions from store/actions
+// import functions from store/actions
 
-function mapStateToProps(state) {
+function mapStateToProps (state) {
     return {
         isInitializingDB: state.configure.isInitializingDB,
-        initializeDBError: state.configure.initializeDBError,
+        initializeDBError: state.configure.initializeDBError
     };
 }
 

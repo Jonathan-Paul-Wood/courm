@@ -52,10 +52,10 @@ const RightHeaderWrapper = styled.div`
     }
 `;
 
-export default function AppHeader() {
+export default function AppHeader () {
     const history = useHistory();
 
-    function handleHomeNavigation() {
+    function handleHomeNavigation () {
         history.push('/home');
     }
 
@@ -65,7 +65,7 @@ export default function AppHeader() {
                 <h3><a onClick={() => handleHomeNavigation()}>Personal CRM</a></h3>
                 <PipeSeparator>|</PipeSeparator>
             </LogoContainer>
-            <RightHeaderWrapper> 
+            <RightHeaderWrapper>
                 <PipeSeparator>|</PipeSeparator>
                 <h2>Help</h2>
                 <PipeSeparator>|</PipeSeparator>

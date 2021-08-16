@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import icons from '../../assets/icons/bootstrapIcons';
 import LoadingLoop from '../LoadingLoop/LoadingLoop';
-import {BLACK, WHITE, BLUE, BLUE_FOCUS, GREY, GREEN, GREEN_FOCUS, RED, RED_FOCUS, YELLOW, YELLOW_FOCUS} from '../../assets/colorsConstants';
+import { BLACK, WHITE, BLUE, BLUE_FOCUS, GREY, GREEN, GREEN_FOCUS, RED, RED_FOCUS, YELLOW, YELLOW_FOCUS } from '../../assets/colorsConstants';
 
 const StyleContainer = styled.div`
     margin: auto 0;
@@ -112,27 +112,28 @@ const StyleContainer = styled.div`
       }
 `;
 
-
-export default function Button(props) {
-  const { type, size, block, icon, label, onClick, disabled, isPending } = props;
+export default function Button (props) {
+    const { type, size, block, icon, label, onClick, disabled, isPending } = props;
     return (
         <StyleContainer>
             <button
-              className={`btn btn--${type} btn--${size} ${block ? 'btn-block' : ''} ${disabled ? 'btn-disabled' : ''}`}
-              onClick={onClick}
-              disabled={disabled || isPending}  
+                className={`btn btn--${type} btn--${size} ${block ? 'btn-block' : ''} ${disabled ? 'btn-disabled' : ''}`}
+                onClick={onClick}
+                disabled={disabled || isPending}
             >
-              {isPending ? (         
-                <LoadingLoop
-                  styleGroup='primary'
-                  size={size}
-                />
-              ) : (
-                <>
-                  {icons[icon]}
-                </>
-              )}              
-              <span>{label}</span>
+                {isPending
+                    ? (
+                        <LoadingLoop
+                            styleGroup='primary'
+                            size={size}
+                        />
+                    )
+                    : (
+                        <>
+                            {icons[icon]}
+                        </>
+                    )}
+                <span>{label}</span>
             </button>
         </StyleContainer>
     );
@@ -144,8 +145,8 @@ Button.defaultProps = {
     block: false,
     icon: '',
     disabled: false,
-    isPending: false,
-}
+    isPending: false
+};
 
 Button.propTypes = {
     type: PropTypes.string,
@@ -155,5 +156,5 @@ Button.propTypes = {
     icon: PropTypes.string,
     onClick: PropTypes.func.isRequired,
     disabled: PropTypes.bool,
-    isPending: PropTypes.bool,
-}
+    isPending: PropTypes.bool
+};

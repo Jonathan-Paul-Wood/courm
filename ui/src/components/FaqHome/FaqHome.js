@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import Button from '../../common/Button';
 
 const ConfigureWrapper = styled.div`
     padding: 0 1em;
@@ -22,7 +21,7 @@ const ConfigureWrapper = styled.div`
     }
 `;
 
-export default function FaqHome() {
+export default function FaqHome () {
     return (
         <ConfigureWrapper>
             <h2>FAQ Page</h2>
@@ -36,7 +35,7 @@ export default function FaqHome() {
                         You can save backups of individual contacts (from their respective contact page), individual pages of search results, or all existing contacts (from the Configuration page). These saves are formatted as JSON files which you can store on your computer, on a USB, in the cloud, or whereever.
                     </p>
                     <p>
-                        Backup files can be used to add back contacts you've removed, or to replace all of your existing contacts if you want to revert to a previous version of your address book.
+                        Backup files can be used to add back contacts you\ve removed, or to replace all of your existing contacts if you want to revert to a previous version of your address book.
                     </p>
                 </div>
             </div>
@@ -62,7 +61,7 @@ export default function FaqHome() {
                 </div>
                 <div className="answer">
                     <p>
-                        Simply visit <a target="_blank" rel="noreferrer" href="">CourM's public repository</a> and open a ticket. Here's a good guide for <a target="_blank"  rel="noreferrer" href="">how to write constructive tickets</a>.
+                        Simply visit <a target="_blank" rel="noreferrer" href="">CourM's public repository</a> and open a ticket. Here's a good guide for <a target="_blank" rel="noreferrer" href="">how to write constructive tickets</a>.
                     </p>
                     <p>
                         When you do create a ticket, please first check existing tickets to make sure you're not creating a duplicate.

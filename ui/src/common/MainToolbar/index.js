@@ -1,9 +1,9 @@
 import MainToolbar from './MainToolbar';
 import { connect } from 'react-redux';
 
-function mapStateToProps(state) {
+function mapStateToProps (state) {
     return {
-        contactList: state.contactList.contacts,
+        contactList: state.contactList.contacts
     };
 }
 

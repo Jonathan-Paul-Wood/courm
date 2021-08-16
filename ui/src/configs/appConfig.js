@@ -4,6 +4,6 @@
  */
 
 export default {
-    sessionTimeoutWarning: 120000, //time in milliseconds
-    resultsPerPage: 20,
-}
+    sessionTimeoutWarning: 120000, // time in milliseconds
+    resultsPerPage: 20
+};

@@ -6,6 +6,7 @@ import Button from '../../common/Button';
 import Input from '../../common/Input/Input';
 import DateInput from '../../common/DateInput/DateInput';
 import CommonModal from '../../common/CommonModal/CommonModal';
+import PropTypes from 'prop-types';
 
 const ScrollContainer = styled.div`
     margin: 4em 2em 0 2em;
@@ -145,24 +146,20 @@ input:checked + .slider:before {
 }
 `;
 
-export default function ViewContact(props) {
+export default function EditContact (props) {
     const location = useLocation();
     const isNewContact = !!location.pathname.match('/new');
     const { contactId } = useParams();
-    const { 
+    const {
         contact,
         isContactPending,
-        contactError, 
         getContact,
         postContact,
         isContactPostPending,
-        contactPostError,
         putContact,
         isContactPutPending,
-        contactPutError,
         deleteContact,
-        isContactDeletePending,
-        contactDeleteError
+        isContactDeletePending
     } = props;
     const defaultChanges = {
         firstName: '',
@@ -174,8 +171,8 @@ export default function ViewContact(props) {
         industry: '',
         address: '',
         dateOfBirth: '',
-        bio: '',
-    }
+        bio: ''
+    };
     const [entityIsOrganization, setEntityIsOrganization] = useState(false);
     const [pendingChanges, setPendingChanges] = useState(defaultChanges);
     const [error, setError] = useState(defaultChanges);
@@ -184,8 +181,8 @@ export default function ViewContact(props) {
     const [pageLoaded, setPageLoaded] = useState(false);
 
     useEffect(() => {
-        //initial GET of contact
-        if(contactId) {
+        // initial GET of contact
+        if (contactId) {
             setPendingChanges(getContact(contactId));
         } else {
             setPendingChanges(defaultChanges);
@@ -193,17 +190,17 @@ export default function ViewContact(props) {
     }, []);
 
     useEffect(() => {
-        //update page when GET returns
-        const dob = contact.dateOfBirth ? contact.dateOfBirth.split('T')[0] : "";
-        const newValues = {...contact, dateOfBirth: dob}
-        //TODO: handle 404, and Errors
+        // update page when GET returns
+        const dob = contact.dateOfBirth ? contact.dateOfBirth.split('T')[0] : '';
+        const newValues = { ...contact, dateOfBirth: dob };
+        // TODO: handle 404, and Errors
         setPendingChanges(newValues);
         setEntityIsOrganization(contact.entityType === 'organization');
     }, [contact]);
 
-    //only after the page is first loaded, a post/put/delete changing from pending to success requires a redirect
+    // only after the page is first loaded, a post/put/delete changing from pending to success requires a redirect
     useEffect(() => {
-        if(!isContactPending && contact) {
+        if (!isContactPending && contact) {
             setPageLoaded(true);
         }
     }, [isContactPending]);
@@ -211,99 +208,99 @@ export default function ViewContact(props) {
         setPendingChanges(defaultChanges);
     }, [isContactPostPending]);
     useEffect(() => {
-        if(pageLoaded && !isContactPutPending) {
+        if (pageLoaded && !isContactPutPending) {
             history.push(`/contacts/${contactId}`);
         }
     }, [isContactPutPending]);
     useEffect(() => {
-        if(pageLoaded && !isContactDeletePending) {
-            history.push(`/contacts`);
+        if (pageLoaded && !isContactDeletePending) {
+            history.push('/contacts');
         }
     }, [isContactDeletePending]);
 
-    function updateData(field, value) {
-        //clear any errors
-        let updateError = {};
+    function updateData (field, value) {
+        // clear any errors
+        const updateError = {};
         updateError[field] = '';
-        setError({...error, ...updateError});
+        setError({ ...error, ...updateError });
 
-        //update the value
-        let updatedValue = {};
+        // update the value
+        const updatedValue = {};
         updatedValue[field] = value;
-        setPendingChanges({...pendingChanges, ...updatedValue});
+        setPendingChanges({ ...pendingChanges, ...updatedValue });
     }
 
-    function handleSaveContact() {
+    function handleSaveContact () {
         console.log('attempted save');
-        //validate inputs, error messages if needed TODO
+        // validate inputs, error messages if needed TODO
         let valid = true;
         if (!pendingChanges.firstName) {
             valid = false;
-            setError({...error, ...{firstName: 'Please enter name'}});
+            setError({ ...error, ...{ firstName: 'Please enter name' } });
         }
-        if (pendingChanges.email && !pendingChanges.email.match(/^.{1,}\@[a-zA-Z0-9-_]{1,}\.[a-z]{1,}$/g)) { //^ and $ to match pattern on entire string, not subset
+        if (pendingChanges.email && !pendingChanges.email.match(/^.{1,}@[a-zA-Z0-9-_]{1,}\.[a-z]{1,}$/g)) { // ^ and $ to match pattern on entire string, not subset
             valid = false;
-            setError({...error, ...{email: 'Expected format: name@example.com'}});
+            setError({ ...error, ...{ email: 'Expected format: name@example.com' } });
         }
         if (pendingChanges.phoneNumber && !pendingChanges.phoneNumber.match(/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/g)) {
             valid = false;
-            setError({...error, ...{phoneNumber: 'Expected format: ###-###-####'}});
+            setError({ ...error, ...{ phoneNumber: 'Expected format: ###-###-####' } });
         }
-        if (!entityIsOrganization && 
-                pendingChanges.dateOfBirth && 
+        if (!entityIsOrganization &&
+                pendingChanges.dateOfBirth &&
                 (pendingChanges.dateOfBirth &&
                     !pendingChanges.dateOfBirth.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}Z$/g)
                 )
-            ) {
+        ) {
             valid = false;
-            setError({...error, ...{dateOfBirth: 'Expect format: YYYY-MM-DD'}});
+            setError({ ...error, ...{ dateOfBirth: 'Expect format: YYYY-MM-DD' } });
         }
 
         if (valid) {
             let dob = pendingChanges.dateOfBirth;
             if (!entityIsOrganization && dob) {
-                dob = new Date(pendingChanges.dateOfBirth).toISOString()
+                dob = new Date(pendingChanges.dateOfBirth).toISOString();
             }
             const entity = pendingChanges.entityIsOrganization ? 'organization' : 'person';
 
-            let submitChanges = {
+            const submitChanges = {
                 ...pendingChanges,
                 lastModifiedOn: new Date().toISOString(),
                 dateOfBirth: dob,
-                entityType: entity,
-            }
-            
-            //submit changes
+                entityType: entity
+            };
+
+            // submit changes
             if (isNewContact) {
                 postContact(submitChanges);
             } else {
-                console.log('putting')
+                console.log('putting');
                 putContact(contactId, submitChanges);
             }
         }
     }
 
-    function handleDeleteConfirm() {
+    function handleDeleteConfirm () {
         setShowDeleteModal(false);
         deleteContact(contactId);
     }
 
-    function handlePictureUpload(e) {
+    function handlePictureUpload (e) {
         console.log(e.target.files[0]);
         console.log(e);
     }
 
-    //TODO: handle loading state, 404s and errors
+    // TODO: handle loading state, 404s and errors
     return (
         <>
             <EntityTitleHeader
-                title={isNewContact ? 'New Contact' : `Edit Contact`}
+                title={isNewContact ? 'New Contact' : 'Edit Contact'}
                 editMode={true}
                 handleSave={handleSaveContact}
                 disableSave={
-                    isContactPending
-                    || isContactPostPending
-                    || isContactPutPending
+                    isContactPending ||
+                    isContactPostPending ||
+                    isContactPutPending
                 }
             />
             <ScrollContainer>
@@ -316,7 +313,7 @@ export default function ViewContact(props) {
                         </div>
                         <ToggleSwitch>
                             <span>
-                                {entityIsOrganization 
+                                {entityIsOrganization
                                     ? 'Organization'
                                     : 'Person'}
                             </span>
@@ -395,7 +392,7 @@ export default function ViewContact(props) {
                             </div>
                         )}
 
-                        <div id="placementData" className="inputRow rowMargin">                                
+                        <div id="placementData" className="inputRow rowMargin">
                             <Input
                                 placeholder="212 Oak PL, Neverland OH 12345"
                                 value={pendingChanges.address}
@@ -413,7 +410,7 @@ export default function ViewContact(props) {
                                 onChange={(event) => updateData('industry', event.target.value)}
                             />
                         </div>
-                        {/*TODO: have all the fields as inputs, dis-/en-abled based on editState*/}
+                        {/* TODO: have all the fields as inputs, dis-/en-abled based on editState */}
                     </div>
                     <div className="bioRow">
                         <Input
@@ -438,7 +435,7 @@ export default function ViewContact(props) {
                     </div> */}
                     {!isNewContact && <div id="dangerRow">
                         <div></div>
-                        <Button 
+                        <Button
                             id="delete-contact-button"
                             label="DELETE"
                             type="danger"
@@ -448,8 +445,8 @@ export default function ViewContact(props) {
                     </div>}
                 </GridWrapper>
             </ScrollContainer>
-        
-            <CommonModal 
+
+            <CommonModal
                 show={isContactDeletePending || showDeleteModal}
                 icon={'trashCan'}
                 title={'Please Confirm Contact Deletion'}
@@ -462,5 +459,21 @@ export default function ViewContact(props) {
                 </div>
             </CommonModal>
         </>
-);
+    );
 }
+
+EditContact.propTypes = {
+    contact: PropTypes.object.isRequired,
+    isContactPending: PropTypes.bool.isRequired,
+    contactError: PropTypes.string.isRequired,
+    isContactPostPending: PropTypes.bool.isRequired,
+    contactPostError: PropTypes.string.isRequired,
+    isContactPutPending: PropTypes.bool.isRequired,
+    contactPutError: PropTypes.string.isRequired,
+    isContactDeletePending: PropTypes.bool.isRequired,
+    contactDeleteError: PropTypes.string.isRequired,
+    getContact: PropTypes.func.isRequired,
+    putContact: PropTypes.func.isRequired,
+    postContact: PropTypes.func.isRequired,
+    deleteContact: PropTypes.func.isRequired
+};

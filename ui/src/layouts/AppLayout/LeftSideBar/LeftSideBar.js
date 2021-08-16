@@ -19,7 +19,7 @@ const ActiveTab = styled.div`
     background-color: #4da6ff;
 `;
 
-export default function LeftSidebar() {
+export default function LeftSidebar () {
     const location = useLocation();
     const activeTab = location.pathname.split('/')[1];
 
@@ -27,22 +27,22 @@ export default function LeftSidebar() {
         {
             icon: 'home',
             title: 'Home',
-            path: '/home',
+            path: '/home'
         },
         {
             icon: 'people',
             title: 'Contacts',
-            path: '/contacts',
+            path: '/contacts'
         },
         {
             icon: 'tools',
             title: 'Configure',
-            path: '/configure',
+            path: '/configure'
         },
         {
             icon: 'question',
             title: 'FAQ',
-            path: '/faq',
+            path: '/faq'
         }
     ];
 
@@ -50,23 +50,25 @@ export default function LeftSidebar() {
         <LeftSideBarWrapper>
             {leftNavigationOptions.map((option, index) => {
                 return (
-                    option.path.match(activeTab) ? (
-                        <ActiveTab key={index}>  
+                    option.path.match(activeTab)
+                        ? (
+                            <ActiveTab key={index}>
+                                <SideBarNavItem
+                                    icon={option.icon}
+                                    title={option.title}
+                                    path={option.path}
+                                />
+                            </ActiveTab>
+                        )
+                        : (
                             <SideBarNavItem
+                                key={index}
                                 icon={option.icon}
                                 title={option.title}
                                 path={option.path}
                             />
-                        </ActiveTab>
-                    ) : (
-                        <SideBarNavItem
-                            key={index}
-                            icon={option.icon}
-                            title={option.title}
-                            path={option.path}
-                        />
-                    )
-                )
+                        )
+                );
             })}
         </LeftSideBarWrapper>
     );

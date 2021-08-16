@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useHistory, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
@@ -42,8 +42,8 @@ const RightSideContent = styled.div`
     justify-content: right;
 `;
 
-export default function EntityTitleHeader(props) {
-    const {title, handleSave, editMode, disableSave} = props;
+export default function EntityTitleHeader (props) {
+    const { title, handleSave, editMode, disableSave } = props;
     const { contactId } = useParams();
     const history = useHistory();
 
@@ -57,21 +57,23 @@ export default function EntityTitleHeader(props) {
             />
             <h2 className="pageTitle" title={title}>{title}</h2>
             <RightSideContent className="save-edit">
-                {editMode ? (
-                    <Button
-                        label="SAVE"
-                        type="success"
-                        icon="saveIcon"
-                        onClick={handleSave}
-                        disabled={disableSave}
-                    />
-                ) : (
-                    <Button
-                        label="EDIT"
-                        type="secondary" 
-                        onClick={() => history.push(`/contacts/${contactId}/edit`)}
-                    />
-                )}
+                {editMode
+                    ? (
+                        <Button
+                            label="SAVE"
+                            type="success"
+                            icon="saveIcon"
+                            onClick={handleSave}
+                            disabled={disableSave}
+                        />
+                    )
+                    : (
+                        <Button
+                            label="EDIT"
+                            type="secondary"
+                            onClick={() => history.push(`/contacts/${contactId}/edit`)}
+                        />
+                    )}
             </RightSideContent>
         </ContentWrapper>
     );
@@ -79,12 +81,12 @@ export default function EntityTitleHeader(props) {
 
 EntityTitleHeader.defaultProps = {
     handleSave: () => {},
-    disableSave: true,
-}
+    disableSave: true
+};
 
 EntityTitleHeader.propTypes = {
     title: PropTypes.string.isRequired,
     handleSave: PropTypes.func,
     disableSave: PropTypes.bool,
-    editMode: PropTypes.bool.isRequired,
-}
+    editMode: PropTypes.bool.isRequired
+};
