@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import DatePicker from 'react-datepicker';
@@ -151,8 +151,8 @@ const StyleContainer = styled.div`
 `;
 
 export default function DateInput (props) {
-    const { placeholder, value, onChange, error, label, locked, secondary, height, isDate } = props;
-    const [active, setActive] = useState(false);
+    const { placeholder, value, onChange, error, label, locked, secondary, height } = props;
+    const active = false; // useState if ever need to toggle
 
     const fieldClassName = `${secondary ? 'secondary-field' : 'field'} ${active ? 'active' : ''} ${(locked && !active) ? 'locked' : ''}`;
 
@@ -184,7 +184,8 @@ DateInput.defaultProps = {
     secondary: false, // by default (for white backgrounds)
     height: '56px',
     maxLength: 140,
-    onChange: () => {}
+    onChange: () => {},
+    isDate: () => {}
 };
 
 DateInput.propTypes = {
@@ -196,5 +197,6 @@ DateInput.propTypes = {
     locked: PropTypes.bool,
     secondary: PropTypes.bool, // if true, will be white/transparent (for colored backgrounds)
     height: PropTypes.string,
-    maxLength: PropTypes.number
+    maxLength: PropTypes.number,
+    isDate: PropTypes.func
 };

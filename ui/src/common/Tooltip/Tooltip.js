@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { Manager, Reference, Popper } from 'react-popper';
 
 export default function Tooltip (props) {
-    const { trigger, style, placement, content, children } = props;
+    const { style, content, children } = props;
     const [showPopup, setPopup] = useState(false);
     return (
         <Manager>

@@ -26,5 +26,5 @@ export function exportJSON (json, name) {
         data: json
     };
     const content = JSON.stringify(data);
-    downloadContent(content, `${name}_${time.toISOString().replace(/\:/g, '-')}.json`, 'text/json');
+    downloadContent(content, `${name}_${time.toISOString().replace(/:/g, '-')}.json`, 'text/json');
 }

@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import DatePicker from 'react-datepicker';
-
-import 'react-datepicker/dist/react-datepicker.css';
 
 const StyleContainer = styled.div`
     width: 100%;
@@ -122,7 +119,7 @@ export default function Input (props) {
     const fieldClassName = `${secondary ? 'secondary-field' : 'field'} ${active ? 'active' : ''} ${(locked && !active) ? 'locked' : ''}`;
 
     function handleKeyPress (target) {
-        if (target.charCode == 13) {
+        if (target.charCode === 13) {
             onEnter();
         }
     }

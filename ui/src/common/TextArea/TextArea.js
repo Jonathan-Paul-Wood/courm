@@ -168,9 +168,10 @@ TextArea.defaultProps = {
     error: '',
     locked: false,
     secondary: false, // by default (for white backgrounds)
-    maxLength: 140,
+    max: 140,
     onChange: () => {},
-    onEnter: () => {}
+    onEnter: () => {},
+    required: false
 };
 
 TextArea.propTypes = {
@@ -180,7 +181,8 @@ TextArea.propTypes = {
     error: PropTypes.string,
     locked: PropTypes.bool,
     secondary: PropTypes.bool, // if true, will be white/transparent (for colored backgrounds)
-    maxLength: PropTypes.number,
+    max: PropTypes.number,
     onEnter: PropTypes.func,
-    onChange: PropTypes.func
+    onChange: PropTypes.func,
+    required: PropTypes.bool
 };

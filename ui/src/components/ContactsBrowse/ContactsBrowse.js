@@ -5,6 +5,7 @@ import MainToolbar from '../../common/MainToolbar';
 import ContactCard from './ContactCard';
 import Paginate from './Paginate/Paginate';
 import { RESULTS_PER_PAGE } from '../../common/constants/constants';
+import PropTypes from 'prop-types';
 import LoadingSpinner from '../../common/LoadingSpinner/LoadingSpinner';
 
 const ContentWrapper = styled.div`
@@ -41,7 +42,6 @@ export default function ContactsBrowse (props) {
     const {
         contacts,
         isContactListPending,
-        contactListError,
         getContactList
     } = props;
     const [activeFilters, setActiveFilters] = useState([]);
@@ -129,3 +129,10 @@ export default function ContactsBrowse (props) {
         </>
     );
 }
+
+ContactsBrowse.propTypes = {
+    contacts: PropTypes.object.isRequired,
+    isContactListPending: PropTypes.bool.isRequired,
+    contactListError: PropTypes.string.isRequired,
+    getContactList: PropTypes.func.isRequired
+};

@@ -20,5 +20,6 @@ module.exports = {
   rules: {
     "indent": ["error", 4],
     "semi": ["error", "always"],
+    "react/no-unescaped-entities": 0,
   }
 }

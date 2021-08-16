@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Button from '../../common/Button';
-import { exportJSON, exportContactList } from '../../common/Utilities/utilities';
+import { exportContactList } from '../../common/Utilities/utilities';
 import LoadingSpinner from '../../common/LoadingSpinner';
 
 const ConfigureWrapper = styled.div`
@@ -15,18 +15,13 @@ export default function AppConfigure (props) {
         postContact,
         deleteContact,
         contacts,
-        isContactListPending,
-        contactListError,
-        isContactPostPending,
-        contactPostError,
-        isContactDeletePending,
-        contactDeleteError
+        isContactListPending
     } = props;
 
     const [pendingUpload, setPendingUpload] = useState(null);
 
     useEffect(() => {
-        // TODO: replace with getAll endpoint
+        // TODO: replace with getAll endpoint once made
         getContactList(100000, 1, '', 'firstName', 'ASC'); // TODO: how to stop double calls
     }, []);
 
@@ -62,10 +57,9 @@ export default function AppConfigure (props) {
         <ConfigureWrapper>
             <h2>Configure Application</h2>
             <hr/>
-            {isContactListPending ? (
-                <LoadingSpinner />
-            ) : (
-                <>
+            {isContactListPending
+                ? (<LoadingSpinner />)
+                : (<>
                     <h3>Manage Contacts</h3>
                     <div className="row">
                         <div className="col-lg-6 col-md-6 col-sm-12 col-xs-12">
@@ -98,8 +92,8 @@ export default function AppConfigure (props) {
                                 notes: [],
                             }
                     */}
-                </>
-            )}
+                </>)
+            }
         </ConfigureWrapper>
     );
 }

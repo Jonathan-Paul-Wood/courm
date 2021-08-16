@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import Button from '../Button';
+import PropTypes from 'prop-types';
 
 const ContentWrapper = styled.div`
     height: 4em;
@@ -59,3 +60,7 @@ export default function CollectionTitleHeader (props) {
         </ContentWrapper>
     );
 }
+
+CollectionTitleHeader.propTypes = {
+    title: PropTypes.string.isRequired
+};

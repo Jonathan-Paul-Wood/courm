@@ -6,6 +6,7 @@ import Button from '../../common/Button';
 import Input from '../../common/Input/Input';
 import DateInput from '../../common/DateInput/DateInput';
 import CommonModal from '../../common/CommonModal/CommonModal';
+import PropTypes from 'prop-types';
 
 const ScrollContainer = styled.div`
     margin: 4em 2em 0 2em;
@@ -145,24 +146,20 @@ input:checked + .slider:before {
 }
 `;
 
-export default function ViewContact (props) {
+export default function EditContact (props) {
     const location = useLocation();
     const isNewContact = !!location.pathname.match('/new');
     const { contactId } = useParams();
     const {
         contact,
         isContactPending,
-        contactError,
         getContact,
         postContact,
         isContactPostPending,
-        contactPostError,
         putContact,
         isContactPutPending,
-        contactPutError,
         deleteContact,
-        isContactDeletePending,
-        contactDeleteError
+        isContactDeletePending
     } = props;
     const defaultChanges = {
         firstName: '',
@@ -241,7 +238,7 @@ export default function ViewContact (props) {
             valid = false;
             setError({ ...error, ...{ firstName: 'Please enter name' } });
         }
-        if (pendingChanges.email && !pendingChanges.email.match(/^.{1,}\@[a-zA-Z0-9-_]{1,}\.[a-z]{1,}$/g)) { // ^ and $ to match pattern on entire string, not subset
+        if (pendingChanges.email && !pendingChanges.email.match(/^.{1,}@[a-zA-Z0-9-_]{1,}\.[a-z]{1,}$/g)) { // ^ and $ to match pattern on entire string, not subset
             valid = false;
             setError({ ...error, ...{ email: 'Expected format: name@example.com' } });
         }
@@ -464,3 +461,19 @@ export default function ViewContact (props) {
         </>
     );
 }
+
+EditContact.propTypes = {
+    contact: PropTypes.object.isRequired,
+    isContactPending: PropTypes.bool.isRequired,
+    contactError: PropTypes.string.isRequired,
+    isContactPostPending: PropTypes.bool.isRequired,
+    contactPostError: PropTypes.string.isRequired,
+    isContactPutPending: PropTypes.bool.isRequired,
+    contactPutError: PropTypes.string.isRequired,
+    isContactDeletePending: PropTypes.bool.isRequired,
+    contactDeleteError: PropTypes.string.isRequired,
+    getContact: PropTypes.func.isRequired,
+    putContact: PropTypes.func.isRequired,
+    postContact: PropTypes.func.isRequired,
+    deleteContact: PropTypes.func.isRequired
+};

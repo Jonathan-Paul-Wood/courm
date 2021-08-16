@@ -37,7 +37,7 @@ display: inline-block;
 `;
 
 export default function LoadingLoop (props) {
-    const { type, styleGroup, size } = props;
+    const { styleGroup, size } = props;
 
     return (
         <LoadingContainer>
