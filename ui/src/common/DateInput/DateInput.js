@@ -156,6 +156,14 @@ export default function DateInput (props) {
 
     const fieldClassName = `${secondary ? 'secondary-field' : 'field'} ${active ? 'active' : ''} ${(locked && !active) ? 'locked' : ''}`;
 
+    function handleDateChange (date) {
+        if (date) {
+            onChange(date.toISOString().match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}/g)[0]);
+        } else {
+            onChange('');
+        }
+    }
+
     return (
         <StyleContainer className="input-field">
             <div className={fieldClassName} style={{ height: `${height}` }}>
@@ -165,11 +173,11 @@ export default function DateInput (props) {
                 <DatePicker
                     placeholderText={placeholder}
                     selected={(value && value !== 'null') ? new Date(value) : ''}
-                    onChange={date => onChange(date ? date.toISOString() : date)}
+                    onChange={date => handleDateChange(date)}
                     onClickOutside={() => {}}
                     showYearDropdown={true}
                     showMonthDropdown={true}
-                    dateFormat='yyyy/MM/dd'
+                    dateFormat='yyyy-MM-dd'
                 />
             </div>
         </StyleContainer>
