@@ -231,8 +231,7 @@ export default function EditContact (props) {
     }
 
     function handleSaveContact () {
-        console.log('attempted save');
-        // validate inputs, error messages if needed TODO
+        // validate inputs, prompt user with actionable errors
         let valid = true;
         if (!pendingChanges.firstName) {
             valid = false;
@@ -249,11 +248,11 @@ export default function EditContact (props) {
         if (!entityIsOrganization &&
                 pendingChanges.dateOfBirth &&
                 (pendingChanges.dateOfBirth &&
-                    !pendingChanges.dateOfBirth.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\.[0-9]{3}Z$/g)
+                    !pendingChanges.dateOfBirth.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/g)
                 )
         ) {
             valid = false;
-            setError({ ...error, ...{ dateOfBirth: 'Expect format: YYYY-MM-DD' } });
+            setError({ ...error, ...{ dateOfBirth: 'Expected format: YYYY-MM-DD' } });
         }
 
         if (valid) {
