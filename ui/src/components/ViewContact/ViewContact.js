@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import EntityTitleHeader from '../../common/EntityTitleHeader/EntityTitleHeader';
 import Button from '../../common/Button';
@@ -61,8 +61,6 @@ const GridWrapper = styled.div`
 `;
 
 export default function ViewContact (props) {
-    const location = useLocation();
-    const isNewContact = !!location.pathname.match('/new');
     const { contactId } = useParams();
     const {
         contact,
@@ -99,9 +97,7 @@ export default function ViewContact (props) {
                 : (
                     <>
                         <EntityTitleHeader
-                            title={isNewContact
-                                ? 'New Contact'
-                                : `${contact.firstName} ${contact.lastName}`}
+                            title={`${contact.firstName} ${contact.lastName}`}
                             editMode={false}
                         />
                         <ContentWrapper>
