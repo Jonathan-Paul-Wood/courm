@@ -8,6 +8,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
+    "test-coverage": "react-scripts test --collect-coverage",
     "lint": "eslint ./src",
     "lint-fix": "eslint ./src --fix",
     "lint-fix-dry-run": "eslint ./src --fix-dry-run",
