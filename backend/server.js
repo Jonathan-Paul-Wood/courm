@@ -62,7 +62,19 @@ function initializeDB() {
             lastInteractionId TEXT,
             lastInteractionOn TEXT NOT NULL,
             entityType TEXT NOT NULL
-            )`);
+            );
+            
+            CREATE TABLE IF NOT EXISTS notes (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                date TEXT NOT NULL,
+                title TEXT,
+                record TEXT,
+                address TEXT,
+                contacts TEXT,
+                tags TEXT,
+                createdOn TEXT NOT NULL,
+                lastModifiedOn TEXT
+                );`);
       });      
 }
 
@@ -84,6 +96,153 @@ app.delete("/api/disconnect", (req, res) => {
     res.json({message: 'database closed'})
 });
 
+app.get("api/test", (req, res) => {
+    console.log('req: ', req);
+    db.get(`SELECT * FROM contacts`, (err, rows) => {
+        console.log('error: ', err);
+        if (err) {
+            res.status = ERROR_CODE;
+            res.json(err);
+        } else {
+            res.status = SUCCESS_CODE;
+            res.json({results: rows});
+        }
+    })
+});
+
+// NOTES APIS
+
+app.post('/api/notes/new', (req, res) => {
+    console.log('proposed note: ', req.body);
+    db.run(
+        `INSERT INTO notes(
+            date TEXT NOT NULL,
+            title TEXT,
+            record TEXT,
+            address TEXT,
+            contacts TEXT,
+            tags TEXT,
+            createdOn TEXT NOT NULL,
+            lastModifiedOn TEXT) 
+        VALUES(
+            '${req.body.date}',
+            '${req.body.title}',
+            '${req.body.record}',
+            '${req.body.address}',
+            '${req.body.contacts}',
+            '${req.body.tags}',
+            '${req.body.createdOn}',
+            '${req.body.lastModifiedOn}'
+            )`, (err, rows) => {
+                console.log('error: ', err);
+                if (err) {
+                    res.status = ERROR_CODE;
+                    res.json(err);
+                } else {
+                    res.status = SUCCESS_CODE;
+                    db.run(`SELECT id FROM notes WHERE createdOn=${req.body.createdOn}`, (err, id) => {
+                        if (err) {
+                            res.json({'message': 'could not get new Id'});
+                        } else {
+                            res.json({'newId': id});
+                        }
+                    });
+                }
+            }
+        );
+});
+
+//accepts requests of the form: /api/notes?order=id?results=3&page=1?direction=[ASC|DESC]?search=string
+app.get("/api/notes", (req, res) => {
+    let sql = `SELECT * FROM notes`;
+
+    db.all(sql, (err, rows) => {
+        if (err) {
+            console.log(err);
+            res.status = ERROR_CODE;
+            res.json(err);
+        } else if (!rows) {
+            res.status = NOT_FOUND_CODE;
+            res.json({message: 'NOT FOUND'});
+        } else {
+            console.log(rows);
+            db.all(sql_metadata, (err, result) => {
+                if (err) {
+                    res.status = ERROR_CODE;
+                    return console.error(err.message);
+                } else if (!result) {
+                    res.status = NOT_FOUND_CODE;
+                    return;
+                } else {
+                    totalResults = result.length;
+                    res.json({
+                        results: rows,
+                        resultCount: rows.length
+                    });
+                }
+            });
+        }
+    });
+});
+
+app.get("/api/notes/:id", (req, res) => {
+    const sql = `SELECT * FROM notes WHERE id = ${req.params.id}`;
+    db.get(sql, (err, row) => {
+        if (err) {
+            res.status(ERROR_CODE).send({message: err.message});
+        } else if (!row) {
+            res.status(NOT_FOUND_CODE).send({message: 'No such note'});
+        } else {
+            res.status = SUCCESS_CODE;
+            res.json(row);
+        }
+    })
+});
+
+app.put("/api/notes/:id", (req, res) => {
+    const b = req.body;
+    let sql = `UPDATE notes SET`;
+    Object.keys(b).map(key => {
+        if(key !== 'id' && key !== 'firstName') {
+            sql = sql+`, ${key}='${b[key]}'`
+        } else if (key === 'firstName') {
+            sql = sql+` ${key}='${b[key]}'`
+        }
+    });
+    sql = sql+` WHERE id=${req.params.id}`;
+    db.run(sql, (err, row) => {
+        if (err) {
+            res.status = ERROR_CODE;
+            res.json(err);
+        } else if (!row) {
+            res.status = NOT_FOUND_CODE;
+            res.json({'response': 'NOT FOUND'});
+        } else {
+            res.status = SUCCESS_CODE;
+            res.json({'response': row});
+        }
+    });
+});
+
+app.delete("/api/notes/:id", (req, res) => {
+    const sql = `DELETE FROM notes WHERE id = ${req.params.id}`;
+    db.run(sql, (err, row) => {
+        if (err) {
+            res.status = ERROR_CODE;
+            res.json(err);
+        } else if (!row) {
+            res.status = NOT_FOUND_CODE;
+            res.json({'response': 'NOT FOUND'});
+        } else {
+            res.status = SUCCESS_CODE;
+            res.json({'response': row});
+        }
+    });
+});
+
+// END NOTES APIS
+
+// CONTACTS APIS
 app.post('/api/contacts/new', (req, res) => {
     const createdOn = req.body.createdOn;
     db.run(
@@ -263,6 +422,8 @@ app.delete("/api/contacts/:id", (req, res) => {
         }
     });
 });
+
+// END CONTACTS APIS
   
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
