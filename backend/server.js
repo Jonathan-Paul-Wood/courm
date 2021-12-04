@@ -220,9 +220,9 @@ app.put("/api/notes/:id", (req, res) => {
     const b = req.body;
     let sql = `UPDATE notes SET`;
     Object.keys(b).map(key => {
-        if(key !== 'id' && key !== 'firstName') {
+        if(key !== 'id' && key !== 'date') {
             sql = sql+`, ${key}='${b[key]}'`
-        } else if (key === 'firstName') {
+        } else if (key === 'date') {
             sql = sql+` ${key}='${b[key]}'`
         }
     });
