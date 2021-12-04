@@ -2,7 +2,7 @@ import ViewNote from './ViewNote';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { getNote } from '../../store/Note/actions';
-import { getContact } from '../../store/Note/actions';
+import { getContact } from '../../store/Contact/actions';
 
 function mapStateToProps (state) {
     return {

@@ -7,7 +7,7 @@ import Input from '../../common/Input/Input';
 import DateInput from '../../common/DateInput/DateInput';
 import TextArea from '../../common/TextArea/TextArea';
 import LoadingSpinner from '../../common/LoadingSpinner/LoadingSpinner';
-import { exportNoteList } from '../../common/Utilities/utilities';
+import { exportDataList } from '../../common/Utilities/utilities';
 import PropTypes from 'prop-types';
 
 const ContentWrapper = styled.div`
@@ -70,7 +70,7 @@ export default function ViewNote (props) {
     }, [noteId]);
 
     function exportNote () {
-        exportNoteList([note], `note-${noteId}`);
+        exportDataList('notes', [note], `note-${noteId}`);
     }
 
     // TODO: handle loading state, 404s and errors

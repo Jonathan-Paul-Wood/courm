@@ -35,6 +35,11 @@ export default function LeftSidebar () {
             path: '/contacts'
         },
         {
+            icon: 'notes',
+            title: 'Notes',
+            path: '/notes'
+        },
+        {
             icon: 'tools',
             title: 'Configure',
             path: '/configure'

@@ -7,6 +7,9 @@ import AppHome from '../../../components/AppHome';
 import ContactsBrowse from '../../../components/ContactsBrowse';
 import ViewContact from '../../../components/ViewContact';
 import EditContact from '../../../components/EditContact';
+import NotesBrowse from '../../../components/NotesBrowse';
+import ViewNote from '../../../components/ViewNote';
+import EditNote from '../../../components/EditNote';
 import AppConfigure from '../../../components/AppConfigure';
 import FaqHome from '../../../components/FaqHome';
 
@@ -28,6 +31,10 @@ export default function AppRouter () {
                 <AppLayout path="/contacts/new" exact component={EditContact} {...commonRouteProps} />
                 <AppLayout path="/contacts/:contactId/edit" component={EditContact} {...commonRouteProps} />
                 <AppLayout path="/contacts/:contactId" component={ViewContact} {...commonRouteProps} />
+                <AppLayout path="/notes" exact component={NotesBrowse} {...commonRouteProps} />
+                <AppLayout path="/notes/new" exact component={EditNote} {...commonRouteProps} />
+                <AppLayout path="/notes/:noteId/edit" component={EditNote} {...commonRouteProps} />
+                <AppLayout path="/note/:noteId" component={ViewNote} {...commonRouteProps} />
                 <AppLayout path="/configure" component={AppConfigure} {...commonRouteProps} />
                 <AppLayout path="/faq" component={FaqHome} {...commonRouteProps} />
                 {/* <AppLayout path="/interactions/:interactionsId" component={Interaction} />

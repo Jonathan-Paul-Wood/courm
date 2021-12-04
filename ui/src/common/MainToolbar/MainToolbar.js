@@ -6,7 +6,7 @@ import Input from '../../common/Input/Input';
 import Button from '../../common/Button';
 import Tooltip from '../Tooltip/Tooltip';
 import SortOrderControls from './SortOrderControls';
-import { exportContactList } from '../../common/Utilities/utilities';
+import { exportDataList } from '../../common/Utilities/utilities';
 import FilterControls from './FilterControls';
 
 const ContentWrapper = styled.div`
@@ -78,7 +78,7 @@ export default function MainToolbar (props) {
 
     function exportList () {
         const list = type === 'Contact' ? contactList.results : 'interactionList';
-        exportContactList(list, 'contactList');
+        exportDataList(type.toLowerCase(), list, 'contactList');
     }
 
     function handleSelectionChange (index) {
