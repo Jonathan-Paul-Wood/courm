@@ -97,20 +97,6 @@ app.delete("/api/disconnect", (req, res) => {
     res.json({message: 'database closed'})
 });
 
-app.get("api/test", (req, res) => {
-    console.log('req: ', req);
-    db.get(`SELECT * FROM contacts`, (err, rows) => {
-        console.log('error: ', err);
-        if (err) {
-            res.status = ERROR_CODE;
-            res.json(err);
-        } else {
-            res.status = SUCCESS_CODE;
-            res.json({results: rows});
-        }
-    })
-});
-
 // NOTES APIS
 
 app.post('/api/notes/new', (req, res) => {
