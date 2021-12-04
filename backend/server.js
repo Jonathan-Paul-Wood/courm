@@ -62,19 +62,20 @@ function initializeDB() {
             lastInteractionId TEXT,
             lastInteractionOn TEXT NOT NULL,
             entityType TEXT NOT NULL
+            );`);
+        db.run(`
+        CREATE TABLE IF NOT EXISTS notes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date datetime NOT NULL,
+            title TEXT,
+            record TEXT,
+            address TEXT,
+            contacts TEXT,
+            tags TEXT,
+            createdOn datetime default current_timestamp,
+            lastModifiedOn datetime default current_timestamp
             );
-            
-            CREATE TABLE IF NOT EXISTS notes (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                date TEXT NOT NULL,
-                title TEXT,
-                record TEXT,
-                address TEXT,
-                contacts TEXT,
-                tags TEXT,
-                createdOn TEXT NOT NULL,
-                lastModifiedOn TEXT
-                );`);
+        `);
       });      
 }
 
@@ -116,23 +117,19 @@ app.post('/api/notes/new', (req, res) => {
     console.log('proposed note: ', req.body);
     db.run(
         `INSERT INTO notes(
-            date TEXT NOT NULL,
-            title TEXT,
-            record TEXT,
-            address TEXT,
-            contacts TEXT,
-            tags TEXT,
-            createdOn TEXT NOT NULL,
-            lastModifiedOn TEXT) 
+            date,
+            title,
+            record,
+            address,
+            contacts,
+            tags) 
         VALUES(
             '${req.body.date}',
             '${req.body.title}',
             '${req.body.record}',
             '${req.body.address}',
             '${req.body.contacts}',
-            '${req.body.tags}',
-            '${req.body.createdOn}',
-            '${req.body.lastModifiedOn}'
+            '${req.body.tags}'
             )`, (err, rows) => {
                 console.log('error: ', err);
                 if (err) {
@@ -154,7 +151,23 @@ app.post('/api/notes/new', (req, res) => {
 
 //accepts requests of the form: /api/notes?order=id?results=3&page=1?direction=[ASC|DESC]?search=string
 app.get("/api/notes", (req, res) => {
+    const { results, page, order, direction, searchTerm, filters } = req.query;
     let sql = `SELECT * FROM notes`;
+
+    //apply search
+    if(searchTerm && filters) {
+        const searchFilters = filters.split(',');
+        sql = sql + ` WHERE ${searchFilters[0]} LIKE '%${searchTerm}%'`;
+        searchFilters.forEach((filter, index) => {
+            if(index) {
+                sql = sql + ` OR ${filter} LIKE '%${searchTerm}%'`
+            }
+        });
+    }
+
+    const sql_metadata = sql;
+    //apply sort order and pagination
+    sql = sql+` ORDER BY ${order} ${direction} LIMIT ${results} OFFSET ((${page - 1})* ${results})`;
 
     db.all(sql, (err, rows) => {
         if (err) {
@@ -177,7 +190,11 @@ app.get("/api/notes", (req, res) => {
                     totalResults = result.length;
                     res.json({
                         results: rows,
-                        resultCount: rows.length
+                        resultCount: rows.length,
+                        pageSize: parseInt(results),
+                        totalCount: totalResults,
+                        pageCount: Math.ceil(totalResults / parseInt(results)),
+                        currentPage: parseInt(page)
                     });
                 }
             });
@@ -428,7 +445,7 @@ app.delete("/api/contacts/:id", (req, res) => {
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
-    console.log(`Server is running...`);
+    console.log(`Server is running at http://localhost:${PORT}/`);
 
     // if in production mode: opens the url in the default browser 
     //open(`http://localhost:${PORT}/`);
