@@ -12,7 +12,7 @@ const LeftSideBarWrapper = styled.div`
     color: white;
     display: grid;
     grid-template-columns: 8em;
-    grid-template-rows: 5rem 5rem 5rem 5rem;
+    grid-template-rows: 5rem 5rem 5rem 5rem 5rem;
 `;
 
 const ActiveTab = styled.div`

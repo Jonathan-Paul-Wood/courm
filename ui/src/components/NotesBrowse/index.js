@@ -1,7 +1,7 @@
 import NotesBrowse from './NotesBrowse';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { getNoteList } from '../../store/Note/actions';
+import { getNoteList } from '../../store/NoteList/actions';
 
 function mapStateToProps (state) {
     return {

@@ -8,7 +8,7 @@ export function downloadContent (content, fileName, contentType) {
 // example: downloadContent(jsonData, 'json.txt', 'text/plain');
 
 export function exportDataList (type, array, name) {
-    let info = {};
+    const info = {};
     info[type] = {
         totals: array.length,
         data: array

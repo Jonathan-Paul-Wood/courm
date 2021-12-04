@@ -95,8 +95,6 @@ export default function ViewNote (props) {
                                             <div className="configureRow">
                                                 <Button icon="download" label="Export" onClick={exportNote}/>
                                             </div>
-                                            <div className="contactRow" className="inputRow rowMargin">
-                                            </div>
                                             <div className="recordRow">
                                                 <TextArea
                                                     value={note.record}
@@ -106,24 +104,24 @@ export default function ViewNote (props) {
                                                 />
                                             </div>
                                             <div className="inputRow rowMargin">
-                                                    <Input
-                                                        value={note.address}
-                                                        label="Location of Note"
-                                                        locked={true}
-                                                    />
-                                                    <DateInput
-                                                        value={note.date}
-                                                        label="Date of Note"
-                                                        locked={true}
-                                                    />
+                                                <Input
+                                                    value={note.address}
+                                                    label="Location of Note"
+                                                    locked={true}
+                                                />
+                                                <DateInput
+                                                    value={note.date}
+                                                    label="Date of Note"
+                                                    locked={true}
+                                                />
                                             </div>
                                             <div className="inputRow rowMargin">
-                                                    <div>
+                                                <div>
                                                         Created On: {note.createdOn}
-                                                    </div>
-                                                    <div>
+                                                </div>
+                                                <div>
                                                         Last Modified: {note.lastModifiedOn}
-                                                    </div>
+                                                </div>
                                             </div>
                                         </GridWrapper>
                                     </ScrollContainer>

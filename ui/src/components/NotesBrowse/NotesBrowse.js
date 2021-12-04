@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import CollectionTitleHeader from '../../common/CollectionTitleHeader/CollectionTitleHeader';
 import MainToolbar from '../../common/MainToolbar';
 import NoteCard from './NoteCard';
-import Paginate from './Paginate/Paginate';
+import Paginate from '../../common/Paginate/Paginate';
 import { RESULTS_PER_PAGE } from '../../common/constants/constants';
 import PropTypes from 'prop-types';
 import LoadingSpinner from '../../common/LoadingSpinner/LoadingSpinner';
@@ -83,7 +83,7 @@ export default function NotesBrowse (props) {
         <>
             <CollectionTitleHeader title="View Notes" />
             <ContentWrapper>
-                {/*TODO: MainTollbar need to be passed variables, MainToolbar needs to be abstracted, as does *Browse.js and Pagination controls */}
+                {/* TODO: MainTollbar need to be passed variables, MainToolbar needs to be abstracted, as does *Browse.js and Pagination controls */}
                 <MainToolbar
                     type="Note"
                     className="main-toolbar"
