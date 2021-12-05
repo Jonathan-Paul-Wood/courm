@@ -47,7 +47,7 @@ export default function NotesBrowse (props) {
     const [activeFilters, setActiveFilters] = useState([]);
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
-    const [searchOrderBy, setSearchOrderBy] = useState('firstName');
+    const [searchOrderBy, setSearchOrderBy] = useState('title');
     const [direction, setDirection] = useState('ASC'); // ASC if ascending, DESC if descending
 
     useEffect(() => {

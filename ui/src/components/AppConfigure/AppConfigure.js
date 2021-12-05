@@ -106,7 +106,7 @@ AppConfigure.propTypes = {
     isContactListPending: PropTypes.bool.isRequired,
     contactListError: PropTypes.string.isRequired,
     isContactPostPending: PropTypes.bool.isRequired,
-    contactPostError: PropTypes.object.isRequired,
+    contactPostError: PropTypes.string.isRequired,
     isContactDeletePending: PropTypes.bool.isRequired,
     contactDeleteError: PropTypes.string.isRequired
 };

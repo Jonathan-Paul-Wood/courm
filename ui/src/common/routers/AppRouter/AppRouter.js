@@ -34,7 +34,7 @@ export default function AppRouter () {
                 <AppLayout path="/notes" exact component={NotesBrowse} {...commonRouteProps} />
                 <AppLayout path="/notes/new" exact component={EditNote} {...commonRouteProps} />
                 <AppLayout path="/notes/:noteId/edit" component={EditNote} {...commonRouteProps} />
-                <AppLayout path="/note/:noteId" component={ViewNote} {...commonRouteProps} />
+                <AppLayout path="/notes/:noteId" component={ViewNote} {...commonRouteProps} />
                 <AppLayout path="/configure" component={AppConfigure} {...commonRouteProps} />
                 <AppLayout path="/faq" component={FaqHome} {...commonRouteProps} />
                 {/* <AppLayout path="/interactions/:interactionsId" component={Interaction} />

@@ -6,6 +6,7 @@ import './App.css';
 import '../../../node_modules/bootstrap/scss/bootstrap.scss';
 import axiosSingleton from '../../configs/axiosSingleton';
 import AppRouter from '../routers/AppRouter/AppRouter';
+import LoadingLoop from '../LoadingLoop/LoadingLoop';
 
 const ErrorBoundary = styled.div`
 `;// todo: make it's own component. Wraps around and overlays screen if there is an error message
@@ -17,7 +18,7 @@ export default function App () {
         axiosSingleton.request();
         setIsSetupComplete(true);
     }, []);
-
+    console.info('begin at app');
     return isSetupComplete
         ? (<div>
             <ErrorBoundary>
@@ -27,6 +28,9 @@ export default function App () {
                     <AppRouter path="/contacts/:contactId" component={AppRouter} />
                     <AppRouter path="/contacts/new" component={AppRouter} />
                     <AppRouter path="/contacts" component={AppRouter} />
+                    <AppRouter path="/notes/:noteId" component={AppRouter} />
+                    <AppRouter path="/notes/new" component={AppRouter} />
+                    <AppRouter path="/notes" component={AppRouter} />
                     <AppRouter path="/configure" component={AppRouter} />
                     <AppRouter path="/faq" component={AppRouter} />
                     {/* <Route path="/interactions/:interactionId" component={App} /> */}
@@ -47,5 +51,7 @@ export default function App () {
             />
             <UnsavedChangesModal /> */}
         </div>)
-        : (<></>); // todo: make loading spinner
+        : (
+            <LoadingLoop type='spinner' styleGroup='primary' />
+        ); // todo: make loading spinner
 }
