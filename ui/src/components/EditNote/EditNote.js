@@ -298,7 +298,7 @@ EditNote.propTypes = {
     isNotePending: PropTypes.bool.isRequired,
     noteError: PropTypes.string.isRequired,
     isNotePostPending: PropTypes.bool.isRequired,
-    notePostError: PropTypes.string.isRequired,
+    notePostError: PropTypes.any.isRequired,
     isNotePutPending: PropTypes.bool.isRequired,
     notePutError: PropTypes.string.isRequired,
     isNoteDeletePending: PropTypes.bool.isRequired,
