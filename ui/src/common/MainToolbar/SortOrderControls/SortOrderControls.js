@@ -103,34 +103,7 @@ const RadioEntry = styled.div`
 `;
 
 export default function SortOrderControls (props) {
-    const { currentDirection, currentOrder, handleOrderUpdate, handleDirectionUpdate } = props;
-
-    const contactSortOptions = [
-        {
-            label: 'First Name',
-            value: 'firstName'
-        },
-        {
-            label: 'Last Name',
-            value: 'lastName'
-        },
-        {
-            label: 'Date Of Birth',
-            value: 'dateOfBirth'
-        },
-        {
-            label: 'Date Created',
-            value: 'createdOn'
-        },
-        {
-            label: 'Date of Last Change',
-            value: 'lastModifiedOn'
-        }
-        // {
-        //     label: 'Recently Interacted',
-        //     value: 'lastInteractedOn'
-        // },
-    ];
+    const { currentDirection, currentOrder, handleOrderUpdate, handleDirectionUpdate, sortOptions } = props;
 
     function handleDirectionClick (event) {
         if (event.target.attributes.value &&
@@ -155,7 +128,7 @@ export default function SortOrderControls (props) {
                 </span>
             </div>
             <RadioList>
-                {contactSortOptions.map((option, index) => {
+                {sortOptions.map((option, index) => {
                     return (
                         <RadioEntry key={index}>
                             <input
@@ -164,7 +137,7 @@ export default function SortOrderControls (props) {
                                 type="radio"
                                 id={index}
                                 name="inputs"
-                                onClick={event => handleOrderUpdate(contactSortOptions[event.target.id].value)}
+                                onClick={event => handleOrderUpdate(sortOptions[event.target.id].value)}
                             />
                             <label className="entry" htmlFor={index}>
                                 <div className="entry-label">{option.label}</div>
@@ -181,6 +154,7 @@ SortOrderControls.propTypes = {
     currentOrder: PropTypes.string.isRequired,
     handleOrderUpdate: PropTypes.func.isRequired,
     currentDirection: PropTypes.string.isRequired,
-    handleDirectionUpdate: PropTypes.func.isRequired
+    handleDirectionUpdate: PropTypes.func.isRequired,
+    sortOptions: PropTypes.array.isRequired
     // interactionList: PropTypes.object.isRequired,
 };

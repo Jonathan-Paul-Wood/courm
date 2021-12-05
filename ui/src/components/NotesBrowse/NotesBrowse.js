@@ -50,6 +50,57 @@ export default function NotesBrowse (props) {
     const [searchOrderBy, setSearchOrderBy] = useState('title');
     const [direction, setDirection] = useState('ASC'); // ASC if ascending, DESC if descending
 
+    const searchFields = [
+        {
+            label: 'Title',
+            value: 'title',
+            selected: false
+        },
+        {
+            label: 'Date',
+            value: 'date',
+            selected: false
+        },
+        {
+            label: 'Address',
+            value: 'address',
+            selected: false
+        },
+        {
+            label: 'Contacts',
+            value: 'contacts',
+            selected: false
+        },
+        {
+            label: 'Tag',
+            value: 'tags',
+            selected: false
+        },
+        {
+            label: 'Note',
+            value: 'record',
+            selected: false
+        }
+    ];
+    const noteSortOptions = [
+        {
+            label: 'Title',
+            value: 'title'
+        },
+        {
+            label: 'Date',
+            value: 'date'
+        },
+        {
+            label: 'Date Created',
+            value: 'createdOn'
+        },
+        {
+            label: 'Date of Last Change',
+            value: 'lastModifiedOn'
+        }
+    ];
+
     useEffect(() => {
         initiateSearch();
     }, []);
@@ -89,6 +140,8 @@ export default function NotesBrowse (props) {
                     className="main-toolbar"
                     updateActiveFilters={setActiveFilters}
                     searchTerm={searchTerm}
+                    searchFields={searchFields}
+                    sortOptions={noteSortOptions}
                     updateSearchTerm={setSearchTerm}
                     currentOrder={searchOrderBy}
                     handleOrderUpdate={setSearchOrderBy}
