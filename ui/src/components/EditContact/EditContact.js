@@ -301,6 +301,7 @@ export default function EditContact (props) {
                     isContactPostPending ||
                     isContactPutPending
                 }
+                type='Contact'
             />
             <ScrollContainer>
                 <GridWrapper>

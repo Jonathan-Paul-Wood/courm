@@ -205,6 +205,7 @@ export default function EditNote (props) {
                     isNotePostPending ||
                     isNotePutPending
                 }
+                type='Note'
             />
             <ScrollContainer>
                 <GridWrapper>

@@ -85,6 +85,7 @@ export default function ViewNote (props) {
                         <EntityTitleHeader
                             title={`${note.title} (${note.date})`}
                             editMode={false}
+                            type='Note'
                         />
                         <ContentWrapper>
                             {isNotePending

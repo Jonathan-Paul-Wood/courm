@@ -99,6 +99,7 @@ export default function ViewContact (props) {
                         <EntityTitleHeader
                             title={`${contact.firstName} ${contact.lastName}`}
                             editMode={false}
+                            type='Contact'
                         />
                         <ContentWrapper>
                             {(isContactPending || firstLoad)
