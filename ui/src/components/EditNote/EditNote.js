@@ -5,34 +5,16 @@ import EntityTitleHeader from '../../common/EntityTitleHeader/EntityTitleHeader'
 import Button from '../../common/Button';
 import Input from '../../common/Input/Input';
 import DateInput from '../../common/DateInput/DateInput';
+import TextArea from '../../common/TextArea/TextArea';
 import CommonModal from '../../common/CommonModal/CommonModal';
 import PropTypes from 'prop-types';
 
 const ScrollContainer = styled.div`
-    margin: 4em 2em 0 2em;
+    margin: 2em 2em 0 2em;
     padding: 0 1em;
 `;
 
 const GridWrapper = styled.div`
-    .imageRow {
-        height: 15vh;
-        display: flex;
-        justify-content: space-between;
-        
-        #profile-picture {
-            margin: auto 0;
-            max-height: 13vh;
-            width: auto;
-        }
-
-        #picture-upload {
-        }
-
-        img {
-            cursor: pointer;
-        }
-    }
-
     .rowMargin {
         margin: 1rem 0;
         .input-field {
@@ -60,8 +42,13 @@ const GridWrapper = styled.div`
         height: 20rem;
     }
 
+    .dateInfo {
+        font-style: italic;
+        font-size: 0.8rem;
+    }
+
     #dangerRow {
-        margin: 2rem;
+        margin-top: 3rem;
         display: flex;
         justify-content: space-between;
 
@@ -210,12 +197,11 @@ export default function EditNote (props) {
             <ScrollContainer>
                 <GridWrapper>
                     <div className="metadataRow">
-
                         <div id="titleData" className="inputRow rowMargin">
                             <Input
                                 placeholder="Enter Title"
                                 value={pendingChanges.title}
-                                label='Title'
+                                label='Title *'
                                 error={error.title}
                                 onChange={(event) => updateData('title', event.target.value)}
                             />
@@ -246,7 +232,7 @@ export default function EditNote (props) {
                         </div>
                     </div>
                     <div className="recordRow">
-                        <Input
+                        <TextArea
                             placeholder="Record whatever you wish herein"
                             value={pendingChanges.record}
                             label="Note"
@@ -256,15 +242,24 @@ export default function EditNote (props) {
                             maxLength={750}
                         />
                     </div>
-                    <div className="tagsRow">
+                    {/* <div className="tagsRow">
 
-                    </div>
+                    </div> */}
                     {/* <div className="ContactsRow">
                         <h3>Related Contacts</h3>
                         <div>
                             cards go here, or none available message...
                         </div>
                     </div> */}
+
+                    <div className="dateInfo inputRow rowMargin">
+                        <div>
+                            Created On: {note.createdOn}
+                        </div>
+                        <div>
+                            Last Modified: {note.lastModifiedOn}
+                        </div>
+                    </div>
                     {!isNewNote && <div id="dangerRow">
                         <div></div>
                         <Button

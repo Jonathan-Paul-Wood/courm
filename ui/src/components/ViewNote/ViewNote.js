@@ -51,6 +51,11 @@ const GridWrapper = styled.div`
     tagsRow {
         height: 20rem;
     }
+
+    .dateInfo {
+        font-style: italic;
+        font-size: 0.8rem;
+    }
 `;
 
 export default function ViewNote (props) {
@@ -83,7 +88,7 @@ export default function ViewNote (props) {
                 : (
                     <>
                         <EntityTitleHeader
-                            title={`${note.title} (${note.date})`}
+                            title={`${note.title} ${note.date}`}
                             editMode={false}
                             type='Note'
                         />
@@ -93,36 +98,62 @@ export default function ViewNote (props) {
                                 : (
                                     <ScrollContainer>
                                         <GridWrapper>
-                                            <div className="configureRow">
-                                                <Button icon="download" label="Export" onClick={exportNote}/>
+                                            <div className="metadataRow">
+                                                <div id="titleData" className="inputRow rowMargin">
+                                                    <Input
+                                                        value={note.title}
+                                                        label='Title'
+                                                        locked={true}
+                                                    />
+                                                    <DateInput
+                                                        value={note.date}
+                                                        label="Date"
+                                                        locked={true}
+                                                    />
+                                                </div>
+                                                <div id="placementData" className="inputRow rowMargin">
+                                                    <Input
+                                                        value={note.address}
+                                                        label="Address"
+                                                        locked={true}
+                                                    />
+                                                    {/* <Input
+                                placeholder="upload files"
+                                value={note.files}
+                                label="Files"
+                                error={error.files}
+                                onChange={(event) => updateData('files', event.target.value)}
+                            /> */}
+                                                </div>
+                                                {/* <div className="tagsRow">
+
+                                                </div> */}
+                                                {/* <div className="ContactsRow">
+                        <h3>Related Contacts</h3>
+                        <div>
+                            cards go here, or none available message...
+                        </div>
+                    </div> */}
                                             </div>
                                             <div className="recordRow">
                                                 <TextArea
                                                     value={note.record}
-                                                    label="Record"
-                                                    locked={true}
+                                                    label="Note"
                                                     height="18vh"
-                                                />
-                                            </div>
-                                            <div className="inputRow rowMargin">
-                                                <Input
-                                                    value={note.address}
-                                                    label="Location of Note"
-                                                    locked={true}
-                                                />
-                                                <DateInput
-                                                    value={note.date}
-                                                    label="Date of Note"
                                                     locked={true}
                                                 />
                                             </div>
-                                            <div className="inputRow rowMargin">
+                                            <div className="dateInfo inputRow rowMargin">
                                                 <div>
-                                                        Created On: {note.createdOn}
+                                                    Created On: {note.createdOn}
                                                 </div>
                                                 <div>
-                                                        Last Modified: {note.lastModifiedOn}
+                                                    Last Modified: {note.lastModifiedOn}
                                                 </div>
+                                            </div>
+
+                                            <div className="configureRow">
+                                                <Button icon="download" label="Export" onClick={exportNote} />
                                             </div>
                                         </GridWrapper>
                                     </ScrollContainer>

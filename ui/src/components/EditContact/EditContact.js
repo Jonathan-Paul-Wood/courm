@@ -9,7 +9,7 @@ import CommonModal from '../../common/CommonModal/CommonModal';
 import PropTypes from 'prop-types';
 
 const ScrollContainer = styled.div`
-    margin: 4em 2em 0 2em;
+    margin: 2em 2em 0 2em;
     padding: 0 1em;
 `;
 
