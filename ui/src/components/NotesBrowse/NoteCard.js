@@ -24,6 +24,13 @@ const CardWrapper = styled.div`
         justify-content: space-between;
         margin: 0.5em;
     }
+
+    .recordPreview {
+        width: 50%;
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+    }
 `;
 
 export default function NoteCard (props) {
@@ -33,12 +40,12 @@ export default function NoteCard (props) {
     return (
         <CardWrapper className="a-cursor-pointer" onClick={() => history.push(`/notes/${note.id}`)}>
             <div className="details-row">
-                <h3>{note.title}</h3>
-                <span>Created: {new Date(note.createdOn).getDate()}</span>
+                <h3>{note.title} {note.date}</h3>
+                <span>Created: {note.createdOn}</span>
             </div>
             <div className="details-row">
-                <h3>{new Date(note.date).getDate()}</h3>
-                <span>Created: {new Date(note.lastModifiedOn).getDate()}</span>
+                <p className="recordPreview">{note.record}</p>
+                <span>Last Modified: {note.lastModifiedOn}</span>
             </div>
         </CardWrapper>
     );
