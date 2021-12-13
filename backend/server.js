@@ -87,6 +87,10 @@ function closeDB() {
     });
 }
 
+function cleanseString(str) {
+    return str.replace(/'/g, "''");
+}
+
 app.post("/api/initialize", (req, res) => {
     initializeDB();
     res.json({message: 'done'});
@@ -111,9 +115,9 @@ app.post('/api/notes/new', (req, res) => {
             tags) 
         VALUES(
             '${req.body.date}',
-            '${req.body.title}',
-            '${req.body.record}',
-            '${req.body.address}',
+            '${cleanseString(req.body.title)}',
+            '${cleanseString(req.body.record)}',
+            '${cleanseString(req.body.address)}',
             '${req.body.contacts}',
             '${req.body.tags}'
             )`, (err, rows) => {
@@ -207,12 +211,13 @@ app.put("/api/notes/:id", (req, res) => {
     let sql = `UPDATE notes SET`;
     Object.keys(b).map(key => {
         if(key !== 'id' && key !== 'date') {
-            sql = sql+`, ${key}='${b[key]}'`
+            sql = sql+`, ${key}='${cleanseString(b[key])}'`
         } else if (key === 'date') {
             sql = sql+` ${key}='${b[key]}'`
         }
     });
     sql = sql+` WHERE id=${req.params.id}`;
+    console.log('update note details: ', JSON.stringify(sql, null, 2));
     db.run(sql, (err, row) => {
         if (err) {
             res.status = ERROR_CODE;
@@ -270,18 +275,18 @@ app.post('/api/contacts/new', (req, res) => {
             lastInteractionOn,
             entityType) 
         VALUES(
-            '${req.body.firstName}',
-            '${req.body.lastName}',
+            '${cleanseString(req.body.firstName)}',
+            '${cleanseString(req.body.lastName)}',
             '${req.body.profilePicture}',
             '${req.body.phoneNumber}',
             '${req.body.email}',
-            '${req.body.address}',
-            '${req.body.firm}',
-            '${req.body.industry}',
+            '${cleanseString(req.body.address)}',
+            '${cleanseString(req.body.firm)}',
+            '${cleanseString(req.body.industry)}',
             '${req.body.dateOfBirth}',
             '${req.body.tags}',
             '${req.body.interactions}',
-            '${req.body.bio}',
+            '${cleanseString(req.body.bio)}',
             '${req.body.createdBy}',
             '${req.body.createdOn}',
             '${req.body.lastModifiedBy}',
@@ -390,9 +395,9 @@ app.put("/api/contacts/:id", (req, res) => {
     let sql = `UPDATE contacts SET`;
     Object.keys(b).map(key => {
         if(key !== 'id' && key !== 'firstName') {
-            sql = sql+`, ${key}='${b[key]}'`
+            sql = sql+`, ${key}='${cleanseString(b[key])}'`
         } else if (key === 'firstName') {
-            sql = sql+` ${key}='${b[key]}'`
+            sql = sql+` ${key}='${cleanseString(b[key])}'`
         }
     });
     sql = sql+` WHERE id=${req.params.id}`;
