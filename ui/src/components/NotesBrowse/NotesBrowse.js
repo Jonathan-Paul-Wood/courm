@@ -126,6 +126,16 @@ export default function NotesBrowse (props) {
         initiateSearch();
     }, [searchTerm]);
 
+    function handleFilterChange (value) {
+        setPage(1);
+        setActiveFilters(value);
+    }
+
+    function handleSearchTermChange (value) {
+        setPage(1);
+        setSearchTerm(value);
+    }
+
     function initiateSearch () {
         getNoteList(RESULTS_PER_PAGE, page, searchTerm, searchOrderBy, direction, activeFilters);
     }
@@ -138,11 +148,11 @@ export default function NotesBrowse (props) {
                 <MainToolbar
                     type="Note"
                     className="main-toolbar"
-                    updateActiveFilters={setActiveFilters}
+                    updateActiveFilters={handleFilterChange}
                     searchTerm={searchTerm}
                     searchFields={searchFields}
                     sortOptions={noteSortOptions}
-                    updateSearchTerm={setSearchTerm}
+                    updateSearchTerm={handleSearchTermChange}
                     currentOrder={searchOrderBy}
                     handleOrderUpdate={setSearchOrderBy}
                     currentDirection={direction}
