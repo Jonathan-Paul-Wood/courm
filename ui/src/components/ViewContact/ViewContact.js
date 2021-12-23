@@ -84,7 +84,7 @@ export default function ViewContact (props) {
     }, [contact]);
 
     function exportContact () {
-        exportDataList('contacts', [contact], `contact-${contactId}`);
+        exportDataList(['contacts'], [[contact]], `contact-${contactId}`);
     }
 
     // TODO: handle loading state, 404s and errors

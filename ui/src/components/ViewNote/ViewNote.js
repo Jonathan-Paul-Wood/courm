@@ -75,7 +75,7 @@ export default function ViewNote (props) {
     }, [noteId]);
 
     function exportNote () {
-        exportDataList('notes', [note], `note-${noteId}`);
+        exportDataList(['notes'], [[note]], `note-${noteId}`);
     }
 
     // TODO: handle loading state, 404s and errors
