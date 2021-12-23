@@ -7,20 +7,15 @@ export function downloadContent (content, fileName, contentType) {
 }
 // example: downloadContent(jsonData, 'json.txt', 'text/plain');
 
-export function exportDataList (type, array, name) {
+export function exportDataList (types, data, name) {
     const info = {};
-    info[type] = {
-        totals: array.length,
-        data: array
-    };
-    exportJSON({
-        contacts: {
-            total: array.length,
-            data: array
-        }
-    },
-    name
-    );
+    types.forEach((type, index) => {
+        info[type] = {
+            totals: data[index].length,
+            data: data[index]
+        };
+    });
+    exportJSON(info, name);
 }
 
 export function exportJSON (json, name) {
