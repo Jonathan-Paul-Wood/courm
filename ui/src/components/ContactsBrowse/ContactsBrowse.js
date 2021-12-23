@@ -139,6 +139,16 @@ export default function ContactsBrowse (props) {
         initiateSearch();
     }, [searchTerm]);
 
+    function handleFilterChange (value) {
+        setPage(1);
+        setActiveFilters(value);
+    }
+
+    function handleSearchTermChange (value) {
+        setPage(1);
+        setSearchTerm(value);
+    }
+
     function initiateSearch () {
         getContactList(RESULTS_PER_PAGE, page, searchTerm, searchOrderBy, direction, activeFilters);
     }
@@ -150,11 +160,11 @@ export default function ContactsBrowse (props) {
                 <MainToolbar
                     type="Contact"
                     className="main-toolbar"
-                    updateActiveFilters={setActiveFilters}
+                    updateActiveFilters={handleFilterChange}
                     searchTerm={searchTerm}
                     searchFields={searchFields}
                     sortOptions={contactSortOptions}
-                    updateSearchTerm={setSearchTerm}
+                    updateSearchTerm={handleSearchTermChange}
                     currentOrder={searchOrderBy}
                     handleOrderUpdate={setSearchOrderBy}
                     currentDirection={direction}
