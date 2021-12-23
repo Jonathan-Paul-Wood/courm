@@ -18,7 +18,6 @@ export default function App () {
         axiosSingleton.request();
         setIsSetupComplete(true);
     }, []);
-    console.info('begin at app');
     return isSetupComplete
         ? (<div>
             <ErrorBoundary>
