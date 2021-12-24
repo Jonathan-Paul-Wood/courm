@@ -35,7 +35,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // const breadcrumbtrail = path.join(__dirname, 'build/');
 // app.use('/', express.static(breadcrumbtrail));
 // app.get('/', function(req, res) {
-//     console.log(req);
 //     res.sendFile(path.join(breadcrumbtrail, 'index.html'));
 // });
 
@@ -104,7 +103,6 @@ app.delete("/api/disconnect", (req, res) => {
 // NOTES APIS
 
 app.post('/api/notes/new', (req, res) => {
-    console.log('proposed note: ', req.body);
     db.run(
         `INSERT INTO notes(
             date,
@@ -168,7 +166,6 @@ app.get("/api/notes", (req, res) => {
             res.status = NOT_FOUND_CODE;
             res.json({message: 'NOT FOUND'});
         } else {
-            console.log(rows);
             db.all(sql_metadata, (err, result) => {
                 if (err) {
                     res.status = ERROR_CODE;
@@ -217,7 +214,6 @@ app.put("/api/notes/:id", (req, res) => {
         }
     });
     sql = sql+` WHERE id=${req.params.id}`;
-    console.log('update note details: ', JSON.stringify(sql, null, 2));
     db.run(sql, (err, row) => {
         if (err) {
             res.status = ERROR_CODE;
@@ -324,8 +320,6 @@ app.get("/api/contacts", (req, res) => {
     //apply search
     if(searchTerm && filters) {
         const searchFilters = filters.split(',');
-        //console.log(searchTerm);
-        //console.log('filters: ', searchFilters);
         sql = sql + ` WHERE ${searchFilters[0]} LIKE '%${searchTerm}%'`;
         searchFilters.forEach((filter, index) => {
             if(index) {
@@ -342,17 +336,14 @@ app.get("/api/contacts", (req, res) => {
 
     //apply sort order and pagination
     sql = sql+` ORDER BY ${order} ${direction} LIMIT ${results} OFFSET ((${page - 1})* ${results})`;
-    //console.log('fetch: ', sql);
     db.all(sql, (err, rows) => {
         if (err) {
-            //console.log(err);
             res.status = ERROR_CODE;
             res.json(err);
         } else if (!rows) {
             res.status = NOT_FOUND_CODE;
             res.json({message: 'NOT FOUND'});
         } else {
-            //console.log(rows);
             db.all(sql_metadata, (err, result) => {
                 if (err) {
                     res.status = ERROR_CODE;
