@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
+import { Manager, Reference, Popper } from 'react-popper';
 import { BLACK, WHITE, GREY } from '../../assets/colorsConstants';
 
-const SelectWrapper = styled.div`
+const SelectWrapper = styled(Manager)`
   margin: 1em 0;
   border-radius: 0.5em;
   align-content: center;
@@ -57,6 +58,7 @@ export default function Select (props) {
     const { type, size, block, options, selectedIndex, onSelect, disabled, isPending } = props;
 
     const [selection, setSelection] = useState(selectedIndex);
+    const [showPopup, setPopup] = useState(false);
 
     function handleSelection (val) {
         console.log('value of handleSelection: ', val);
@@ -67,17 +69,32 @@ export default function Select (props) {
 
     return (
         <SelectWrapper>
+            <Reference>
+                {({ ref }) => (
+                    <span
+                        className="reference-element"
+                        ref={ref}
+                        onClick={() => {
+                            setPopup(!showPopup);
+                        }}
+                    >
+                    </span>
+                )}
+            </Reference>
             <select
                 className={`select select--${type} select--${size} ${block ? 'select-block' : ''} ${disabled ? 'select-disabled' : ''}`}
-                onSelect={(val) => handleSelection(val)}
+                onChange={(val) => handleSelection(val)}
                 disabled={disabled || isPending}
+                value={selection}
             >
-                {options.map((option, index) => {
-                    console.info('rendering options...');
-                    return (
-                        <option key={index} selected={index === selection} value={index}>A+{option.label}</option>
-                    );
-                })}
+                <Popper placement="bottom">
+                    {options.map((option, index) => {
+                        console.info('rendering options...');
+                        return (
+                            <option key={index} value={index}>{option.label}</option>
+                        );
+                    })}
+                </Popper>
             </select>
         </SelectWrapper>
     );
