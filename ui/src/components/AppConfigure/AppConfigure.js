@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Button from '../../common/Button';
-import { exportContactList } from '../../common/Utilities/utilities';
+import { exportDataList } from '../../common/Utilities/utilities';
 import LoadingSpinner from '../../common/LoadingSpinner';
 
 const ConfigureWrapper = styled.div`
@@ -26,7 +26,7 @@ export default function AppConfigure (props) {
     }, []);
 
     function handleContactListExport () {
-        exportContactList(contacts.results, 'contactList');
+        exportDataList('contacts', contacts.results, 'contactList');
     }
 
     function captureUpload (event) {
