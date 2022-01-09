@@ -210,7 +210,7 @@ export default function EditNote (props) {
                                 value={pendingChanges.date}
                                 label="Date"
                                 error={error.date}
-                                onChange={(event) => updateData('date', event.target.value)}
+                                onChange={(event) => { console.log('note date event: ', JSON.stringify(event)); updateData('date', event); } }
                                 maxLength={11}
                             />
                         </div>
@@ -251,15 +251,6 @@ export default function EditNote (props) {
                             cards go here, or none available message...
                         </div>
                     </div> */}
-
-                    <div className="dateInfo inputRow rowMargin">
-                        <div>
-                            Created On: {note.createdOn}
-                        </div>
-                        <div>
-                            Last Modified: {note.lastModifiedOn}
-                        </div>
-                    </div>
                     {!isNewNote && <div id="dangerRow">
                         <div></div>
                         <Button
