@@ -8,7 +8,7 @@ import DateInput from '../../common/DateInput/DateInput';
 import TextArea from '../../common/TextArea/TextArea';
 import icons from '../../assets/icons/bootstrapIcons';
 import LoadingSpinner from '../../common/LoadingSpinner/LoadingSpinner';
-import { exportContactList } from '../../common/Utilities/utilities';
+import { exportDataList } from '../../common/Utilities/utilities';
 import PropTypes from 'prop-types';
 
 const ContentWrapper = styled.div`
@@ -84,7 +84,7 @@ export default function ViewContact (props) {
     }, [contact]);
 
     function exportContact () {
-        exportContactList([contact], `contact-${contactId}`);
+        exportDataList(['contacts'], [[contact]], `contact-${contactId}`);
     }
 
     // TODO: handle loading state, 404s and errors
@@ -99,6 +99,7 @@ export default function ViewContact (props) {
                         <EntityTitleHeader
                             title={`${contact.firstName} ${contact.lastName}`}
                             editMode={false}
+                            type='Contact'
                         />
                         <ContentWrapper>
                             {(isContactPending || firstLoad)

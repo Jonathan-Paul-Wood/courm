@@ -50,6 +50,70 @@ export default function ContactsBrowse (props) {
     const [searchOrderBy, setSearchOrderBy] = useState('firstName');
     const [direction, setDirection] = useState('ASC'); // ASC if ascending, DESC if descending
 
+    const searchFields = [
+        {
+            label: 'First Name',
+            value: 'firstName',
+            selected: false
+        },
+        {
+            label: 'Last Name',
+            value: 'lastName',
+            selected: false
+        },
+        {
+            label: 'Email',
+            value: 'email',
+            selected: false
+        },
+        {
+            label: 'Phone Number',
+            value: 'phoneNumber',
+            selected: false
+        },
+        {
+            label: 'Address',
+            value: 'address',
+            selected: false
+        },
+        {
+            label: 'Firm',
+            value: 'firm',
+            selected: false
+        },
+        {
+            label: 'Industry',
+            value: 'industry',
+            selected: false
+        }
+    ];
+    const contactSortOptions = [
+        {
+            label: 'First Name',
+            value: 'firstName'
+        },
+        {
+            label: 'Last Name',
+            value: 'lastName'
+        },
+        {
+            label: 'Date Of Birth',
+            value: 'dateOfBirth'
+        },
+        {
+            label: 'Date Created',
+            value: 'createdOn'
+        },
+        {
+            label: 'Date of Last Change',
+            value: 'lastModifiedOn'
+        }
+        // {
+        //     label: 'Recently Interacted',
+        //     value: 'lastInteractedOn'
+        // },
+    ];
+
     useEffect(() => {
         initiateSearch();
     }, []);
@@ -75,6 +139,16 @@ export default function ContactsBrowse (props) {
         initiateSearch();
     }, [searchTerm]);
 
+    function handleFilterChange (value) {
+        setPage(1);
+        setActiveFilters(value);
+    }
+
+    function handleSearchTermChange (value) {
+        setPage(1);
+        setSearchTerm(value);
+    }
+
     function initiateSearch () {
         getContactList(RESULTS_PER_PAGE, page, searchTerm, searchOrderBy, direction, activeFilters);
     }
@@ -86,9 +160,11 @@ export default function ContactsBrowse (props) {
                 <MainToolbar
                     type="Contact"
                     className="main-toolbar"
-                    updateActiveFilters={setActiveFilters}
+                    updateActiveFilters={handleFilterChange}
                     searchTerm={searchTerm}
-                    updateSearchTerm={setSearchTerm}
+                    searchFields={searchFields}
+                    sortOptions={contactSortOptions}
+                    updateSearchTerm={handleSearchTermChange}
                     currentOrder={searchOrderBy}
                     handleOrderUpdate={setSearchOrderBy}
                     currentDirection={direction}

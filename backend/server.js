@@ -35,7 +35,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 // const breadcrumbtrail = path.join(__dirname, 'build/');
 // app.use('/', express.static(breadcrumbtrail));
 // app.get('/', function(req, res) {
-//     console.log(req);
 //     res.sendFile(path.join(breadcrumbtrail, 'index.html'));
 // });
 
@@ -62,7 +61,20 @@ function initializeDB() {
             lastInteractionId TEXT,
             lastInteractionOn TEXT NOT NULL,
             entityType TEXT NOT NULL
-            )`);
+            );`);
+        db.run(`
+        CREATE TABLE IF NOT EXISTS notes (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date datetime NOT NULL,
+            title TEXT,
+            record TEXT,
+            address TEXT,
+            contacts TEXT,
+            tags TEXT,
+            createdOn datetime default current_timestamp,
+            lastModifiedOn datetime default current_timestamp
+            );
+        `);
       });      
 }
 
@@ -72,6 +84,10 @@ function closeDB() {
             return console.error(err.message);
         }
     });
+}
+
+function cleanseString(str) {
+    return str.replace(/'/g, "''");
 }
 
 app.post("/api/initialize", (req, res) => {
@@ -84,6 +100,153 @@ app.delete("/api/disconnect", (req, res) => {
     res.json({message: 'database closed'})
 });
 
+// NOTES APIS
+
+app.post('/api/notes/new', (req, res) => {
+    db.run(
+        `INSERT INTO notes(
+            date,
+            title,
+            record,
+            address,
+            contacts,
+            tags) 
+        VALUES(
+            '${req.body.date}',
+            '${cleanseString(req.body.title)}',
+            '${cleanseString(req.body.record)}',
+            '${cleanseString(req.body.address)}',
+            '${req.body.contacts}',
+            '${req.body.tags}'
+            )`, (err, rows) => {
+                console.log('error: ', err);
+                if (err) {
+                    res.status = ERROR_CODE;
+                    res.json(err);
+                } else {
+                    res.status = SUCCESS_CODE;
+                    db.run(`SELECT id FROM notes WHERE createdOn=${req.body.createdOn}`, (err, id) => {
+                        if (err) {
+                            res.json({'message': 'could not get new Id'});
+                        } else {
+                            res.json({'newId': id});
+                        }
+                    });
+                }
+            }
+        );
+});
+
+//accepts requests of the form: /api/notes?order=id?results=3&page=1?direction=[ASC|DESC]?search=string
+app.get("/api/notes", (req, res) => {
+    const { results, page, order, direction, searchTerm, filters } = req.query;
+    let sql = `SELECT * FROM notes`;
+
+    //apply search
+    if(searchTerm && filters) {
+        const searchFilters = filters.split(',');
+        sql = sql + ` WHERE ${searchFilters[0]} LIKE '%${searchTerm}%'`;
+        searchFilters.forEach((filter, index) => {
+            if(index) {
+                sql = sql + ` OR ${filter} LIKE '%${searchTerm}%'`
+            }
+        });
+    }
+
+    const sql_metadata = sql;
+    //apply sort order and pagination
+    sql = sql+` ORDER BY ${order} ${direction} LIMIT ${results} OFFSET ((${page - 1})* ${results})`;
+
+    db.all(sql, (err, rows) => {
+        if (err) {
+            console.log(err);
+            res.status = ERROR_CODE;
+            res.json(err);
+        } else if (!rows) {
+            res.status = NOT_FOUND_CODE;
+            res.json({message: 'NOT FOUND'});
+        } else {
+            db.all(sql_metadata, (err, result) => {
+                if (err) {
+                    res.status = ERROR_CODE;
+                    return console.error(err.message);
+                } else if (!result) {
+                    res.status = NOT_FOUND_CODE;
+                    return;
+                } else {
+                    totalResults = result.length;
+                    res.json({
+                        results: rows,
+                        resultCount: rows.length,
+                        pageSize: parseInt(results),
+                        totalCount: totalResults,
+                        pageCount: Math.ceil(totalResults / parseInt(results)),
+                        currentPage: parseInt(page)
+                    });
+                }
+            });
+        }
+    });
+});
+
+app.get("/api/notes/:id", (req, res) => {
+    const sql = `SELECT * FROM notes WHERE id = ${req.params.id}`;
+    db.get(sql, (err, row) => {
+        if (err) {
+            res.status(ERROR_CODE).send({message: err.message});
+        } else if (!row) {
+            res.status(NOT_FOUND_CODE).send({message: 'No such note'});
+        } else {
+            res.status = SUCCESS_CODE;
+            res.json(row);
+        }
+    })
+});
+
+app.put("/api/notes/:id", (req, res) => {
+    const b = req.body;
+    let sql = `UPDATE notes SET`;
+    Object.keys(b).map(key => {
+        if(key !== 'id' && key !== 'date') {
+            sql = sql+`, ${key}='${cleanseString(b[key])}'`
+        } else if (key === 'date') {
+            sql = sql+` ${key}='${b[key]}'`
+        }
+    });
+    sql = sql+` WHERE id=${req.params.id}`;
+    db.run(sql, (err, row) => {
+        if (err) {
+            res.status = ERROR_CODE;
+            res.json(err);
+        } else if (!row) {
+            res.status = NOT_FOUND_CODE;
+            res.json({'response': 'NOT FOUND'});
+        } else {
+            res.status = SUCCESS_CODE;
+            res.json({'response': row});
+        }
+    });
+});
+
+app.delete("/api/notes/:id", (req, res) => {
+    const sql = `DELETE FROM notes WHERE id = ${req.params.id}`;
+    db.run(sql, (err, row) => {
+        if (err) {
+            res.status = ERROR_CODE;
+            res.json(err);
+        } else if (!row) {
+            res.status = NOT_FOUND_CODE;
+            res.json({'response': 'NOT FOUND'});
+        } else {
+            res.status = SUCCESS_CODE;
+            res.json({'response': row});
+        }
+    });
+});
+
+// END NOTES APIS
+
+// CONTACTS APIS
 app.post('/api/contacts/new', (req, res) => {
     const createdOn = req.body.createdOn;
     db.run(
@@ -108,18 +271,18 @@ app.post('/api/contacts/new', (req, res) => {
             lastInteractionOn,
             entityType) 
         VALUES(
-            '${req.body.firstName}',
-            '${req.body.lastName}',
+            '${cleanseString(req.body.firstName)}',
+            '${cleanseString(req.body.lastName)}',
             '${req.body.profilePicture}',
             '${req.body.phoneNumber}',
             '${req.body.email}',
-            '${req.body.address}',
-            '${req.body.firm}',
-            '${req.body.industry}',
+            '${cleanseString(req.body.address)}',
+            '${cleanseString(req.body.firm)}',
+            '${cleanseString(req.body.industry)}',
             '${req.body.dateOfBirth}',
             '${req.body.tags}',
             '${req.body.interactions}',
-            '${req.body.bio}',
+            '${cleanseString(req.body.bio)}',
             '${req.body.createdBy}',
             '${req.body.createdOn}',
             '${req.body.lastModifiedBy}',
@@ -157,8 +320,6 @@ app.get("/api/contacts", (req, res) => {
     //apply search
     if(searchTerm && filters) {
         const searchFilters = filters.split(',');
-        //console.log(searchTerm);
-        //console.log('filters: ', searchFilters);
         sql = sql + ` WHERE ${searchFilters[0]} LIKE '%${searchTerm}%'`;
         searchFilters.forEach((filter, index) => {
             if(index) {
@@ -175,17 +336,14 @@ app.get("/api/contacts", (req, res) => {
 
     //apply sort order and pagination
     sql = sql+` ORDER BY ${order} ${direction} LIMIT ${results} OFFSET ((${page - 1})* ${results})`;
-    //console.log('fetch: ', sql);
     db.all(sql, (err, rows) => {
         if (err) {
-            //console.log(err);
             res.status = ERROR_CODE;
             res.json(err);
         } else if (!rows) {
             res.status = NOT_FOUND_CODE;
             res.json({message: 'NOT FOUND'});
         } else {
-            //console.log(rows);
             db.all(sql_metadata, (err, result) => {
                 if (err) {
                     res.status = ERROR_CODE;
@@ -228,9 +386,9 @@ app.put("/api/contacts/:id", (req, res) => {
     let sql = `UPDATE contacts SET`;
     Object.keys(b).map(key => {
         if(key !== 'id' && key !== 'firstName') {
-            sql = sql+`, ${key}='${b[key]}'`
+            sql = sql+`, ${key}='${cleanseString(b[key])}'`
         } else if (key === 'firstName') {
-            sql = sql+` ${key}='${b[key]}'`
+            sql = sql+` ${key}='${cleanseString(b[key])}'`
         }
     });
     sql = sql+` WHERE id=${req.params.id}`;
@@ -263,11 +421,13 @@ app.delete("/api/contacts/:id", (req, res) => {
         }
     });
 });
+
+// END CONTACTS APIS
   
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
-    console.log(`Server is running...`);
+    console.log(`Server is running at http://localhost:${PORT}/`);
 
     // if in production mode: opens the url in the default browser 
     //open(`http://localhost:${PORT}/`);

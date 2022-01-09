@@ -12,7 +12,7 @@ const LeftSideBarWrapper = styled.div`
     color: white;
     display: grid;
     grid-template-columns: 8em;
-    grid-template-rows: 5rem 5rem 5rem 5rem;
+    grid-template-rows: 5rem 5rem 5rem 5rem 5rem;
 `;
 
 const ActiveTab = styled.div`
@@ -33,6 +33,11 @@ export default function LeftSidebar () {
             icon: 'people',
             title: 'Contacts',
             path: '/contacts'
+        },
+        {
+            icon: 'notes',
+            title: 'Notes',
+            path: '/notes'
         },
         {
             icon: 'tools',

@@ -14,10 +14,12 @@ ReactDOM.render(
             <Switch>
                 <Route path="/home" component={App} />
                 <Route exact path="/" component={App} />
-                <Route path="/contacts/:contactId" component={App} />
                 <Route path="/contacts" component={App} />
-                <Route path="/interactions/:interactionId" component={App} />
-                <Route path="/interactions" component={App} />
+                <Route path="/contacts/new" component={App} />
+                <Route path="/contacts/:contactId" component={App} />
+                <Route path="/notes" component={App} />
+                <Route path="/notes/new" component={App} />
+                <Route path="/notes/:noteId" component={App} />
                 <Route path="/configure" component={App} />
                 <Route path="/faq" component={App} />
                 {/* <Route path="/statistics" component={App} /> */}

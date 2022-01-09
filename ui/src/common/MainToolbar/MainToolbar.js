@@ -6,7 +6,7 @@ import Input from '../../common/Input/Input';
 import Button from '../../common/Button';
 import Tooltip from '../Tooltip/Tooltip';
 import SortOrderControls from './SortOrderControls';
-import { exportContactList } from '../../common/Utilities/utilities';
+import { exportDataList } from '../../common/Utilities/utilities';
 import FilterControls from './FilterControls';
 
 const ContentWrapper = styled.div`
@@ -24,61 +24,34 @@ const ControlContainer = styled.div`
 `;
 
 export default function MainToolbar (props) {
-    const history = useHistory();
-    const [selectedSearchFields, setSelectedSearchFields] = useState([
-        {
-            label: 'First Name',
-            value: 'firstName',
-            selected: false
-        },
-        {
-            label: 'Last Name',
-            value: 'lastName',
-            selected: false
-        },
-        {
-            label: 'Email',
-            value: 'email',
-            selected: false
-        },
-        {
-            label: 'Phone Number',
-            value: 'phoneNumber',
-            selected: false
-        },
-        {
-            label: 'Address',
-            value: 'address',
-            selected: false
-        },
-        {
-            label: 'Firm',
-            value: 'firm',
-            selected: false
-        },
-        {
-            label: 'Industry',
-            value: 'industry',
-            selected: false
-        }
-    ]);
-    const [filtersApplied, setFiltersApplied] = useState(false);
-
     const {
         updateActiveFilters,
         searchTerm,
+        searchFields,
+        sortOptions,
         updateSearchTerm,
         handleDirectionUpdate,
         handleOrderUpdate,
         type,
         currentDirection,
         currentOrder,
-        contactList
+        contactList,
+        noteList
     } = props;
+    const history = useHistory();
+    const [selectedSearchFields, setSelectedSearchFields] = useState(searchFields);
+    const [filtersApplied, setFiltersApplied] = useState(false);
 
     function exportList () {
-        const list = type === 'Contact' ? contactList.results : 'interactionList';
-        exportContactList(list, 'contactList');
+        let list, name;
+        if (type === 'Contact') {
+            list = contactList.results;
+            name = 'contactList';
+        } else if (type === 'Note') {
+            list = noteList.results;
+            name = 'noteList';
+        }
+        exportDataList([type.toLowerCase() + 's'], [list], name);
     }
 
     function handleSelectionChange (index) {
@@ -103,7 +76,7 @@ export default function MainToolbar (props) {
                 <Button
                     icon="plusCircle"
                     label={`Add ${type}`}
-                    onClick={() => history.push('/contacts/new')}
+                    onClick={() => history.push(`/${type.toLowerCase()}s/new`)}
                 />
                 <Button
                     icon="download"
@@ -143,6 +116,7 @@ export default function MainToolbar (props) {
                             handleOrderUpdate={handleOrderUpdate}
                             currentDirection={currentDirection}
                             handleDirectionUpdate={handleDirectionUpdate}
+                            sortOptions={sortOptions}
                         />
                     }
                     style={{
@@ -163,12 +137,14 @@ export default function MainToolbar (props) {
 MainToolbar.propTypes = {
     updateActiveFilters: PropTypes.func.isRequired,
     searchTerm: PropTypes.string.isRequired,
+    searchFields: PropTypes.array.isRequired,
+    sortOptions: PropTypes.array.isRequired,
     updateSearchTerm: PropTypes.func.isRequired,
     type: PropTypes.string.isRequired,
     currentOrder: PropTypes.string.isRequired,
     handleOrderUpdate: PropTypes.func.isRequired,
     currentDirection: PropTypes.string.isRequired,
     handleDirectionUpdate: PropTypes.func.isRequired,
-    contactList: PropTypes.object.isRequired
-    // interactionList: PropTypes.object.isRequired,
+    contactList: PropTypes.object.isRequired,
+    noteList: PropTypes.object.isRequired
 };

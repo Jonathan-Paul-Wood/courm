@@ -9,26 +9,26 @@ const props = {
     contactError: '',
     getContact: jest.fn(),
     contact: {
-        "id": 8,
-        "firstName": "John",
-        "lastName": "Smith",
-        "profilePicture": "",
-        "phoneNumber": "111-222-3333",
-        "email": "john.smith@protonmail.com",
-        "address": "123 4th Street City, DC, 77007",
-        "firm": "Company",
-        "industry": "Professional",
-        "dateOfBirth": "1990-01-12T04:00:00.000Z",
-        "tags": "",
-        "interactions": "",
-        "createdBy": "",
-        "createdOn": "2021-01-24T20:52:41.921Z",
-        "lastModifiedBy": "",
-        "lastModifiedOn": "2021-02-04T23:08:48.053Z",
-        "lastInteractionId": "",
-        "lastInteractionOn": "",
-        "entityType": "person",
-        "bio": "An end, not a means"
+        id: 8,
+        firstName: 'John',
+        lastName: 'Smith',
+        profilePicture: '',
+        phoneNumber: '111-222-3333',
+        email: 'john.smith@protonmail.com',
+        address: '123 4th Street City, DC, 77007',
+        firm: 'Company',
+        industry: 'Professional',
+        dateOfBirth: '1990-01-12T04:00:00.000Z',
+        tags: '',
+        interactions: '',
+        createdBy: '',
+        createdOn: '2021-01-24T20:52:41.921Z',
+        lastModifiedBy: '',
+        lastModifiedOn: '2021-02-04T23:08:48.053Z',
+        lastInteractionId: '',
+        lastInteractionOn: '',
+        entityType: 'person',
+        bio: 'An end, not a means'
     }
 };
 
@@ -50,7 +50,7 @@ describe('Test ViewContacts and displayed values', () => {
         const inputs = screen.getAllByRole('textbox', { type: 'text' });
         expect(inputs[0].value).toEqual('John');
         expect(inputs[1].value).toEqual('Smith');
-        
+
         expect(inputs[2].value).toEqual('john.smith@protonmail.com');
         expect(inputs[3].value).toEqual('111-222-3333');
 

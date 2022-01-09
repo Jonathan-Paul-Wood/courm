@@ -35,7 +35,7 @@ export default function FaqHome () {
                         You can save backups of individual contacts (from their respective contact page), individual pages of search results, or all existing contacts (from the Configuration page). These saves are formatted as JSON files which you can store on your computer, on a USB, in the cloud, or whereever.
                     </p>
                     <p>
-                        Backup files can be used to add back contacts you\ve removed, or to replace all of your existing contacts if you want to revert to a previous version of your address book.
+                        Backup files can be used to add back contacts you've removed, or to replace all of your existing contacts if you want to revert to a previous version of your address book.
                     </p>
                 </div>
             </div>
@@ -61,10 +61,10 @@ export default function FaqHome () {
                 </div>
                 <div className="answer">
                     <p>
-                        Simply visit <a target="_blank" rel="noreferrer" href="">CouRM's public repository</a> and open a ticket. Here's a good guide for <a target="_blank" rel="noreferrer" href="">how to write constructive tickets</a>.
+                        Simply visit <a target="_blank" rel="noreferrer" href="https://github.com/Jonathan-Paul-Wood/courm">CouRM's public repository</a> and open a ticket. Here's a good guide for <a target="_blank" rel="noreferrer" href="https://github.com/Jonathan-Paul-Wood/courm">how to write constructive tickets</a>.
                     </p>
                     <p>
-                        When you do create a ticket, please first check existing tickets to make sure you're not creating a duplicate.
+                        When you do create a ticket, please first check existing tickets to make sure you're not creating a duplicate. These steps will help ensure that reports are detailed and easy to address.
                     </p>
                 </div>
             </div>
@@ -74,7 +74,7 @@ export default function FaqHome () {
                 </div>
                 <div className="answer">
                     <p>
-                        Great news! CourM does not track you at all. Since this is a locally run application, everything you need is on your own machine.
+                        Great news! CouRM does not track you at all. Since this is a locally run application, everything you need is on your own machine.
                         We don't install any cookies or other trackers on your device, we don't serve ads, and we don't collect any data to send to third parties.
                     </p>
                     <p>
@@ -88,13 +88,11 @@ export default function FaqHome () {
                 </div>
                 <div className="answer">
                     <p>
-                        You are in control of your data, as such CouRM will not update automatically. From the 'Configuration' page you can 'Check for Updates'. This will ping our server (the only time this application communicates with us)
-                        and we will send you the current version number, along with the link to the latest download. Your application will then compare the latest version number with your own, and if there
-                        is a new version available display the download link to you.
+                        You are in control of your data, as such CouRM will not update automatically. You will need to proactively check for updates, which you can find at <a target="_blank" rel="noreferrer" href="https://github.com/Jonathan-Paul-Wood/courm/archive/refs/heads/main.zip">this link</a>.
                     </p>
                     <p>
                         You will then be able to download the latest version and start using it immediately. Your data can be ported over to the new version by using the Export and Import features
-                        in the 'Configuration' page (these features will always be tested for compatibility with at least the previous two versions, if not more).
+                        in the 'Configuration' page.
                     </p>
                 </div>
             </div>

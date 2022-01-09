@@ -43,9 +43,16 @@ const RightSideContent = styled.div`
 `;
 
 export default function EntityTitleHeader (props) {
-    const { title, handleSave, editMode, disableSave } = props;
-    const { contactId } = useParams();
+    const { title, handleSave, editMode, disableSave, type } = props;
+    const { contactId, noteId } = useParams();
     const history = useHistory();
+
+    let editPath;
+    if (type === 'Contact') {
+        editPath = `/contacts/${contactId}/edit`;
+    } else if (type === 'Note') {
+        editPath = `/notes/${noteId}/edit`;
+    }
 
     return (
         <ContentWrapper>
@@ -71,7 +78,7 @@ export default function EntityTitleHeader (props) {
                         <Button
                             label="EDIT"
                             type="secondary"
-                            onClick={() => history.push(`/contacts/${contactId}/edit`)}
+                            onClick={() => history.push(editPath)}
                         />
                     )}
             </RightSideContent>
@@ -88,5 +95,6 @@ EntityTitleHeader.propTypes = {
     title: PropTypes.string.isRequired,
     handleSave: PropTypes.func,
     disableSave: PropTypes.bool,
-    editMode: PropTypes.bool.isRequired
+    editMode: PropTypes.bool.isRequired,
+    type: PropTypes.string.isRequired
 };
