@@ -2,11 +2,9 @@ import * as types from './types';
 
 export const initialState = {
     relation: {
-        title: '',
-        date: '',
-        record: '',
-        address: '',
-        contacts: '',
+        contactId: '',
+        noteId: '',
+        eventId: '',
         createdOn: '',
         lastModifiedOn: ''
     },

@@ -438,7 +438,7 @@ app.delete("/api/contacts/:id", (req, res) => {
 
 app.post('/api/relations/new', (req, res) => {
     db.run(
-        `INSERT INTO notes(
+        `INSERT INTO relations(
             contactId,
             noteId,
             eventId) 
@@ -468,10 +468,7 @@ app.post('/api/relations/new', (req, res) => {
 //accepts requests of the form: /api/relations?entity=[contactId | noteId | eventId]?id=string
 app.get("/api/relations", (req, res) => {
     const { entity, id } = req.query;
-    let sql = `SELECT * FROM relations`;
-
-    //apply search
-    sql += `WHERE ${entity} = ${id}`
+    let sql = `SELECT * FROM relations WHERE ${entity} = ${id}`
 
     db.all(sql, (err, rows) => {
         if (err) {
@@ -482,7 +479,7 @@ app.get("/api/relations", (req, res) => {
             res.status = NOT_FOUND_CODE;
             res.json({message: 'NOT FOUND'});
         } else {
-            res.json({results: rows});
+            res.json(rows);
         }
     });
 });

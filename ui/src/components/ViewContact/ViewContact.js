@@ -10,6 +10,7 @@ import icons from '../../assets/icons/bootstrapIcons';
 import LoadingSpinner from '../../common/LoadingSpinner/LoadingSpinner';
 import { exportDataList } from '../../common/Utilities/utilities';
 import PropTypes from 'prop-types';
+import RelationViewCard from '../../common/RelationViewCard/RelationViewCard';
 
 const ContentWrapper = styled.div`
     padding: 0 1em;
@@ -58,6 +59,16 @@ const GridWrapper = styled.div`
     tagsRow {
         height: 20rem;
     }
+
+    .relationsRow {
+        display: flex;
+        justify-content: space-between;
+
+        .relationsList {
+            min-width: 50%;
+            margin: 1em;
+        }
+    }
 `;
 
 export default function ViewContact (props) {
@@ -66,7 +77,9 @@ export default function ViewContact (props) {
         contact,
         isContactPending,
         contactError,
-        getContact
+        getContact,
+        getRelationList,
+        relationList
     } = props;
     const [entityType, setEntityType] = useState('');
     const [firstLoad, setFirstLoad] = useState(true);
@@ -75,6 +88,7 @@ export default function ViewContact (props) {
         // initial GET of contact
         if (contactId) {
             getContact(contactId);
+            getRelationList('contactId', contactId);
         }
     }, [contactId]);
 
@@ -190,6 +204,10 @@ export default function ViewContact (props) {
                                             cards go here, or none available message...
                                         </div>
                                     </div> */}
+                                            <div className="relationsRow">
+                                                <RelationViewCard relationList={relationList} relationType='note'/>
+                                                <RelationViewCard relationList={relationList} relationType='event'/>
+                                            </div>
                                         </GridWrapper>
                                     </ScrollContainer>
                                 )}
@@ -204,5 +222,7 @@ ViewContact.propTypes = {
     contact: PropTypes.object.isRequired,
     isContactPending: PropTypes.bool.isRequired,
     contactError: PropTypes.string.isRequired,
-    getContact: PropTypes.func.isRequired
+    getContact: PropTypes.func.isRequired,
+    getRelationList: PropTypes.func.isRequired,
+    relationList: PropTypes.array.isRequired
 };
