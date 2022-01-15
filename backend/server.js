@@ -465,13 +465,13 @@ app.post('/api/relations/new', (req, res) => {
         );
 });
 
-//accepts requests of the form: /api/relations?identifier=[contactId | noteId | eventId]?id=string
+//accepts requests of the form: /api/relations?entity=[contactId | noteId | eventId]?id=string
 app.get("/api/relations", (req, res) => {
-    const { identifier, id } = req.query;
+    const { entity, id } = req.query;
     let sql = `SELECT * FROM relations`;
 
     //apply search
-    sql += `WHERE ${identifier} = ${id}`
+    sql += `WHERE ${entity} = ${id}`
 
     db.all(sql, (err, rows) => {
         if (err) {
