@@ -65,61 +65,62 @@ export default function AppConfigure (props) {
         setPendingUpload(reader);
     }
 
-    function handleAddContacts () {
+    function handleAddEntity (entityType) {
         const uploadedJSON = JSON.parse(pendingUpload.result);
-        uploadedJSON.data.contacts.data.forEach(contact => {
-            const newContact = {
-                ...contact,
-                lastModifiedOn: new Date().toISOString()
-            };
-            delete newContact.id;
-            postContact(newContact);
-        });
-    }
-
-    function handleAddNotes () {
-        const uploadedJSON = JSON.parse(pendingUpload.result);
-        uploadedJSON.data.notes.data.forEach(note => {
-            const newNote = {
-                ...note
-            };
-            delete newNote.id;
-            postNote(newNote);
-        });
+        if (uploadedJSON && uploadedJSON.data && uploadedJSON.data[entityType] && uploadedJSON.data[entityType].data && uploadedJSON.data[entityType].data.length) {
+            uploadedJSON.data[entityType].data.forEach(entity => {
+                const newEntity = {
+                    ...entity
+                };
+                delete newEntity.id;
+                switch (entityType) {
+                case 'contacts':
+                    postContact(newEntity);
+                    break;
+                case 'notes':
+                    postNote(newEntity);
+                    break;
+                case 'events':
+                    // postEvent(newEntity);
+                    break;
+                case 'relations':
+                    // postRelation(newEntity);
+                    break;
+                }
+            });
+        }
     }
 
     function handleRestore () {
         const type = fileTypeOptions[selectedTypeIndex].value;
         if (type === 'contacts') {
-            contacts.forEach(contact => deleteContact(contact.id));
-            handleAddContacts();
+            contacts.results.forEach(contact => deleteContact(contact.id));
+            handleAddEntity(type);
         } else if (type === 'notes') {
-            notes.forEach(note => deleteNote(note.id));
-            handleAddNotes();
+            notes.results.forEach(note => deleteNote(note.id));
+            handleAddEntity(type);
         } else if (type === 'all') {
-            contacts.forEach(contact => deleteContact(contact.id));
-            handleAddContacts();
-            notes.forEach(note => deleteNote(note.id));
-            handleAddNotes();
+            contacts.results.forEach(contact => deleteContact(contact.id));
+            handleAddEntity('contacts');
+            notes.results.forEach(note => deleteNote(note.id));
+            handleAddEntity('notes');
         }
     }
 
     function handleAddData () {
         const type = fileTypeOptions[selectedTypeIndex].value;
-        if (type === 'contacts') {
-            handleAddContacts();
-        } else if (type === 'notes') {
-            handleAddNotes();
-        } else if (type === 'all') {
-            handleAddContacts();
-            handleAddNotes();
+        if (type === 'all') {
+            handleAddEntity('contacts');
+            handleAddEntity('notes');
+        } else {
+            handleAddEntity(type);
         }
     }
 
     return (
         <ConfigureWrapper>
             <h2>Configure Application</h2>
-            <hr/>
+            <hr />
             {(isContactListPending || isNoteListPending)
                 ? (<LoadingSpinner />)
                 : (<>
@@ -127,7 +128,7 @@ export default function AppConfigure (props) {
                     <div className="row">
                         <div className="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                             <p>Select what type of records you are processing:</p>
-                            <Select options={fileTypeOptions} selectedIndex={selectedTypeIndex} onSelect={setSelectedTypeIndex}/>
+                            <Select options={fileTypeOptions} selectedIndex={selectedTypeIndex} onSelect={setSelectedTypeIndex} />
                         </div>
                         <div className="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                             <p>Upload your saved records:</p>
