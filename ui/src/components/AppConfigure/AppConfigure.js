@@ -127,7 +127,7 @@ export default function AppConfigure (props) {
                     <div className="row">
                         <div className="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                             <p>Select what type of records you are processing:</p>
-                            <Select options={fileTypeOptions} selected={selectedTypeIndex} onSelect={(e) => setSelectedTypeIndex(e.value)}/>
+                            <Select options={fileTypeOptions} selected={selectedTypeIndex} onSelect={setSelectedTypeIndex}/>
                         </div>
                         <div className="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                             <p>Upload your saved records:</p>
@@ -138,14 +138,14 @@ export default function AppConfigure (props) {
                         <div className="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                             <h4>Export</h4>
                             <p>You can make backups by saving JSON files.</p>
-                            <Button icon="download" label={`Export ${fileTypeOptions[selectedTypeIndex].label}`} type="secondary" onClick={handleListExport} />
+                            <Button icon="download" label={`Export ${fileTypeOptions[selectedTypeIndex].label}`} type="secondary" onClick={() => handleListExport()} />
                         </div>
                         <div className="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                             <h4>Import</h4>
                             <p>Adding data will create new records. This does not check for duplicates of existing data.</p>
-                            <Button icon="upload" label={`Add ${fileTypeOptions[selectedTypeIndex].label}`} type="secondary" onClick={handleAddData} />
+                            <Button icon="upload" label={`Add ${fileTypeOptions[selectedTypeIndex].label}`} type="secondary" onClick={() => handleAddData()} />
                             <p>Restoring data will remove all existing data and replace them with those in the uploaded file.</p>
-                            <Button icon="upload" label={`Restore ${fileTypeOptions[selectedTypeIndex].label}`} type="secondary" onClick={handleRestore} />
+                            <Button icon="upload" label={`Restore ${fileTypeOptions[selectedTypeIndex].label}`} type="secondary" onClick={() => handleRestore()} />
                         </div>
                     </div>
                     {/*

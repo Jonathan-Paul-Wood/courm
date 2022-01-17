@@ -5,52 +5,55 @@ import { Manager, Reference, Popper } from 'react-popper';
 import { BLACK, WHITE, GREY } from '../../assets/colorsConstants';
 
 const SelectWrapper = styled(Manager)`
-  margin: 1em 0;
-  border-radius: 0.5em;
-  align-content: center;
-  width: 100%;
+    margin: 1em 0;
+    border-radius: 0.5em;
+    align-content: center;
+    display: inline-block;
+    width: 100%;
 
-  --text-dark: ${BLACK};
-  --text-dark-hover: ${BLACK};
-  --secondary-color: ${WHITE};
-  --secondary-color-hover: ${GREY};
+    --text-dark: ${BLACK};
+    --text-dark-hover: ${BLACK};
+    --secondary-color: ${WHITE};
+    --secondary-color-hover: ${GREY};
     
     .select {
-      padding: 0.5em 1em;
-      font-size: 15px;
-      border: none;
-      box-shadow: 0 0 2px var(--text-dark);
-      cursor: pointer;
-      transition: background-color 0.2s ease;
+        padding: 0.5em 1em;
+        border: none;
+        box-shadow: 0 0 2px var(--text-dark);
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+        width: 100%;
+        display: inline-block;
+        line-height: 1.5;
     }
     
     .select:focus {
-      outline: 0;
+        outline: 0;
     }
     
     .select:active {
-      transform: scale(0.97);
+        transform: scale(0.97);
     }
 
     .select--secondary {
-      color: var(--text-dark);
-      background-color: var(--secondary-color);
+        color: var(--text-dark);
+        background-color: var(--secondary-color);
     }
     
     .select--secondary:hover {
-      color: var(--text-dark-hover);
-      background-color: var(--secondary-color-hover);
+        color: var(--text-dark-hover);
+        background-color: var(--secondary-color-hover);
     }
 
     .select-disabled {
-      transform: scale(1) !important; /*override active class*/
-      background-color: #e6e6e6 !important;
-      cursor: not-allowed;
-      color: var(--text-dark) !important;
+        transform: scale(1) !important; /*override active class*/
+        background-color: #e6e6e6 !important;
+        cursor: not-allowed;
+        color: var(--text-dark) !important;
     }
     .select-disabled:hover {
-      background-color: #e6e6e6 !important;
-      color: var(--text-dark-hover) !important;
+        background-color: #e6e6e6 !important;
+        color: var(--text-dark-hover) !important;
     }
 `;
 
@@ -61,9 +64,11 @@ export default function Select (props) {
     const [showPopup, setPopup] = useState(false);
 
     function handleSelection (val) {
-        console.log('value of handleSelection: ', val);
-        setSelection(val);
-        onSelect(val);
+        const value = val.target.selectedIndex;
+        if (value >= 0) {
+            setSelection(value);
+            onSelect(value);
+        }
     }
     console.info('loaded Select');
 
@@ -78,24 +83,30 @@ export default function Select (props) {
                             setPopup(!showPopup);
                         }}
                     >
+                        <select
+                            className={`select select--${type} select--${size} ${block ? 'select-block' : ''} ${disabled ? 'select-disabled' : ''}`}
+                            onChange={(val) => handleSelection(val)}
+                            disabled={disabled || isPending}
+                            value={selection}
+                        >
+                            <Popper placement="bottom">
+                                {() =>
+                                    showPopup
+                                        ? (
+                                            options.map((option, index) => {
+                                                return (
+                                                    <option key={index} value={index}>{option.label}</option>
+                                                );
+                                            })
+                                        )
+                                        : (
+                                            ''
+                                        )}
+                            </Popper>
+                        </select>
                     </span>
                 )}
             </Reference>
-            <select
-                className={`select select--${type} select--${size} ${block ? 'select-block' : ''} ${disabled ? 'select-disabled' : ''}`}
-                onChange={(val) => handleSelection(val)}
-                disabled={disabled || isPending}
-                value={selection}
-            >
-                <Popper placement="bottom">
-                    {options.map((option, index) => {
-                        console.info('rendering options...');
-                        return (
-                            <option key={index} value={index}>{option.label}</option>
-                        );
-                    })}
-                </Popper>
-            </select>
         </SelectWrapper>
     );
 }
