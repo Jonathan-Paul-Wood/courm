@@ -79,7 +79,8 @@ export default function ViewContact (props) {
         contactError,
         getContact,
         getRelationList,
-        relationList
+        relationList,
+        isRelationListPending
     } = props;
     const [entityType, setEntityType] = useState('');
     const [firstLoad, setFirstLoad] = useState(true);
@@ -116,7 +117,7 @@ export default function ViewContact (props) {
                             type='Contact'
                         />
                         <ContentWrapper>
-                            {(isContactPending || firstLoad)
+                            {(isContactPending || isRelationListPending || firstLoad)
                                 ? (<LoadingSpinner />)
                                 : (
                                     <ScrollContainer>
@@ -224,5 +225,6 @@ ViewContact.propTypes = {
     contactError: PropTypes.string.isRequired,
     getContact: PropTypes.func.isRequired,
     getRelationList: PropTypes.func.isRequired,
-    relationList: PropTypes.array.isRequired
+    relationList: PropTypes.array.isRequired,
+    isRelationListPending: PropTypes.bool.isRequired
 };

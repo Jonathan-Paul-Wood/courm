@@ -9,7 +9,8 @@ function mapStateToProps (state) {
         contact: state.contact.contact,
         isContactPending: state.contact.isContactPending,
         contactError: state.contact.contactError,
-        relationList: state.relationList.relations
+        relationList: state.relationList.relations,
+        isRelationListPending: state.relationList.isRelationListPending
     };
 }
 

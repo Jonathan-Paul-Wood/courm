@@ -23,28 +23,32 @@ const RelationContainer = styled.div`
 export default function RelationEditCard (props) {
     const { relationList, relationType, postRelation, deleteRelation, putRelation } = props;
 
-    const [pendingRelation, setPendingRelation] = useState(null);
+    const [pendingRelation, setPendingRelation] = useState('');
     console.log('relationList: ', JSON.stringify(relationList));
     console.log(relationList);
 
-    const filteredRelations = relationList.filter(r => r[relationType + 'Id'] !== "null");
+    const filteredRelations = relationList.filter(r => r[relationType + 'Id'] !== 'null');
 
-    function handleCreateRelation() {
+    function handleCreateRelation () {
         const newRelation = {
             contactId: '',
             noteId: '',
             eventId: ''
         };
         postRelation(newRelation);
-    }
+    };
 
-    function handleUpdateRelation(id) {
+    function handleUpdateRelation (id) {
         const pendingRelation = {
             contactId: '',
             noteId: '',
             eventId: ''
         };
         putRelation(id, pendingRelation);
+    };
+
+    function clearPendingRelation () {
+        console.log('clear some state');
     }
 
     return (
@@ -56,14 +60,14 @@ export default function RelationEditCard (props) {
                 {filteredRelations.map((relation, index) => {
                     return (
                         <span key={index}>
-                            <Input placeholder={relation[relationType]} label='' value={} onChange={} />
+                            <Input label='' value={relation[relationType].value} onChange={(e) => console.log(e)} />
                             <Button icon="trash" onClick={() => deleteRelation(relation.id)}/>
-                            <Button icon="save" onClick={() => handleUpdateRelation(relation.id)}/> {/*disabled unless pending changes to this relation. On save of entity, error if unsaved changes, prompt user to 'confirm pending changes to relations*/}
+                            <Button icon="save" onClick={() => handleUpdateRelation(relation.id)}/> {/* disabled unless pending changes to this relation. On save of entity, error if unsaved changes, prompt user to 'confirm pending changes to relations */}
                         </span>
                     );
                 })}
                 <span>
-                    <Input placeholder={`${relationType} name`} label='' value={pendingRelation} onChange={(val) => setPendingRelation(val)} />
+                    <Input placeholder={`${relationType}`} label='' value={pendingRelation} onChange={(val) => setPendingRelation(val)} />
                     <Button icon="trash" onClick={() => clearPendingRelation()}/>
                     <Button icon="save" onClick={() => handleCreateRelation()}/>
                 </span>

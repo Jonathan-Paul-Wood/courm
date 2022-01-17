@@ -24,9 +24,8 @@ export default function RelationViewCard (props) {
 
     const history = useHistory();
     console.log('relationList: ', JSON.stringify(relationList));
-    console.log(relationList);
 
-    const filteredRelations = relationList.filter(r => r[relationType + 'Id'] !== "null");
+    const filteredRelations = relationList.length ? relationList.filter(r => r[relationType + 'Id'] !== 'null') : [];
 
     return (
         <div className="relationsList">
