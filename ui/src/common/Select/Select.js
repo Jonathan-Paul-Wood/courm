@@ -68,7 +68,6 @@ export default function Select (props) {
             onSelect(value);
         }
     }
-    console.info('loaded Select');
 
     return (
         <SelectWrapper>
