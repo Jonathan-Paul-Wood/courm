@@ -127,7 +127,7 @@ export default function AppConfigure (props) {
                     <div className="row">
                         <div className="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                             <p>Select what type of records you are processing:</p>
-                            <Select options={fileTypeOptions} selected={selectedTypeIndex} onSelect={setSelectedTypeIndex}/>
+                            <Select options={fileTypeOptions} selectedIndex={selectedTypeIndex} onSelect={setSelectedTypeIndex}/>
                         </div>
                         <div className="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                             <p>Upload your saved records:</p>

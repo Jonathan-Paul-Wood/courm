@@ -60,13 +60,11 @@ const SelectWrapper = styled(Manager)`
 export default function Select (props) {
     const { type, size, block, options, selectedIndex, onSelect, disabled, isPending } = props;
 
-    const [selection, setSelection] = useState(selectedIndex);
     const [showPopup, setPopup] = useState(false);
 
     function handleSelection (val) {
         const value = val.target.selectedIndex;
         if (value >= 0) {
-            setSelection(value);
             onSelect(value);
         }
     }
@@ -87,21 +85,16 @@ export default function Select (props) {
                             className={`select select--${type} select--${size} ${block ? 'select-block' : ''} ${disabled ? 'select-disabled' : ''}`}
                             onChange={(val) => handleSelection(val)}
                             disabled={disabled || isPending}
-                            value={selection}
+                            value={selectedIndex}
                         >
                             <Popper placement="bottom">
-                                {() =>
-                                    showPopup
-                                        ? (
-                                            options.map((option, index) => {
-                                                return (
-                                                    <option key={index} value={index}>{option.label}</option>
-                                                );
-                                            })
-                                        )
-                                        : (
-                                            ''
-                                        )}
+                                {() => (
+                                    options.map((option, index) => {
+                                        return (
+                                            <option display={showPopup ? 'visible' : 'hidden'} key={index} value={index}>{option.label}</option>
+                                        );
+                                    })
+                                )}
                             </Popper>
                         </select>
                     </span>
@@ -124,7 +117,7 @@ Select.propTypes = {
     size: PropTypes.string,
     block: PropTypes.bool,
     options: PropTypes.array.isRequired,
-    selectedIndex: PropTypes.number,
+    selectedIndex: PropTypes.number.isRequired,
     onSelect: PropTypes.func.isRequired,
     disabled: PropTypes.bool,
     isPending: PropTypes.bool
