@@ -51,7 +51,7 @@ export default function MainToolbar (props) {
             list = noteList.results;
             name = 'noteList';
         }
-        exportDataList([type.toLowerCase() + 's'], [list], name);
+        exportDataList([type.toLowerCase()], [list], name);
     }
 
     function handleSelectionChange (index) {
