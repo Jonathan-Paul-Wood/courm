@@ -17,6 +17,11 @@ export default function AppConfigure (props) {
         deleteContact,
         contacts,
         isContactListPending,
+        getEventList,
+        postEvent,
+        deleteEvent,
+        events,
+        isEventPending,
         getNoteList,
         postNote,
         deleteNote,
@@ -34,6 +39,10 @@ export default function AppConfigure (props) {
             value: 'contacts'
         },
         {
+            label: 'Events',
+            value: 'events'
+        },
+        {
             label: 'Notes',
             value: 'notes'
         }
@@ -45,14 +54,17 @@ export default function AppConfigure (props) {
     useEffect(() => {
         // TODO: replace with getAll endpoints once made
         getContactList(100000, 1, '', 'firstName', 'ASC'); // TODO: how to stop double calls
-        getNoteList(100000, 1, '', 'title', 'ASC'); // TODO: how to stop double calls
+        getEventList(100000, 1, '', 'title', 'ASC');
+        getNoteList(100000, 1, '', 'title', 'ASC');
     }, []);
 
     function handleListExport () {
         const type = fileTypeOptions[selectedTypeIndex].value;
         if (type === 'contacts') {
             exportDataList(['contacts'], [contacts.results], 'contactList');
-        } else if (type === 'notes') {
+        } else if (type === 'events') {
+            exportDataList(['events'], [events.results], 'eventList');
+        }  else if (type === 'notes') {
             exportDataList(['notes'], [notes.results], 'noteList');
         } else if (type === 'all') {
             exportDataList(['contacts', 'notes'], [contacts.results, notes.results], 'fullExport');
@@ -81,7 +93,7 @@ export default function AppConfigure (props) {
                     postNote(newEntity);
                     break;
                 case 'events':
-                    // postEvent(newEntity);
+                    postEvent(newEntity);
                     break;
                 case 'relations':
                     // postRelation(newEntity);
@@ -93,17 +105,20 @@ export default function AppConfigure (props) {
 
     function handleRestore () {
         const type = fileTypeOptions[selectedTypeIndex].value;
-        if (type === 'contacts') {
-            contacts.results.forEach(contact => deleteContact(contact.id));
-            handleAddEntity(type);
-        } else if (type === 'notes') {
-            notes.results.forEach(note => deleteNote(note.id));
-            handleAddEntity(type);
-        } else if (type === 'all') {
+        if (type === 'all') {
             contacts.results.forEach(contact => deleteContact(contact.id));
             handleAddEntity('contacts');
             notes.results.forEach(note => deleteNote(note.id));
             handleAddEntity('notes');
+        } else if (type === 'contacts') {
+            contacts.results.forEach(contact => deleteContact(contact.id));
+            handleAddEntity(type);
+        } else if (type === 'events') {
+            events.results.forEach(event => deleteEvent(event.id));
+            handleAddEntity(type);
+        } else if (type === 'notes') {
+            notes.results.forEach(note => deleteNote(note.id));
+            handleAddEntity(type);
         }
     }
 
@@ -111,6 +126,7 @@ export default function AppConfigure (props) {
         const type = fileTypeOptions[selectedTypeIndex].value;
         if (type === 'all') {
             handleAddEntity('contacts');
+            handleAddEntity('events');
             handleAddEntity('notes');
         } else {
             handleAddEntity(type);
@@ -121,7 +137,7 @@ export default function AppConfigure (props) {
         <ConfigureWrapper>
             <h2>Configure Application</h2>
             <hr />
-            {(isContactListPending || isNoteListPending)
+            {(isContactListPending || isNoteListPending || isEventPending)
                 ? (<LoadingSpinner />)
                 : (<>
                     <h3>Manage Records</h3>
@@ -181,6 +197,16 @@ AppConfigure.propTypes = {
     contactPostError: PropTypes.string.isRequired,
     isContactDeletePending: PropTypes.bool.isRequired,
     contactDeleteError: PropTypes.string.isRequired,
+    getEventList: PropTypes.func.isRequired,
+    postEvent: PropTypes.func.isRequired,
+    deleteEvent: PropTypes.func.isRequired,
+    events: PropTypes.object.isRequired,
+    isEventListPending: PropTypes.bool.isRequired,
+    eventListError: PropTypes.string.isRequired,
+    isEventPostPending: PropTypes.bool.isRequired,
+    eventPostError: PropTypes.string.isRequired,
+    isEventDeletePending: PropTypes.bool.isRequired,
+    eventDeleteError: PropTypes.string.isRequired,
     getNoteList: PropTypes.func.isRequired,
     postNote: PropTypes.func.isRequired,
     deleteNote: PropTypes.func.isRequired,
