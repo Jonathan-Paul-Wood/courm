@@ -85,8 +85,19 @@ function initializeDB() {
             lastModifiedOn datetime default current_timestamp
             );
         `);
+        db.run(`
+        CREATE TABLE IF NOT EXISTS events (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            date datetime NOT NULL,
+            title TEXT,
+            description TEXT,
+            address TEXT,
+            createdOn datetime default current_timestamp,
+            lastModifiedOn datetime default current_timestamp
+            );
+        `);
       });      
-}
+} //TODO: delete interactions from contacts, delete contacts from notes, delete tags from all (maybe tags in new table like relations)
 
 function closeDB() { 
     db.close((err) => {
@@ -434,6 +445,148 @@ app.delete("/api/contacts/:id", (req, res) => {
 
 // END CONTACTS APIS
 
+// EVENTS APIS
+
+app.post('/api/events/new', (req, res) => {
+    db.run(
+        `INSERT INTO events(
+            date,
+            title,
+            description,
+            address)
+            VALUES(
+                '${req.body.date}',
+                '${cleanseString(req.body.title)}',
+                '${cleanseString(req.body.description)}',
+                '${cleanseString(req.body.address)}'
+            )`, (err, rows) => {
+                console.log('error: ', err);
+                if (err) {
+                    res.status = ERROR_CODE;
+                    res.json(err);
+                } else {
+                    res.status = SUCCESS_CODE;
+                    db.run(`SELECT id FROM events WHERE createdOn=${req.body.createdOn}`, (err, id) => {
+                        if (err) {
+                            res.json({'message': 'could not get new Id'});
+                        } else {
+                            res.json({'newId': id});
+                        }
+                    });
+                }
+            }
+        );
+    });
+
+//accepts requests of the form: /api/events?order=id?results=3&page=1?direction=[ASC|DESC]?search=string
+app.get("/api/events", (req, res) => {
+    const { results, page, order, direction, searchTerm, filters } = req.query;
+    let sql = `SELECT * FROM events`;
+//apply search
+if(searchTerm && filters) {
+    const searchFilters = filters.split(',');
+    sql = sql + ` WHERE ${searchFilters[0]} LIKE '%${searchTerm}%'`;
+    searchFilters.forEach((filter, index) => {
+        if(index) {
+            sql = sql + ` OR ${filter} LIKE '%${searchTerm}%'`
+        }
+    });
+}
+
+const sql_metadata = sql;
+//apply sort order and pagination
+sql = sql+` ORDER BY ${order} ${direction} LIMIT ${results} OFFSET ((${page - 1})* ${results})`;
+
+db.all(sql, (err, rows) => {
+    if (err) {
+        console.log(err);
+        res.status = ERROR_CODE;
+        res.json(err);
+    } else if (!rows) {
+        res.status = NOT_FOUND_CODE;
+        res.json({message: 'NOT FOUND'});
+    } else {
+        res.json(rows);
+        db.all(sql_metadata, (err, result) => {
+            if (err) {
+                res.status = ERROR_CODE;
+                return console.error(err.message);
+            } else if (!result) {
+                res.status = NOT_FOUND_CODE;
+                return;
+            } else {
+                totalResults = result.length;
+                res.json({
+                    results: rows,
+                    resultCount: rows.length,
+                    pageSize: parseInt(results),
+                    totalCount: totalResults,
+                    pageCount: Math.ceil(totalResults / parseInt(results)),
+                    currentPage: parseInt(page)
+                });
+            }
+        });
+    }
+});
+});
+
+app.get("/api/events/:id", (req, res) => {
+    const sql = `SELECT * FROM events WHERE id = ${req.params.id}`;
+    db.get(sql, (err, row) => {
+        if (err) {
+            res.status(ERROR_CODE).send({message: err.message});
+        } else if (!row) {
+            res.status(NOT_FOUND_CODE).send({message: 'No such event'});
+        } else {
+            res.status = SUCCESS_CODE;
+            res.json(row);
+        }
+    })
+});
+
+app.put("/api/events/:id", (req, res) => {
+    const b = req.body;
+    let sql = `UPDATE events SET`;
+    Object.keys(b).map(key => {
+        if(key !== 'id' && key !== 'date') {
+            sql = sql+`, ${key}='${cleanseString(b[key])}'`
+        } else if (key === 'date') {
+            sql = sql+` ${key}='${b[key]}'`
+        }
+    });
+    sql = sql+` WHERE id=${req.params.id}`;
+    db.run(sql, (err, row) => {
+        if (err) {
+            res.status = ERROR_CODE;
+            res.json(err);
+        } else if (!row) {
+            res.status = NOT_FOUND_CODE;
+            res.json({'response': 'NOT FOUND'});
+        } else {
+            res.status = SUCCESS_CODE;
+            res.json({'response': row});
+        }
+    });
+});
+
+app.delete("/api/events/:id", (req, res) => {
+    const sql = `DELETE FROM events WHERE id = ${req.params.id}`;
+    db.run(sql, (err, row) => {
+        if (err) {
+            res.status = ERROR_CODE;
+            res.json(err);
+        } else if (!row) {
+            res.status = NOT_FOUND_CODE;
+            res.json({'response': 'NOT FOUND'});
+        } else {
+            res.status = SUCCESS_CODE;
+            res.json({'response': row});
+        }
+    });
+});
+
+// END EVENTS APIS
+
 // RELATIONS APIS
 
 app.post('/api/relations/new', (req, res) => {
@@ -470,6 +623,21 @@ app.get("/api/relations", (req, res) => {
     const { entity, id } = req.query;
     let sql = `SELECT * FROM relations WHERE ${entity} = ${id}`
 
+    //apply search
+    if(searchTerm && filters) {
+        const searchFilters = filters.split(',');
+        sql = sql + ` WHERE ${searchFilters[0]} LIKE '%${searchTerm}%'`;
+        searchFilters.forEach((filter, index) => {
+            if(index) {
+                sql = sql + ` OR ${filter} LIKE '%${searchTerm}%'`
+            }
+        });
+    }
+
+    const sql_metadata = sql;
+    //apply sort order and pagination
+    sql = sql+` ORDER BY ${order} ${direction} LIMIT ${results} OFFSET ((${page - 1})* ${results})`;
+
     db.all(sql, (err, rows) => {
         if (err) {
             console.log(err);
@@ -480,6 +648,25 @@ app.get("/api/relations", (req, res) => {
             res.json({message: 'NOT FOUND'});
         } else {
             res.json(rows);
+            db.all(sql_metadata, (err, result) => {
+                if (err) {
+                    res.status = ERROR_CODE;
+                    return console.error(err.message);
+                } else if (!result) {
+                    res.status = NOT_FOUND_CODE;
+                    return;
+                } else {
+                    totalResults = result.length;
+                    res.json({
+                        results: rows,
+                        resultCount: rows.length,
+                        pageSize: parseInt(results),
+                        totalCount: totalResults,
+                        pageCount: Math.ceil(totalResults / parseInt(results)),
+                        currentPage: parseInt(page)
+                    });
+                }
+            });
         }
     });
 });
