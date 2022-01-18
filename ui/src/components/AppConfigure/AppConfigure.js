@@ -45,6 +45,10 @@ export default function AppConfigure (props) {
         {
             label: 'Notes',
             value: 'notes'
+        },
+        {
+            label: 'Relations',
+            value: 'relations'
         }
     ];
 

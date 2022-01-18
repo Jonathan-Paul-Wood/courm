@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import Input from '../Input';
+import Select from '../Select';
 import Button from '../Button';
 
 const RelationContainer = styled.div`
@@ -17,6 +17,15 @@ const RelationContainer = styled.div`
         font-size: 0.75em;
         font-style: italic;
         padding-left: 1em;
+    }
+`;
+
+const Relation = styled.div`
+    display: flex;
+    justify-content: space-between;
+
+    Select {
+        flex: 3;
     }
 `;
 
@@ -55,18 +64,18 @@ export default function RelationEditCard (props) {
             <RelationContainer>
                 {filteredRelations.map((relation, index) => {
                     return (
-                        <span key={index}>
+                        <Relation key={index}>
                             <Select options={filteredRelations} selectedIndex={filteredRelations.indexOf(relation)} onChange={(e) => console.log(e)} />
-                            <Button icon="trashCan" onClick={() => deleteRelation(relation.id)}/>
-                            <Button icon="saveIcon" onClick={() => handleUpdateRelation(relation.id)}/> {/* disabled unless pending changes to this relation. On save of entity, error if unsaved changes, prompt user to 'confirm pending changes to relations */}
-                        </span>
+                            <Button icon="trashCan" type="secondary" onClick={() => deleteRelation(relation.id)}/>
+                            <Button icon="saveIcon" type="secondary" onClick={() => handleUpdateRelation(relation.id)}/> {/* disabled unless pending changes to this relation. On save of entity, error if unsaved changes, prompt user to 'confirm pending changes to relations */}
+                        </Relation>
                     );
                 })}
-                <span>
-                    <Input placeholder={`${relationType}`} label='' value={pendingRelation} onChange={(val) => setPendingRelation(val)} />
-                    <Button icon="trashCan" onClick={() => setPendingRelation(-1)}/>
-                    <Button disabled={pendingRelation < 0} icon="saveIcon" onClick={() => handleCreateRelation()}/>
-                </span>
+                <Relation key={filteredRelations.length}>
+                    <Select options={filteredRelations} selectedIndex={-1} onChange={(val) => setPendingRelation(val)} />
+                    <Button icon="trashCan" type="secondary" onClick={() => setPendingRelation(-1)}/>
+                    <Button disabled={pendingRelation < 0} type="secondary" icon="saveIcon" onClick={() => handleCreateRelation()}/>
+                </Relation>
             </RelationContainer>
         </div>
     );

@@ -618,25 +618,10 @@ app.post('/api/relations/new', (req, res) => {
         );
 });
 
-//accepts requests of the form: /api/relations?entity=[contactId | noteId | eventId]?id=string
+//accepts requests of the form: /api/relations?entity=[contactId | noteId | eventId]&id=string
 app.get("/api/relations", (req, res) => {
     const { entity, id } = req.query;
     let sql = `SELECT * FROM relations WHERE ${entity} = ${id}`
-
-    //apply search
-    if(searchTerm && filters) {
-        const searchFilters = filters.split(',');
-        sql = sql + ` WHERE ${searchFilters[0]} LIKE '%${searchTerm}%'`;
-        searchFilters.forEach((filter, index) => {
-            if(index) {
-                sql = sql + ` OR ${filter} LIKE '%${searchTerm}%'`
-            }
-        });
-    }
-
-    const sql_metadata = sql;
-    //apply sort order and pagination
-    sql = sql+` ORDER BY ${order} ${direction} LIMIT ${results} OFFSET ((${page - 1})* ${results})`;
 
     db.all(sql, (err, rows) => {
         if (err) {
@@ -648,25 +633,6 @@ app.get("/api/relations", (req, res) => {
             res.json({message: 'NOT FOUND'});
         } else {
             res.json(rows);
-            db.all(sql_metadata, (err, result) => {
-                if (err) {
-                    res.status = ERROR_CODE;
-                    return console.error(err.message);
-                } else if (!result) {
-                    res.status = NOT_FOUND_CODE;
-                    return;
-                } else {
-                    totalResults = result.length;
-                    res.json({
-                        results: rows,
-                        resultCount: rows.length,
-                        pageSize: parseInt(results),
-                        totalCount: totalResults,
-                        pageCount: Math.ceil(totalResults / parseInt(results)),
-                        currentPage: parseInt(page)
-                    });
-                }
-            });
         }
     });
 });

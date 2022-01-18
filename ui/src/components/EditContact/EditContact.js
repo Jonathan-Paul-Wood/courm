@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import EntityTitleHeader from '../../common/EntityTitleHeader/EntityTitleHeader';
+import RelationEditCard from '../../common/RelationEditCard/';
 import Button from '../../common/Button';
 import Input from '../../common/Input/Input';
 import DateInput from '../../common/DateInput/DateInput';
@@ -54,6 +55,16 @@ const GridWrapper = styled.div`
         height: 20vh;
         width: 100%;
         margin: 0 1.25em;
+    }
+
+    .relationsRow {
+        display: flex;
+        justify-content: space-between;
+
+        .relationsList {
+            min-width: 50%;
+            margin: 1em;
+        }
     }
 
     tagsRow {
@@ -159,7 +170,10 @@ export default function EditContact (props) {
         putContact,
         isContactPutPending,
         deleteContact,
-        isContactDeletePending
+        isContactDeletePending,
+        getRelationList,
+        relationList,
+        isRelationListPending
     } = props;
     const defaultChanges = {
         firstName: '',
@@ -184,6 +198,7 @@ export default function EditContact (props) {
         // initial GET of contact
         if (contactId) {
             setPendingChanges(getContact(contactId));
+            getRelationList('contactId', contactId);
         } else {
             setPendingChanges(defaultChanges);
         }
@@ -299,7 +314,8 @@ export default function EditContact (props) {
                 disableSave={
                     isContactPending ||
                     isContactPostPending ||
-                    isContactPutPending
+                    isContactPutPending ||
+                    isRelationListPending
                 }
                 type='Contact'
             />
@@ -415,15 +431,16 @@ export default function EditContact (props) {
                             maxLength={750}
                         />
                     </div>
-                    <div className="tagsRow">
-
-                    </div>
                     {/* <div className="InteractionsRow">
                         <h3>Recent Interactions</h3>
                         <div>
                             cards go here, or none available message...
                         </div>
                     </div> */}
+                    <div className="relationsRow">
+                        <RelationEditCard relationList={relationList} relationType='note'/>
+                        <RelationEditCard relationList={relationList} relationType='event'/>
+                    </div>
                     {!isNewContact && <div id="dangerRow">
                         <div></div>
                         <Button
@@ -466,5 +483,8 @@ EditContact.propTypes = {
     getContact: PropTypes.func.isRequired,
     putContact: PropTypes.func.isRequired,
     postContact: PropTypes.func.isRequired,
-    deleteContact: PropTypes.func.isRequired
+    deleteContact: PropTypes.func.isRequired,
+    getRelationList: PropTypes.func.isRequired,
+    relationList: PropTypes.array.isRequired,
+    isRelationListPending: PropTypes.bool.isRequired
 };

@@ -78,8 +78,6 @@ export default function EditEvent (props) {
         title: '',
         date: '',
         address: '',
-        contacts: '',
-        tags: '',
         description: ''
     };
     const [pendingChanges, setPendingChanges] = useState(defaultChanges);

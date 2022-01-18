@@ -1,7 +1,7 @@
 import * as types from './types';
 
 export const initialState = {
-    relations: {},
+    relations: [],
     isRelationListPending: true,
     relationListError: ''
 };
