@@ -7,6 +7,9 @@ import AppHome from '../../../components/AppHome';
 import ContactsBrowse from '../../../components/ContactsBrowse';
 import ViewContact from '../../../components/ViewContact';
 import EditContact from '../../../components/EditContact';
+import EventsBrowse from '../../../components/EventsBrowse';
+import ViewEvent from '../../../components/ViewEvent';
+import EditEvent from '../../../components/EditEvent';
 import NotesBrowse from '../../../components/NotesBrowse';
 import ViewNote from '../../../components/ViewNote';
 import EditNote from '../../../components/EditNote';
@@ -31,6 +34,10 @@ export default function AppRouter () {
                 <AppLayout path="/contacts/new" exact component={EditContact} {...commonRouteProps} />
                 <AppLayout path="/contacts/:contactId/edit" component={EditContact} {...commonRouteProps} />
                 <AppLayout path="/contacts/:contactId" component={ViewContact} {...commonRouteProps} />
+                <AppLayout path="/events" exact component={EventsBrowse} {...commonRouteProps} />
+                <AppLayout path="/events/new" exact component={EditEvent} {...commonRouteProps} />
+                <AppLayout path="/events/:eventId/edit" component={EditEvent} {...commonRouteProps} />
+                <AppLayout path="/events/:eventId" component={ViewEvent} {...commonRouteProps} />
                 <AppLayout path="/notes" exact component={NotesBrowse} {...commonRouteProps} />
                 <AppLayout path="/notes/new" exact component={EditNote} {...commonRouteProps} />
                 <AppLayout path="/notes/:noteId/edit" component={EditNote} {...commonRouteProps} />

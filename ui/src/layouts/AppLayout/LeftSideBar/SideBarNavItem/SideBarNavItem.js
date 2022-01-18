@@ -35,7 +35,7 @@ const ItemContainer = styled.div`
     }
 `;
 
-export default function LeftSidebar (props) {
+export default function SideBarNavItem (props) {
     const history = useHistory();
 
     function handleNavigation (path) {
@@ -52,8 +52,8 @@ export default function LeftSidebar (props) {
     );
 }
 
-LeftSidebar.propTypes = {
+SideBarNavItem.propTypes = {
     path: PropTypes.string,
-    icon: PropTypes.object,
+    icon: PropTypes.string,
     title: PropTypes.string
 };

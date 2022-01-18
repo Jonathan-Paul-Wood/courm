@@ -17,6 +17,9 @@ ReactDOM.render(
                 <Route path="/contacts" component={App} />
                 <Route path="/contacts/new" component={App} />
                 <Route path="/contacts/:contactId" component={App} />
+                <Route path="/events" component={App} />
+                <Route path="/events/new" component={App} />
+                <Route path="/events/:contactId" component={App} />
                 <Route path="/notes" component={App} />
                 <Route path="/notes/new" component={App} />
                 <Route path="/notes/:noteId" component={App} />

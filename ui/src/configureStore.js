@@ -6,6 +6,8 @@ import contactList from './store/ContactList/reducer';
 import note from './store/Note/reducer';
 import noteList from './store/NoteList/reducer';
 import configure from './store/Configure/reducer';
+import event from './store/Event/reducer';
+import eventList from './store/EventList/reducer';
 
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
@@ -14,7 +16,9 @@ const rootReducer = combineReducers({
     contactList,
     note,
     noteList,
-    configure
+    configure,
+    event,
+    eventList
 });
 
 const middlewares = applyMiddleware(reduxThunk, reduxLogger);

@@ -33,5 +33,5 @@ export default function AppLayout ({ component: Component, ...props }) {
 }
 
 AppLayout.propTypes = {
-    component: PropTypes.object
+    component: PropTypes.any
 };

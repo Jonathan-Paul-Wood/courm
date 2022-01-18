@@ -44,12 +44,14 @@ const RightSideContent = styled.div`
 
 export default function EntityTitleHeader (props) {
     const { title, handleSave, editMode, disableSave, type } = props;
-    const { contactId, noteId } = useParams();
+    const { contactId, noteId, eventId } = useParams();
     const history = useHistory();
 
     let editPath;
     if (type === 'Contact') {
         editPath = `/contacts/${contactId}/edit`;
+    } else if (type === 'Event') {
+        editPath = `/events/${eventId}/edit`;
     } else if (type === 'Note') {
         editPath = `/notes/${noteId}/edit`;
     }
