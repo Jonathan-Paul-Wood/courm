@@ -62,23 +62,13 @@ export default function EventsBrowse (props) {
             selected: false
         },
         {
+            label: 'Description',
+            value: 'description',
+            selected: false
+        },
+        {
             label: 'Address',
             value: 'address',
-            selected: false
-        },
-        {
-            label: 'Contacts',
-            value: 'contacts',
-            selected: false
-        },
-        {
-            label: 'Tag',
-            value: 'tags',
-            selected: false
-        },
-        {
-            label: 'Event',
-            value: 'description',
             selected: false
         }
     ];
@@ -179,7 +169,7 @@ export default function EventsBrowse (props) {
                                 )
                         )}
                 </ScrollContainer>
-                {events.totalCount > RESULTS_PER_PAGE && (
+                {!isEventListPending && events.totalCount > RESULTS_PER_PAGE && (
                     <Paginate
                         className="paginate"
                         total={events.totalCount}

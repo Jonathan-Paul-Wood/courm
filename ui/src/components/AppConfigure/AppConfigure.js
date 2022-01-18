@@ -21,7 +21,7 @@ export default function AppConfigure (props) {
         postEvent,
         deleteEvent,
         events,
-        isEventPending,
+        isEventListPending,
         getNoteList,
         postNote,
         deleteNote,
@@ -64,7 +64,7 @@ export default function AppConfigure (props) {
             exportDataList(['contacts'], [contacts.results], 'contactList');
         } else if (type === 'events') {
             exportDataList(['events'], [events.results], 'eventList');
-        }  else if (type === 'notes') {
+        } else if (type === 'notes') {
             exportDataList(['notes'], [notes.results], 'noteList');
         } else if (type === 'all') {
             exportDataList(['contacts', 'notes'], [contacts.results, notes.results], 'fullExport');
@@ -137,7 +137,7 @@ export default function AppConfigure (props) {
         <ConfigureWrapper>
             <h2>Configure Application</h2>
             <hr />
-            {(isContactListPending || isNoteListPending || isEventPending)
+            {(isContactListPending || isNoteListPending || isEventListPending)
                 ? (<LoadingSpinner />)
                 : (<>
                     <h3>Manage Records</h3>

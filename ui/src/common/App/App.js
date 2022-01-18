@@ -27,6 +27,9 @@ export default function App () {
                     <AppRouter path="/contacts/:contactId" component={AppRouter} />
                     <AppRouter path="/contacts/new" component={AppRouter} />
                     <AppRouter path="/contacts" component={AppRouter} />
+                    <AppRouter path="/events/:contactId" component={AppRouter} />
+                    <AppRouter path="/events/new" component={AppRouter} />
+                    <AppRouter path="/events" component={AppRouter} />
                     <AppRouter path="/notes/:noteId" component={AppRouter} />
                     <AppRouter path="/notes/new" component={AppRouter} />
                     <AppRouter path="/notes" component={AppRouter} />

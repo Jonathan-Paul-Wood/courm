@@ -435,9 +435,9 @@ app.delete("/api/contacts/:id", (req, res) => {
 
 // END CONTACTS APIS
 
-// NOTES APIS
+// EVENTS APIS
 
-app.post('/api/notes/new', (req, res) => {
+app.post('/api/events/new', (req, res) => {
     db.run(
         `INSERT INTO events(
             date,
@@ -447,10 +447,8 @@ app.post('/api/notes/new', (req, res) => {
         VALUES(
             '${req.body.date}',
             '${cleanseString(req.body.title)}',
-            '${cleanseString(req.body.record)}',
-            '${cleanseString(req.body.address)}',
-            '${req.body.contacts}',
-            '${req.body.tags}'
+            '${cleanseString(req.body.description)}',
+            '${cleanseString(req.body.address)}'
             )`, (err, rows) => {
                 console.log('error: ', err);
                 if (err) {

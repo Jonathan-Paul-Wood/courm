@@ -1,11 +1,11 @@
-import eventBrowse from './eventBrowse';
+import EventsBrowse from './EventsBrowse';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { getEventList } from '../../store/EventList/actions';
 
 function mapStateToProps (state) {
     return {
-        event: state.eventList.event,
+        events: state.eventList.events,
         isEventListPending: state.eventList.isEventListPending,
         eventListError: state.eventList.eventListError
     };
@@ -19,4 +19,4 @@ const mapDispatchToProps = dispatch =>
         dispatch
     );
 
-export default connect(mapStateToProps, mapDispatchToProps)(eventBrowse);
+export default connect(mapStateToProps, mapDispatchToProps)(EventsBrowse);
