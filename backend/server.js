@@ -618,10 +618,43 @@ app.post('/api/relations/new', (req, res) => {
         );
 });
 
+app.get("/api/relations/:id", (req, res) => {
+    let sql = `SELECT * FROM relations WHERE id = ${req.params.id}`;
+
+    db.all(sql, (err, rows) => {
+        if (err) {
+            console.log(err);
+            res.status = ERROR_CODE;
+            res.json(err);
+        } else if (!rows) {
+            res.status = NOT_FOUND_CODE;
+            res.json({message: 'NOT FOUND'});
+        } else {
+            res.json(rows);
+        }
+    });
+});
+app.get("/api/relations/all", (req, res) => {
+    let sql = `SELECT * FROM relations`;
+
+    db.all(sql, (err, rows) => {
+        if (err) {
+            console.log(err);
+            res.status = ERROR_CODE;
+            res.json(err);
+        } else if (!rows) {
+            res.status = NOT_FOUND_CODE;
+            res.json({message: 'NOT FOUND'});
+        } else {
+            res.json(rows);
+        }
+    });
+});
+
 //accepts requests of the form: /api/relations?entity=[contactId | noteId | eventId]&id=string
 app.get("/api/relations", (req, res) => {
     const { entity, id } = req.query;
-    let sql = `SELECT * FROM relations WHERE ${entity} = ${id}`
+    let sql = `SELECT * FROM relations WHERE ${entity} = ${id}`;
 
     db.all(sql, (err, rows) => {
         if (err) {
