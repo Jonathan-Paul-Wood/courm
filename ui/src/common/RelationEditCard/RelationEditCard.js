@@ -34,7 +34,7 @@ const Relation = styled.div`
 `;
 
 export default function RelationEditCard (props) {
-    const { relationList, relationType, options, postRelation, deleteRelation, putRelation } = props;
+    const { relationList, relationType, parentType, parentId, options, postRelation, deleteRelation, putRelation } = props;
 
     const blankRelation = { firstName: '', title: '', label: '', id: null };
     const [pendingNewRelation, setPendingNewRelation] = useState(blankRelation);
@@ -60,6 +60,8 @@ export default function RelationEditCard (props) {
             noteId: '',
             eventId: ''
         };
+        newRelation[relationType + 'Id'] = id;
+        newRelation[parentType + 'Id'] = parentId;
         postRelation(newRelation);
     };
 
@@ -69,6 +71,8 @@ export default function RelationEditCard (props) {
             noteId: '',
             eventId: ''
         };
+        modifiedRelation[relationType + 'Id'] = id;
+        modifiedRelation[parentType + 'Id'] = parentId;
         putRelation(id, modifiedRelation);
     };
 
@@ -109,6 +113,8 @@ export default function RelationEditCard (props) {
 RelationEditCard.propTypes = {
     relationList: PropTypes.array.isRequired,
     relationType: PropTypes.string.isRequired,
+    parentType: PropTypes.string.isRequired,
+    parentId: PropTypes.number.isRequired,
     options: PropTypes.array.isRequired,
     postRelation: PropTypes.func.isRequired,
     putRelation: PropTypes.func.isRequired,

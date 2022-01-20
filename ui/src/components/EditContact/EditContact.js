@@ -446,8 +446,8 @@ export default function EditContact (props) {
                     </div>
                 </div> */}
                         <div className="relationsRow">
-                            <RelationEditCard relationList={relationList} relationType='note' options={noteList.results || []} />
-                            <RelationEditCard relationList={relationList} relationType='event' options={eventList.results || []} />
+                            <RelationEditCard relationList={relationList} relationType='note' parentType='contact' parentId={contactId} options={noteList.results || []} />
+                            <RelationEditCard relationList={relationList} relationType='event' parentType='contact' parentId={contactId} options={eventList.results || []} />
                         </div>
                         {!isNewContact && <div id="dangerRow">
                             <div></div>
