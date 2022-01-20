@@ -482,52 +482,51 @@ app.post('/api/events/new', (req, res) => {
 app.get("/api/events", (req, res) => {
     const { results, page, order, direction, searchTerm, filters } = req.query;
     let sql = `SELECT * FROM events`;
-//apply search
-if(searchTerm && filters) {
-    const searchFilters = filters.split(',');
-    sql = sql + ` WHERE ${searchFilters[0]} LIKE '%${searchTerm}%'`;
-    searchFilters.forEach((filter, index) => {
-        if(index) {
-            sql = sql + ` OR ${filter} LIKE '%${searchTerm}%'`
-        }
-    });
-}
-
-const sql_metadata = sql;
-//apply sort order and pagination
-sql = sql+` ORDER BY ${order} ${direction} LIMIT ${results} OFFSET ((${page - 1})* ${results})`;
-
-db.all(sql, (err, rows) => {
-    if (err) {
-        console.log(err);
-        res.status = ERROR_CODE;
-        res.json(err);
-    } else if (!rows) {
-        res.status = NOT_FOUND_CODE;
-        res.json({message: 'NOT FOUND'});
-    } else {
-        res.json(rows);
-        db.all(sql_metadata, (err, result) => {
-            if (err) {
-                res.status = ERROR_CODE;
-                return console.error(err.message);
-            } else if (!result) {
-                res.status = NOT_FOUND_CODE;
-                return;
-            } else {
-                totalResults = result.length;
-                res.json({
-                    results: rows,
-                    resultCount: rows.length,
-                    pageSize: parseInt(results),
-                    totalCount: totalResults,
-                    pageCount: Math.ceil(totalResults / parseInt(results)),
-                    currentPage: parseInt(page)
-                });
+    //apply search
+    if(searchTerm && filters) {
+        const searchFilters = filters.split(',');
+        sql = sql + ` WHERE ${searchFilters[0]} LIKE '%${searchTerm}%'`;
+        searchFilters.forEach((filter, index) => {
+            if(index) {
+                sql = sql + ` OR ${filter} LIKE '%${searchTerm}%'`
             }
         });
     }
-});
+
+    const sql_metadata = sql;
+    //apply sort order and pagination
+    sql = sql+` ORDER BY ${order} ${direction} LIMIT ${results} OFFSET ((${page - 1})* ${results})`;
+
+    db.all(sql, (err, rows) => {
+        if (err) {
+            console.log(err);
+            res.status = ERROR_CODE;
+            res.json(err);
+        } else if (!rows) {
+            res.status = NOT_FOUND_CODE;
+            res.json({message: 'NOT FOUND'});
+        } else {
+            db.all(sql_metadata, (err, result) => {
+                if (err) {
+                    res.status = ERROR_CODE;
+                    return console.error(err.message);
+                } else if (!result) {
+                    res.status = NOT_FOUND_CODE;
+                    return;
+                } else {
+                    totalResults = result.length;
+                    res.json({
+                        results: rows,
+                        resultCount: rows.length,
+                        pageSize: parseInt(results),
+                        totalCount: totalResults,
+                        pageCount: Math.ceil(totalResults / parseInt(results)),
+                        currentPage: parseInt(page)
+                    });
+                }
+            });
+        }
+    });
 });
 
 app.get("/api/events/:id", (req, res) => {
