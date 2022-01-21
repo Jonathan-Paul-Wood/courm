@@ -54,21 +54,27 @@ export default function RelationEditCard (props) {
 
     const blankRelation = { firstName: '', title: '', label: '', id: null };
     const [pendingNewRelation, setPendingNewRelation] = useState(blankRelation);
-    console.log('relationList: ', JSON.stringify(relationList));
+    console.log('RELATION TYPE: ', relationType);
+    console.log('relationList: ', relationList);
 
     const labelTerm = relationType === 'contact' ? 'firstName' : 'title';
+    // get relations of this component's type
     const filteredRelations = relationList.filter(r => r[relationType + 'Id'] !== 'null');
-    const relationsWithPending = [...filteredRelations, pendingNewRelation];
-    console.log('relationsWithPending: ', relationsWithPending);
+    const relationsWithPending = [pendingNewRelation, ...filteredRelations];
+    console.log('filtered relations with pending: ', relationsWithPending);
     // get entities that do not have relations
     const filteredOptions = [];
+    const formattedSelections = [];
     options.forEach(option => {
         console.log('option: ', option);
-        if (!relationsWithPending.find(fRel => fRel.id === option.id)) {
+        if (!relationsWithPending.find(fRel => parseInt(fRel[relationType + 'Id']) === parseInt(option.id))) {
+            console.log('option added');
             filteredOptions.push({ label: option[labelTerm], id: option.id });
+        } else if (option.id !== pendingNewRelation[relationType + 'Id']) {
+            formattedSelections.push({ label: option[labelTerm], id: option.id });
         }
     });
-    console.log('filteredOptions: ', filteredOptions);
+    console.log('filtered options: ', filteredOptions);
 
     function handleCreateRelation (id) {
         const newRelation = {
@@ -102,13 +108,15 @@ export default function RelationEditCard (props) {
         }
     }
 
+    console.log('formattedSelections: ', formattedSelections);
     return (
         <div className="relationsList">
             <div>
                 {`${relationType.toUpperCase()}S`}
             </div>
             <RelationContainer>
-                {filteredRelations.map((relation, index) => {
+                {formattedSelections.map((relation, index) => {
+                    console.log('relation: ', relation);
                     return (
                         <Relation key={index}>
                             <Select options={[relation, ...filteredOptions]} selectedIndex={filteredRelations.indexOf(relation)} onSelect={(e) => console.log(e)} />
