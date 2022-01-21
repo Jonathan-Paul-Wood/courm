@@ -2,48 +2,12 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { Manager, Reference, Popper } from 'react-popper';
-import { BLACK, WHITE, GREY } from '../../assets/colorsConstants';
 
-const SelectWrapper = styled(Manager)`
-    margin: 1em 0;
-    border-radius: 0.5em;
+const StyledSelect = styled.select`
     align-content: center;
     display: inline-block;
     width: 100%;
-
-    --text-dark: ${BLACK};
-    --text-dark-hover: ${BLACK};
-    --secondary-color: ${WHITE};
-    --secondary-color-hover: ${GREY};
-    
-    .select {
-        padding: 0.5em 1em;
-        border: none;
-        box-shadow: 0 0 2px var(--text-dark);
-        cursor: pointer;
-        transition: background-color 0.2s ease;
-        width: 100%;
-        display: inline-block;
-        line-height: 1.5;
-    }
-    
-    .select:focus {
-        outline: 0;
-    }
-    
-    .select:active {
-        transform: scale(0.97);
-    }
-
-    .select--secondary {
-        color: var(--text-dark);
-        background-color: var(--secondary-color);
-    }
-    
-    .select--secondary:hover {
-        color: var(--text-dark-hover);
-        background-color: var(--secondary-color-hover);
-    }
+    cursor: pointer;
 
     .select-disabled {
         transform: scale(1) !important; /*override active class*/
@@ -70,7 +34,7 @@ export default function Select (props) {
     }
 
     return (
-        <SelectWrapper>
+        <Manager>
             <Reference>
                 {({ ref }) => (
                     <span
@@ -80,7 +44,7 @@ export default function Select (props) {
                             setPopup(!showPopup);
                         }}
                     >
-                        <select
+                        <StyledSelect
                             className={`select select--${type} select--${size} ${block ? 'select-block' : ''} ${disabled ? 'select-disabled' : ''}`}
                             onChange={(val) => handleSelection(val)}
                             disabled={disabled || isPending}
@@ -95,11 +59,11 @@ export default function Select (props) {
                                     })
                                 )}
                             </Popper>
-                        </select>
+                        </StyledSelect>
                     </span>
                 )}
             </Reference>
-        </SelectWrapper>
+        </Manager>
     );
 }
 
