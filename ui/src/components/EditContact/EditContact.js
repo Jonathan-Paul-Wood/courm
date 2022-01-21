@@ -9,6 +9,7 @@ import DateInput from '../../common/DateInput/DateInput';
 import CommonModal from '../../common/CommonModal/CommonModal';
 import LoadingSpinner from '../../common/LoadingSpinner/LoadingSpinner';
 import PropTypes from 'prop-types';
+import { deepCopy } from '../../utilities/utilities';
 
 const ScrollContainer = styled.div`
     margin: 2em 2em 0 2em;
@@ -175,10 +176,15 @@ export default function EditContact (props) {
         getRelationList,
         relationList,
         isRelationListPending,
+        isRelationPostPending,
+        isRelationPutPending,
+        isRelationDeletePending,
         noteList,
         getNoteList,
         isNoteListPending,
-        eventList
+        eventList,
+        getEventList,
+        isEventListPending
     } = props;
     const defaultChanges = {
         firstName: '',
@@ -205,7 +211,7 @@ export default function EditContact (props) {
             setPendingChanges(getContact(contactId));
             getRelationList('contactId', contactId);
             getNoteList();
-            // getEventList();
+            getEventList();
         } else {
             setPendingChanges(defaultChanges);
         }
@@ -226,46 +232,57 @@ export default function EditContact (props) {
             setPageLoaded(true);
         }
     }, [isContactPending]);
+
     useEffect(() => {
         setPendingChanges(defaultChanges);
     }, [isContactPostPending]);
+
     useEffect(() => {
         if (pageLoaded && !isContactPutPending) {
             history.push(`/contacts/${contactId}`);
         }
     }, [isContactPutPending]);
+
     useEffect(() => {
         if (pageLoaded && !isContactDeletePending) {
             history.push('/contacts');
         }
     }, [isContactDeletePending]);
 
+    useEffect(() => {
+        if (!isRelationPostPending && !isRelationPutPending && !isRelationDeletePending) {
+            console.log('getting new relation list');
+            getRelationList('contactId', contactId); // get updated list of relations whenever a change resolves
+        }
+    }, [isRelationPostPending, isRelationPutPending, isRelationDeletePending]);
+
     function updateData (field, value) {
         // clear any errors
-        const updateError = {};
-        updateError[field] = '';
-        setError({ ...error, ...updateError });
+        const updatedError = deepCopy(error);
+        updatedError[field] = '';
+        setError(updatedError);
 
         // update the value
-        const updatedValue = {};
+        const updatedValue = deepCopy(pendingChanges);
         updatedValue[field] = value;
-        setPendingChanges({ ...pendingChanges, ...updatedValue });
+        setPendingChanges(updatedValue);
     }
 
     function handleSaveContact () {
         // validate inputs, prompt user with actionable errors
         let valid = true;
+        const updatedError = deepCopy(error);
         if (!pendingChanges.firstName) {
             valid = false;
-            setError({ ...error, ...{ firstName: 'Please enter name' } });
+            updatedError.firstName = 'Please enter name';
         }
         if (pendingChanges.email && !pendingChanges.email.match(/^.{1,}@[a-zA-Z0-9-_]{1,}\.[a-z]{1,}$/g)) { // ^ and $ to match pattern on entire string, not subset
             valid = false;
-            setError({ ...error, ...{ email: 'Expected format: name@example.com' } });
+            updatedError.email = 'Expected format: name@example.com';
         }
         if (pendingChanges.phoneNumber && !pendingChanges.phoneNumber.match(/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/g)) {
             valid = false;
-            setError({ ...error, ...{ phoneNumber: 'Expected format: ###-###-####' } });
+            updatedError.phoneNumber = 'Expected format: ###-###-####';
         }
         if (!entityIsOrganization &&
             pendingChanges.dateOfBirth &&
@@ -274,8 +291,9 @@ export default function EditContact (props) {
             )
         ) {
             valid = false;
-            setError({ ...error, ...{ dateOfBirth: 'Expected format: YYYY-MM-DD' } });
+            updatedError.dateOfBirth = 'Expected format: YYYY-MM-DD';
         }
+        setError(updatedError);
 
         if (valid) {
             let dob = pendingChanges.dateOfBirth;
@@ -326,7 +344,7 @@ export default function EditContact (props) {
                 type='Contact'
             />
             <ScrollContainer>
-                {(isContactPending || isRelationListPending || isNoteListPending)
+                {(isContactPending || isRelationListPending || isNoteListPending || isEventListPending)
                     ? <LoadingSpinner />
                     : <GridWrapper>
                         <div className="imageRow">
@@ -446,8 +464,8 @@ export default function EditContact (props) {
                     </div>
                 </div> */}
                         <div className="relationsRow">
-                            <RelationEditCard relationList={relationList} relationType='note' parentType='contact' parentId={contactId} options={noteList.results || []} />
-                            <RelationEditCard relationList={relationList} relationType='event' parentType='contact' parentId={contactId} options={eventList.results || []} />
+                            <RelationEditCard relationList={relationList} relationType='note' parentType='contact' parentId={parseInt(contactId)} options={noteList.results || []} />
+                            <RelationEditCard relationList={relationList} relationType='event' parentType='contact' parentId={parseInt(contactId)} options={eventList.results || []} />
                         </div>
                         {!isNewContact && <div id="dangerRow">
                             <div></div>
@@ -495,11 +513,14 @@ EditContact.propTypes = {
     deleteContact: PropTypes.func.isRequired,
     getRelationList: PropTypes.func.isRequired,
     relationList: PropTypes.array.isRequired,
+    isRelationPostPending: PropTypes.bool.isRequired,
+    isRelationPutPending: PropTypes.bool.isRequired,
+    isRelationDeletePending: PropTypes.bool.isRequired,
     isRelationListPending: PropTypes.bool.isRequired,
     noteList: PropTypes.object.isRequired,
     getNoteList: PropTypes.func.isRequired,
     isNoteListPending: PropTypes.bool.isRequired,
-    eventList: PropTypes.object.isRequired
-    // getEventList: PropTypes.func.isRequired,
-    // isEventListPending: PropTypes.bool.isRequired
+    eventList: PropTypes.object.isRequired,
+    getEventList: PropTypes.func.isRequired,
+    isEventListPending: PropTypes.bool.isRequired
 };
