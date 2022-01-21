@@ -36,7 +36,7 @@ export default function RelationViewCard (props) {
                 {filteredRelations.length
                     ? filteredRelations.map((relation, index) => {
                         return (
-                            <div key={index} onClick={() => history.push(`/${relationType.toLowerCase()}s/${relation[relationType]}`)}>
+                            <div key={index} onClick={() => history.push(`/${relationType.toLowerCase()}s/${relation[relationType + 'Id']}`)}>
                                 <span className="relationId">{relation[relationType + 'Id']}</span>
                             </div>
                         );

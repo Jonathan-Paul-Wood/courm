@@ -27,16 +27,25 @@ const RelationContainer = styled.div`
 const Relation = styled.div`
     display: flex;
     justify-content: space-between;
+    margin: 0.25em 0 0.25em 0.25em;
 
-    span {
+    .reference-element {
         display: flex;
-        flex: 4;
+        flex: 5;
         margin-right: 0.5em;
     }
 
-    div {
+    .button-group {
         display: flex;
-        flex: 1;
+        flex: 2;
+        justify-content: right;
+
+        button {
+            display: flex;
+            justify-content: space-between;
+            flex: 1;
+            margin: auto 0.25em;
+        }
     }
 `;
 
@@ -103,15 +112,19 @@ export default function RelationEditCard (props) {
                     return (
                         <Relation key={index}>
                             <Select options={[relation, ...filteredOptions]} selectedIndex={filteredRelations.indexOf(relation)} onSelect={(e) => console.log(e)} />
-                            <Button icon="trashCan" type="secondary" label='' onClick={() => deleteRelation(relation.id)}/>
-                            <Button icon="saveIcon" type="secondary" label='' onClick={() => handleUpdateRelation(relation.id)}/> {/* disabled unless pending changes to this relation. On save of entity, error if unsaved changes, prompt user to 'confirm pending changes to relations */}
+                            <span className="button-group">
+                                <Button icon="trashCan" type="secondary" label='' onClick={() => deleteRelation(relation.id)}/>
+                                <Button icon="saveIcon" type="secondary" label='' onClick={() => handleUpdateRelation(relation.id)}/> {/* disabled unless pending changes to this relation. On save of entity, error if unsaved changes, prompt user to 'confirm pending changes to relations */}
+                            </span>
                         </Relation>
                     );
                 })}
                 <Relation key={filteredRelations.length}>
                     <Select options={[pendingNewRelation, ...filteredOptions]} selectedIndex={-1} onSelect={(val) => updatePendingRelation(val - 1)} />
-                    <Button icon="trashCan" type="secondary" label='' onClick={() => updatePendingRelation(-1)}/>
-                    <Button disabled={JSON.stringify(pendingNewRelation) === JSON.stringify(blankRelation)} icon="saveIcon" type="secondary" label='' onClick={() => handleCreateRelation(pendingNewRelation.id)}/>
+                    <span className="button-group">
+                        <Button icon="trashCan" type="secondary" label='' onClick={() => updatePendingRelation(-1)}/>
+                        <Button disabled={JSON.stringify(pendingNewRelation) === JSON.stringify(blankRelation)} icon="saveIcon" type="secondary" label='' onClick={() => handleCreateRelation(pendingNewRelation.id)}/>
+                    </span>
                 </Relation>
             </RelationContainer>
         </div>

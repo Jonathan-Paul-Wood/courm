@@ -19,6 +19,12 @@ const StyledSelect = styled.select`
         background-color: #e6e6e6 !important;
         color: var(--text-dark-hover) !important;
     }
+
+    option {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
 `;
 
 export default function Select (props) {
@@ -54,7 +60,7 @@ export default function Select (props) {
                                 {() => (
                                     options.map((option, index) => {
                                         return (
-                                            <option display={showPopup ? 'visible' : 'hidden'} key={index} value={index}>{option.label}</option>
+                                            <option display={showPopup ? 'visible' : 'hidden'} key={index} value={index} title={option.label}>{option.label}</option>
                                         );
                                     })
                                 )}
