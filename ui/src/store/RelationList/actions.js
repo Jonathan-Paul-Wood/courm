@@ -34,3 +34,35 @@ export function getRelationList (entity, id) {
         }
     };
 }
+
+function getAllRelationsLoading () {
+    return {
+        type: types.GET_ALL_RELATIONS_PENDING
+    };
+}
+
+function getAllRelationsSuccess (payload) {
+    return {
+        type: types.GET_ALL_RELATIONS_SUCCESS,
+        payload
+    };
+}
+
+function getAllRelationsError (error) {
+    return {
+        type: types.GET_ALL_RELATIONS_ERROR,
+        error: new ServiceError('get all relations', error)
+    };
+}
+
+export function getAllRelations () {
+    return async dispatch => {
+        dispatch(getAllRelationsLoading());
+        try {
+            const response = await RelationListService.getAllRelations();
+            dispatch(getAllRelationsSuccess(response));
+        } catch (e) {
+            dispatch(getAllRelationsError(e));
+        }
+    };
+}

@@ -5,4 +5,8 @@ export default class RelationListService {
         // to GET all relations for a given entity
         return axios.get(`/relations?entity=${entity}&id=${id}`);
     }
+
+    static getAllRelations () {
+        return axios.get('/relations/all');
+    }
 }

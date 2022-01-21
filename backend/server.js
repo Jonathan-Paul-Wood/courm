@@ -617,8 +617,8 @@ app.post('/api/relations/new', (req, res) => {
         );
 });
 
-app.get("/api/relations/:id", (req, res) => {
-    let sql = `SELECT * FROM relations WHERE id = ${req.params.id}`;
+app.get('/api/relations/all', (req, res) => {
+    let sql = `SELECT * FROM relations`;
 
     db.all(sql, (err, rows) => {
         if (err) {
@@ -633,8 +633,9 @@ app.get("/api/relations/:id", (req, res) => {
         }
     });
 });
-app.get("/api/relations/all", (req, res) => {
-    let sql = `SELECT * FROM relations`;
+
+app.get('/api/relations/:id', (req, res) => {
+    let sql = `SELECT * FROM relations WHERE id = ${req.params.id}`;
 
     db.all(sql, (err, rows) => {
         if (err) {
