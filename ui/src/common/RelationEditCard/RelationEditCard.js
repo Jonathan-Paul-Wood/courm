@@ -28,8 +28,15 @@ const Relation = styled.div`
     display: flex;
     justify-content: space-between;
 
-    Select {
-        flex: 3;
+    span {
+        display: flex;
+        flex: 4;
+        margin-right: 0.5em;
+    }
+
+    div {
+        display: flex;
+        flex: 1;
     }
 `;
 
@@ -54,7 +61,7 @@ export default function RelationEditCard (props) {
     });
     console.log('filteredOptions: ', filteredOptions);
 
-    function handleCreateRelation () {
+    function handleCreateRelation (id) {
         const newRelation = {
             contactId: '',
             noteId: '',
@@ -62,6 +69,7 @@ export default function RelationEditCard (props) {
         };
         newRelation[relationType + 'Id'] = id;
         newRelation[parentType + 'Id'] = parentId;
+        console.log('newRelation: ', newRelation);
         postRelation(newRelation);
     };
 
@@ -103,7 +111,7 @@ export default function RelationEditCard (props) {
                 <Relation key={filteredRelations.length}>
                     <Select options={[pendingNewRelation, ...filteredOptions]} selectedIndex={-1} onSelect={(val) => updatePendingRelation(val - 1)} />
                     <Button icon="trashCan" type="secondary" label='' onClick={() => updatePendingRelation(-1)}/>
-                    <Button disabled={!pendingNewRelation} icon="saveIcon" type="secondary" label='' onClick={() => handleCreateRelation()}/>
+                    <Button disabled={JSON.stringify(pendingNewRelation) === JSON.stringify(blankRelation)} icon="saveIcon" type="secondary" label='' onClick={() => handleCreateRelation(pendingNewRelation.id)}/>
                 </Relation>
             </RelationContainer>
         </div>
