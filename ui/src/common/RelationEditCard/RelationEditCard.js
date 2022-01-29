@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Select from '../Select';
 import Button from '../Button';
+import { deepCopy, isJSONEqual } from '../../utilities/utilities';
 
 const RelationContainer = styled.div`
     min-height: 3em;
@@ -54,13 +55,14 @@ export default function RelationEditCard (props) {
 
     const blankRelation = { firstName: '', title: '', label: '', id: null };
     const [pendingNewRelation, setPendingNewRelation] = useState(blankRelation);
+    const filteredRelations = relationList.filter(r => r[relationType + 'Id'] !== 'null');
+    const [pendingChanges, setPendingChanges] = useState(filteredRelations);
     console.log('RELATION TYPE: ', relationType);
     console.log('relationList: ', relationList);
 
     const labelTerm = relationType === 'contact' ? 'firstName' : 'title';
     // get relations of this component's type
-    const filteredRelations = relationList.filter(r => r[relationType + 'Id'] !== 'null');
-    const relationsWithPending = [pendingNewRelation, ...filteredRelations];
+    const relationsWithPending = [pendingNewRelation, ...pendingChanges];
     console.log('filtered relations with pending: ', relationsWithPending);
     // get entities that do not have relations
     const filteredOptions = [];
@@ -99,13 +101,19 @@ export default function RelationEditCard (props) {
         putRelation(id, modifiedRelation);
     };
 
-    function updatePendingRelation (index) {
+    function updatePendingNewRelation (index) {
         console.log(index);
         if (index > -1) {
             setPendingNewRelation(filteredOptions[index]);
         } else {
             setPendingNewRelation(blankRelation);
         }
+    }
+
+    function updatePendingChanges (changedIndex, selectedIndex) {
+        const newPending = deepCopy(pendingChanges);
+        newPending[changedIndex] = filteredOptions[selectedIndex];
+        setPendingChanges(newPending);
     }
 
     console.log('formattedSelections: ', formattedSelections);
@@ -119,7 +127,7 @@ export default function RelationEditCard (props) {
                     console.log('relation: ', relation);
                     return (
                         <Relation key={index}>
-                            <Select options={[relation, ...filteredOptions]} selectedIndex={filteredRelations.indexOf(relation)} onSelect={(e) => console.log(e)} />
+                            <Select options={[relation, ...filteredOptions]} selectedIndex={pendingChanges.indexOf(relation)} onSelect={(val) => updatePendingChanges(index, val)} />
                             <span className="button-group">
                                 <Button icon="trashCan" type="secondary" label='' onClick={() => deleteRelation(relation.id)}/>
                                 <Button icon="saveIcon" type="secondary" label='' onClick={() => handleUpdateRelation(relation.id)}/> {/* disabled unless pending changes to this relation. On save of entity, error if unsaved changes, prompt user to 'confirm pending changes to relations */}
@@ -127,11 +135,11 @@ export default function RelationEditCard (props) {
                         </Relation>
                     );
                 })}
-                <Relation key={filteredRelations.length}>
-                    <Select options={[pendingNewRelation, ...filteredOptions]} selectedIndex={-1} onSelect={(val) => updatePendingRelation(val - 1)} />
+                <Relation key={pendingChanges.length}>
+                    <Select options={[pendingNewRelation, ...filteredOptions]} selectedIndex={-1} onSelect={(val) => updatePendingNewRelation(val - 1)} />
                     <span className="button-group">
-                        <Button icon="trashCan" type="secondary" label='' onClick={() => updatePendingRelation(-1)}/>
-                        <Button disabled={JSON.stringify(pendingNewRelation) === JSON.stringify(blankRelation)} icon="saveIcon" type="secondary" label='' onClick={() => handleCreateRelation(pendingNewRelation.id)}/>
+                        <Button disabled={isJSONEqual(pendingNewRelation, blankRelation)} icon="trashCan" type="secondary" label='' onClick={() => updatePendingNewRelation(-1)}/>
+                        <Button disabled={isJSONEqual(pendingNewRelation, blankRelation)} icon="saveIcon" type="secondary" label='' onClick={() => handleCreateRelation(pendingNewRelation.id)}/>
                     </span>
                 </Relation>
             </RelationContainer>
