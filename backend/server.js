@@ -78,9 +78,9 @@ function initializeDB() {
         db.run(`
         CREATE TABLE IF NOT EXISTS relations (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            contactId TEXT,
-            noteId TEXT,
-            eventId TEXT,
+            contactId INTEGER,
+            noteId INTEGER,
+            eventId INTEGER,
             createdOn datetime default current_timestamp,
             lastModifiedOn datetime default current_timestamp
             );
