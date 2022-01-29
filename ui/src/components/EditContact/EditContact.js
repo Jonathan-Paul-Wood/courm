@@ -205,6 +205,13 @@ export default function EditContact (props) {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [pageLoaded, setPageLoaded] = useState(false);
 
+    const [existingNoteRelations, setExistingNoteRelations] = useState([]); // the relations that are of notes
+    const [notesInRelations, setNotesInRelations] = useState([]);
+    const [notesWithoutRelations, setNotesWithoutRelations] = useState([]);
+    const [existingEventRelations, setExistingEventRelations] = useState([]); // the relations that are of events
+    const [eventsInRelations, setEventsInRelations] = useState([]);
+    const [eventsWithoutRelations, setEventsWithoutRelations] = useState([]);
+
     useEffect(() => {
         // initial GET of contact
         if (contactId) {
@@ -256,6 +263,38 @@ export default function EditContact (props) {
         }
     }, [isRelationPostPending, isRelationPutPending, isRelationDeletePending]);
 
+    useEffect(() => {
+        if (!isEventListPending && !isNoteListPending && !isRelationListPending) {
+            relationList.forEach(relation => {
+                console.log('relation: ', relation);
+                if (relation.noteId) {
+                    setExistingNoteRelations([...existingNoteRelations, relation]);
+                } else if (relation.eventId) {
+                    setExistingEventRelations([...existingEventRelations, relation]);
+                }
+            });
+            eventList.results.forEach(event => {
+                if (existingEventRelations.find(relation => relation.eventId === event.id)) {
+                    setEventsInRelations([...eventsInRelations, event]);
+                } else {
+                    setEventsWithoutRelations([...eventsWithoutRelations, event]);
+                }
+            });
+            noteList.results.forEach(note => {
+                if (existingNoteRelations.find(relation => relation.noteId === note.id)) {
+                    setNotesInRelations([...notesInRelations, note]);
+                } else {
+                    setNotesWithoutRelations([...notesWithoutRelations, note]);
+                }
+            });
+        }
+    }, [isEventListPending, isNoteListPending, isRelationListPending]);
+
+    function handleRelationChanges (existingRelations, pendingEntities) {
+        console.log('change from: ', existingRelations);
+        console.log('change to: ', pendingEntities);
+    }
+
     function updateData (field, value) {
         // clear any errors
         const updatedError = deepCopy(error);
@@ -296,6 +335,8 @@ export default function EditContact (props) {
         setError(updatedError);
 
         if (valid) {
+            handleRelationChanges(existingEventRelations, eventsInRelations);
+            handleRelationChanges(existingNoteRelations, notesInRelations);
             let dob = pendingChanges.dateOfBirth;
             if (!entityIsOrganization && dob) {
                 dob = new Date(pendingChanges.dateOfBirth).toISOString();
@@ -464,8 +505,8 @@ export default function EditContact (props) {
                     </div>
                 </div> */}
                         <div className="relationsRow">
-                            <RelationEditCard relationList={relationList} relationType='note' parentType='contact' parentId={parseInt(contactId)} options={noteList.results || []} />
-                            <RelationEditCard relationList={relationList} relationType='event' parentType='contact' parentId={parseInt(contactId)} options={eventList.results || []} />
+                            <RelationEditCard entitiesInRelations={notesInRelations} relationType='note' entitiesWithoutRelations={notesWithoutRelations} onChange={setNotesInRelations} />
+                            <RelationEditCard entitiesInRelations={eventsInRelations} relationType='event' entitiesWithoutRelations={eventsWithoutRelations} onChange={setEventsInRelations} />
                         </div>
                         {!isNewContact && <div id="dangerRow">
                             <div></div>
