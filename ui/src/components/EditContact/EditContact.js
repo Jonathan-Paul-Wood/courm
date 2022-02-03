@@ -173,10 +173,11 @@ export default function EditContact (props) {
         isContactPutPending,
         deleteContact,
         isContactDeletePending,
-        getRelationList,
         isRelationListPending,
+        noteList,
         getNoteList,
         isNoteListPending,
+        eventList,
         getEventList,
         isEventListPending
     } = props;
@@ -204,9 +205,8 @@ export default function EditContact (props) {
         // initial GET of contact
         if (contactId) {
             setPendingChanges(getContact(contactId));
-            getRelationList('contactId', contactId);
-            getNoteList();
-            getEventList();
+            getNoteList(100000);
+            getEventList(100000);
         } else {
             setPendingChanges(defaultChanges);
         }
@@ -284,8 +284,6 @@ export default function EditContact (props) {
         setError(updatedError);
 
         if (valid) {
-            handleRelationChanges(existingEventRelations, eventsInRelations);
-            handleRelationChanges(existingNoteRelations, notesInRelations);
             let dob = pendingChanges.dateOfBirth;
             if (!entityIsOrganization && dob) {
                 dob = new Date(pendingChanges.dateOfBirth).toISOString();
@@ -455,8 +453,8 @@ export default function EditContact (props) {
                     </div>
                 </div> */}
                         <div className="relationsRow">
-                            <RelationEditCard parentType='contact' parentId={contactId} relationType='note' onChange={setPendingRelationChanges} />
-                            <RelationEditCard parentType='contact' parentId={contactId} relationType='event' onChange={setPendingRelationChanges} />
+                            <RelationEditCard parentType='contact' parentId={contactId} relationType='note' relatedEntityList={noteList.results ?? []} onChange={setPendingRelationChanges} />
+                            <RelationEditCard parentType='contact' parentId={contactId} relationType='event' relatedEntityList={eventList.results ?? []} onChange={setPendingRelationChanges} />
                         </div>
                         {!isNewContact && <div id="dangerRow">
                             <div></div>
@@ -501,5 +499,12 @@ EditContact.propTypes = {
     getContact: PropTypes.func.isRequired,
     putContact: PropTypes.func.isRequired,
     postContact: PropTypes.func.isRequired,
-    deleteContact: PropTypes.func.isRequired
+    deleteContact: PropTypes.func.isRequired,
+    noteList: PropTypes.object.isRequired,
+    getNoteList: PropTypes.func.isRequired,
+    isNoteListPending: PropTypes.bool.isRequired,
+    eventList: PropTypes.object.isRequired,
+    getEventList: PropTypes.func.isRequired,
+    isEventListPending: PropTypes.bool.isRequired,
+    isRelationListPending: PropTypes.bool.isRequired
 };

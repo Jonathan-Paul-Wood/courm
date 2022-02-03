@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Select from '../Select';
 import Button from '../Button';
+import { isJSONEqual } from '../../utilities/utilities';
 
 const RelationContainer = styled.div`
     min-height: 3em;
@@ -44,17 +45,56 @@ const Relation = styled.div`
 `;
 
 export default function RelationEditCard (props) {
-    const { entitiesInRelations, entitiesWithoutRelations, relationType, onChange } = props;
+    const {
+        relationList,
+        getRelationList,
+        postRelation,
+        putRelation,
+        deleteRelation,
+        parentType,
+        parentId,
+        relationType,
+        relatedEntityList,
+        onChange
+    } = props;
 
-    const [remainingOptions, setRemainingOptions] = useState(entitiesWithoutRelations);
-    const [pendingChanges, setPendingChanges] = useState(entitiesInRelations);
+    const labelTerm = relationType === 'contact' ? 'firstName' : 'title';
+
+    const [defaultChanges, setDefaultChages] = useState([]);
+    const [remainingOptions, setRemainingOptions] = useState([]);
+    const [pendingChanges, setPendingChanges] = useState([]);
     const [pendingSelection, setPendingSelection] = useState(0);
 
     useEffect(() => {
-        onChange(pendingChanges); // update parent state whenever pendingChanges is updated
-    }, [pendingChanges]);
+        getRelationList(`${parentType}Id`, parentId);
+    }, []);
 
-    const labelTerm = relationType === 'contact' ? 'firstName' : 'title';
+    useEffect(() => {
+        if (relationList.length) {
+            // return relations where id of relationType is not null
+            const filteredExistingRelations = relationList.filter(relation => relation[`${relationType}Id`]);
+            const filteredExistingRelationIds = filteredExistingRelations.map(rel => rel[`${relationType}Id`]);
+
+            const existingRelationValues = [];
+            const remainingRelationValues = [];
+
+            relatedEntityList.forEach(entity => {
+                if (filteredExistingRelationIds.indexOf(entity.id)) {
+                    existingRelationValues.push(entity);
+                } else {
+                    remainingRelationValues.push(entity);
+                }
+            });
+
+            setPendingChanges(existingRelationValues);
+            setDefaultChages(existingRelationValues);
+            setRemainingOptions(remainingRelationValues);
+        }
+    }, [relationList]);
+
+    useEffect(() => {
+        onChange(isJSONEqual(pendingChanges, defaultChanges)); // update parent state whenever pendingChanges is updated
+    }, [pendingChanges]);
 
     function handleRemovePendingRelation (index) {
         setRemainingOptions([...remainingOptions, pendingChanges[index]]);
@@ -64,11 +104,21 @@ export default function RelationEditCard (props) {
     function handleAddPendingRelation () {
         setPendingChanges([...pendingChanges, remainingOptions[pendingSelection]]);
         setRemainingOptions(remainingOptions.splice(pendingSelection, 1));
-        setPendingSelection(null);
+        setPendingSelection(0);
     }
 
-    console.log('relation edit card props: ', props);
-    console.log('relation state: ', remainingOptions, pendingChanges);
+    function handleCancel () {
+        setPendingChanges(defaultChanges);
+    }
+
+    function handleConfirm () {
+        console.log(pendingChanges);
+        if (relationType === 'jack') {
+            putRelation(1, {});
+            deleteRelation(1);
+            postRelation(1);
+        }
+    }
 
     return (
         <div className="relationsList">
@@ -95,6 +145,8 @@ export default function RelationEditCard (props) {
                             </Relation>
                         );
                     })}
+                    <Button icon="minus" type="secondary" label='Cancel' disabled={isJSONEqual(pendingChanges, defaultChanges)} onClick={() => handleCancel()} />
+                    <Button icon="plus" type="primary" label='Confirm' disabled={isJSONEqual(pendingChanges, defaultChanges)} onClick={() => handleConfirm()} />
                 </>
             </RelationContainer>
         </div>
@@ -102,8 +154,14 @@ export default function RelationEditCard (props) {
 }
 
 RelationEditCard.propTypes = {
-    entitiesInRelations: PropTypes.array.isRequired,
-    entitiesWithoutRelations: PropTypes.array.isRequired,
+    relationList: PropTypes.array.isRequired,
+    getRelationList: PropTypes.func.isRequired,
+    postRelation: PropTypes.func.isRequired,
+    putRelation: PropTypes.func.isRequired,
+    deleteRelation: PropTypes.func.isRequired,
+    parentType: PropTypes.string.isRequired,
+    parentId: PropTypes.number.isRequired,
     relationType: PropTypes.string.isRequired,
+    relatedEntityList: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired
 };
