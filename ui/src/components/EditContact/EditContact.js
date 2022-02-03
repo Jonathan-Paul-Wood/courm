@@ -174,15 +174,9 @@ export default function EditContact (props) {
         deleteContact,
         isContactDeletePending,
         getRelationList,
-        relationList,
         isRelationListPending,
-        isRelationPostPending,
-        isRelationPutPending,
-        isRelationDeletePending,
-        noteList,
         getNoteList,
         isNoteListPending,
-        eventList,
         getEventList,
         isEventListPending
     } = props;
@@ -204,13 +198,7 @@ export default function EditContact (props) {
     const history = useHistory();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [pageLoaded, setPageLoaded] = useState(false);
-
-    const [existingNoteRelations, setExistingNoteRelations] = useState([]); // the relations that are of notes
-    const [notesInRelations, setNotesInRelations] = useState([]);
-    const [notesWithoutRelations, setNotesWithoutRelations] = useState([]);
-    const [existingEventRelations, setExistingEventRelations] = useState([]); // the relations that are of events
-    const [eventsInRelations, setEventsInRelations] = useState([]);
-    const [eventsWithoutRelations, setEventsWithoutRelations] = useState([]);
+    const [pendingRelationChanges, setPendingRelationChanges] = useState(false);
 
     useEffect(() => {
         // initial GET of contact
@@ -255,45 +243,6 @@ export default function EditContact (props) {
             history.push('/contacts');
         }
     }, [isContactDeletePending]);
-
-    useEffect(() => {
-        if (!isRelationPostPending && !isRelationPutPending && !isRelationDeletePending) {
-            console.log('getting new relation list');
-            getRelationList('contactId', contactId); // get updated list of relations whenever a change resolves
-        }
-    }, [isRelationPostPending, isRelationPutPending, isRelationDeletePending]);
-
-    useEffect(() => {
-        if (!isEventListPending && !isNoteListPending && !isRelationListPending) {
-            relationList.forEach(relation => {
-                console.log('relation: ', relation);
-                if (relation.noteId) {
-                    setExistingNoteRelations([...existingNoteRelations, relation]);
-                } else if (relation.eventId) {
-                    setExistingEventRelations([...existingEventRelations, relation]);
-                }
-            });
-            eventList.results.forEach(event => {
-                if (existingEventRelations.find(relation => relation.eventId === event.id)) {
-                    setEventsInRelations([...eventsInRelations, event]);
-                } else {
-                    setEventsWithoutRelations([...eventsWithoutRelations, event]);
-                }
-            });
-            noteList.results.forEach(note => {
-                if (existingNoteRelations.find(relation => relation.noteId === note.id)) {
-                    setNotesInRelations([...notesInRelations, note]);
-                } else {
-                    setNotesWithoutRelations([...notesWithoutRelations, note]);
-                }
-            });
-        }
-    }, [isEventListPending, isNoteListPending, isRelationListPending]);
-
-    function handleRelationChanges (existingRelations, pendingEntities) {
-        console.log('change from: ', existingRelations);
-        console.log('change to: ', pendingEntities);
-    }
 
     function updateData (field, value) {
         // clear any errors
@@ -380,7 +329,8 @@ export default function EditContact (props) {
                 disableSave={
                     isContactPending ||
                     isContactPostPending ||
-                    isContactPutPending
+                    isContactPutPending ||
+                    pendingRelationChanges
                 }
                 type='Contact'
             />
@@ -505,8 +455,8 @@ export default function EditContact (props) {
                     </div>
                 </div> */}
                         <div className="relationsRow">
-                            <RelationEditCard entitiesInRelations={notesInRelations} relationType='note' entitiesWithoutRelations={notesWithoutRelations} onChange={setNotesInRelations} />
-                            <RelationEditCard entitiesInRelations={eventsInRelations} relationType='event' entitiesWithoutRelations={eventsWithoutRelations} onChange={setEventsInRelations} />
+                            <RelationEditCard parentType='contact' parentId={contactId} relationType='note' onChange={setPendingRelationChanges} />
+                            <RelationEditCard parentType='contact' parentId={contactId} relationType='event' onChange={setPendingRelationChanges} />
                         </div>
                         {!isNewContact && <div id="dangerRow">
                             <div></div>
@@ -551,17 +501,5 @@ EditContact.propTypes = {
     getContact: PropTypes.func.isRequired,
     putContact: PropTypes.func.isRequired,
     postContact: PropTypes.func.isRequired,
-    deleteContact: PropTypes.func.isRequired,
-    getRelationList: PropTypes.func.isRequired,
-    relationList: PropTypes.array.isRequired,
-    isRelationPostPending: PropTypes.bool.isRequired,
-    isRelationPutPending: PropTypes.bool.isRequired,
-    isRelationDeletePending: PropTypes.bool.isRequired,
-    isRelationListPending: PropTypes.bool.isRequired,
-    noteList: PropTypes.object.isRequired,
-    getNoteList: PropTypes.func.isRequired,
-    isNoteListPending: PropTypes.bool.isRequired,
-    eventList: PropTypes.object.isRequired,
-    getEventList: PropTypes.func.isRequired,
-    isEventListPending: PropTypes.bool.isRequired
+    deleteContact: PropTypes.func.isRequired
 };

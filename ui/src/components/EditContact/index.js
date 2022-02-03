@@ -2,9 +2,6 @@ import EditContact from './EditContact';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { getContact, putContact, postContact, deleteContact } from '../../store/Contact/actions';
-import { getRelationList } from '../../store/RelationList/actions';
-import { getNoteList } from '../../store/NoteList/actions';
-import { getEventList } from '../../store/EventList/actions';
 
 function mapStateToProps (state) {
     return {
@@ -16,16 +13,7 @@ function mapStateToProps (state) {
         isContactPutPending: state.contact.isContactPutPending,
         contactPutError: state.contact.contactPutError,
         isContactDeletePending: state.contact.isContactDeletePending,
-        contactDeleteError: state.contact.contactDeleteError,
-        relationList: state.relationList.relations,
-        isRelationListPending: state.relationList.isRelationListPending,
-        isRelationPostPending: state.relation.isRelationPostPending,
-        isRelationPutPending: state.relation.isRelationPutPending,
-        isRelationDeletePending: state.relation.isRelationDeletePending,
-        noteList: state.noteList.notes,
-        isNoteListPending: state.noteList.isNoteListPending,
-        eventList: state.eventList.events,
-        isEventListPending: state.eventList.isEventListPending
+        contactDeleteError: state.contact.contactDeleteError
     };
 }
 
@@ -35,10 +23,7 @@ const mapDispatchToProps = dispatch =>
             getContact,
             putContact,
             postContact,
-            deleteContact,
-            getRelationList,
-            getNoteList,
-            getEventList
+            deleteContact
         },
         dispatch
     );
