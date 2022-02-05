@@ -173,7 +173,6 @@ export default function EditContact (props) {
         isContactPutPending,
         deleteContact,
         isContactDeletePending,
-        isRelationListPending,
         noteList,
         getNoteList,
         isNoteListPending,
@@ -333,7 +332,7 @@ export default function EditContact (props) {
                 type='Contact'
             />
             <ScrollContainer>
-                {(isContactPending || isRelationListPending || isNoteListPending || isEventListPending)
+                {(isContactPending || isNoteListPending || isEventListPending)
                     ? <LoadingSpinner />
                     : <GridWrapper>
                         <div className="imageRow">
@@ -453,8 +452,8 @@ export default function EditContact (props) {
                     </div>
                 </div> */}
                         <div className="relationsRow">
-                            <RelationEditCard parentType='contact' parentId={contactId} relationType='note' relatedEntityList={noteList.results ?? []} onChange={setPendingRelationChanges} />
-                            <RelationEditCard parentType='contact' parentId={contactId} relationType='event' relatedEntityList={eventList.results ?? []} onChange={setPendingRelationChanges} />
+                            <RelationEditCard parentType='contact' parentId={parseInt(contactId)} relationType='note' relatedEntityList={noteList.results ?? []} onChange={setPendingRelationChanges} />
+                            <RelationEditCard parentType='contact' parentId={parseInt(contactId)} relationType='event' relatedEntityList={eventList.results ?? []} onChange={setPendingRelationChanges} />
                         </div>
                         {!isNewContact && <div id="dangerRow">
                             <div></div>
@@ -505,6 +504,5 @@ EditContact.propTypes = {
     isNoteListPending: PropTypes.bool.isRequired,
     eventList: PropTypes.object.isRequired,
     getEventList: PropTypes.func.isRequired,
-    isEventListPending: PropTypes.bool.isRequired,
-    isRelationListPending: PropTypes.bool.isRequired
+    isEventListPending: PropTypes.bool.isRequired
 };

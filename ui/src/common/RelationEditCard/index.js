@@ -6,7 +6,8 @@ import { postRelation, putRelation, deleteRelation } from '../../store/Relation/
 
 function mapStateToProps (state) {
     return {
-        relationList: state.relationList.relations
+        relationList: state.relationList.relations,
+        isRelationListPending: state.relationList.isRelationListPending
     };
 }
 

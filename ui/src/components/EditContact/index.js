@@ -19,8 +19,7 @@ function mapStateToProps (state) {
         noteList: state.noteList.notes,
         isNoteListPending: state.noteList.isNoteListPending,
         eventList: state.eventList.events,
-        isEventListPending: state.eventList.isEventListPending,
-        isRelationListPending: state.relationList.isRelationListPending
+        isEventListPending: state.eventList.isEventListPending
     };
 }
 

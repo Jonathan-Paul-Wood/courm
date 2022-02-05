@@ -154,7 +154,7 @@ export default function EventsBrowse (props) {
                             <LoadingSpinner type="spinner" />
                         )
                         : (
-                            events.results.length
+                            events.results && events.results.length
                                 ? (
                                     events.results.map(event => {
                                         return (

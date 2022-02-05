@@ -164,7 +164,7 @@ export default function NotesBrowse (props) {
                             <LoadingSpinner type="spinner" />
                         )
                         : (
-                            notes.results.length
+                            notes.results && notes.results.length
                                 ? (
                                     notes.results.map(note => {
                                         return (

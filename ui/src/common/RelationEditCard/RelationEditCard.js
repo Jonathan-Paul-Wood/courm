@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Select from '../Select';
 import Button from '../Button';
-import { isJSONEqual } from '../../utilities/utilities';
+import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
+import { deepCopy, isJSONEqual } from '../../utilities/utilities';
 
 const RelationContainer = styled.div`
     min-height: 3em;
@@ -44,10 +45,16 @@ const Relation = styled.div`
     }
 `;
 
+const ConfirmCancelButtonGroup = styled.div`
+    display: flex;
+    justify-content: right;
+`;
+
 export default function RelationEditCard (props) {
     const {
         relationList,
         getRelationList,
+        isRelationListPending,
         postRelation,
         putRelation,
         deleteRelation,
@@ -58,10 +65,12 @@ export default function RelationEditCard (props) {
         onChange
     } = props;
 
-    const labelTerm = relationType === 'contact' ? 'firstName' : 'title';
+    const labelTerm = relationType === 'contact' ? 'firstName' : 'title'; // CONSTANTS
 
+    const [relationsOfCurrentType, setRelationsOfCurrentType] = useState([]);
     const [defaultChanges, setDefaultChages] = useState([]);
-    const [remainingOptions, setRemainingOptions] = useState([]);
+    const [defaultOptions, setDefaultOptions] = useState([]);
+    const [remainingOptions, setRemainingOptions] = useState([{ label: 'Select Option' }]);
     const [pendingChanges, setPendingChanges] = useState([]);
     const [pendingSelection, setPendingSelection] = useState(0);
 
@@ -70,16 +79,18 @@ export default function RelationEditCard (props) {
     }, []);
 
     useEffect(() => {
-        if (relationList.length) {
+        if (!isRelationListPending) {
             // return relations where id of relationType is not null
             const filteredExistingRelations = relationList.filter(relation => relation[`${relationType}Id`]);
+            setRelationsOfCurrentType(filteredExistingRelations);
             const filteredExistingRelationIds = filteredExistingRelations.map(rel => rel[`${relationType}Id`]);
-
+            console.log('filteredExistingRelationIds: ', filteredExistingRelationIds);
             const existingRelationValues = [];
-            const remainingRelationValues = [];
+            const remainingRelationValues = [{ firstName: 'Select Option', title: 'Select Option' }]; // CONSTANTS
 
             relatedEntityList.forEach(entity => {
-                if (filteredExistingRelationIds.indexOf(entity.id)) {
+                console.log('entity: ', entity);
+                if (filteredExistingRelationIds.indexOf(entity.id) >= 0) {
                     existingRelationValues.push(entity);
                 } else {
                     remainingRelationValues.push(entity);
@@ -89,35 +100,66 @@ export default function RelationEditCard (props) {
             setPendingChanges(existingRelationValues);
             setDefaultChages(existingRelationValues);
             setRemainingOptions(remainingRelationValues);
+            setDefaultOptions(remainingRelationValues);
         }
-    }, [relationList]);
+    }, [isRelationListPending]);
 
     useEffect(() => {
-        onChange(isJSONEqual(pendingChanges, defaultChanges)); // update parent state whenever pendingChanges is updated
+        onChange(!isJSONEqual(pendingChanges, defaultChanges)); // update parent state whenever pendingChanges is updated
     }, [pendingChanges]);
 
     function handleRemovePendingRelation (index) {
         setRemainingOptions([...remainingOptions, pendingChanges[index]]);
-        setPendingChanges(pendingChanges.splice(index, 1));
+        const newPending = pendingChanges.filter((_, i) => i !== index);
+        setPendingChanges(newPending);
     }
 
     function handleAddPendingRelation () {
         setPendingChanges([...pendingChanges, remainingOptions[pendingSelection]]);
-        setRemainingOptions(remainingOptions.splice(pendingSelection, 1));
+        const newRemainingOptions = remainingOptions.filter((_, i) => i !== pendingSelection);
+        setRemainingOptions(newRemainingOptions);
         setPendingSelection(0);
     }
 
     function handleCancel () {
         setPendingChanges(defaultChanges);
+        setRemainingOptions(defaultOptions);
     }
 
     function handleConfirm () {
-        console.log(pendingChanges);
-        if (relationType === 'jack') {
-            putRelation(1, {});
-            deleteRelation(1);
-            postRelation(1);
-        }
+        const existingDatabaseRelations = deepCopy(relationsOfCurrentType);
+        pendingChanges.forEach(change => {
+            if (existingDatabaseRelations.find((relation, i) => {
+                if (relation[`${relationType}Id`] === change.id) {
+                    existingDatabaseRelations.splice(i, 1);
+                    return true;
+                }
+                return false;
+            })) {
+                const newBody = {};
+                newBody[`${parentType}Id`] = parentId;
+                newBody[`${relationType}Id`] = change.id;
+                console.log('put new body: ', newBody);
+                putRelation(change.id, newBody);
+            } else {
+                const newBody = {
+                    contactId: null,
+                    eventId: null,
+                    noteId: null
+                };
+                newBody[`${parentType}Id`] = parentId;
+                newBody[`${relationType}Id`] = change.id;
+                console.log('post new body: ', newBody);
+                postRelation(newBody);
+            }
+        });
+        // existingDatabaseRelations that did not have corresponding pendingChanges have been removed
+        console.log('delete these: ', existingDatabaseRelations);
+        existingDatabaseRelations.forEach(relation => {
+            deleteRelation(relation.id);
+        });
+
+        getRelationList(`${parentType}Id`, parentId);
     }
 
     return (
@@ -125,30 +167,35 @@ export default function RelationEditCard (props) {
             <div>
                 {`${relationType.toUpperCase()}S`}
             </div>
-            <RelationContainer>
-                <div>
-                    <Select
-                        options={remainingOptions.map(x => { return { label: x[labelTerm] }; })}
-                        selectedIndex={pendingSelection}
-                        // searchable={true}
-                        // icon={'search'}
-                        onSelect={(e) => setPendingSelection(e.target.index)}
-                    />
-                    <Button disabled={!pendingSelection} icon="plus" type="secondary" label='' onClick={() => handleAddPendingRelation} />
-                </div>
-                <>
-                    {pendingChanges.map((pendingChange, index) => {
-                        return (
-                            <Relation key={index}>
-                                <span className="pendingRelation">{`${pendingChange[labelTerm]} (${pendingChange.id})`}</span>
-                                <Button icon="minus" type="secondary" label='' onClick={() => handleRemovePendingRelation(index)} />
-                            </Relation>
-                        );
-                    })}
-                    <Button icon="minus" type="secondary" label='Cancel' disabled={isJSONEqual(pendingChanges, defaultChanges)} onClick={() => handleCancel()} />
-                    <Button icon="plus" type="primary" label='Confirm' disabled={isJSONEqual(pendingChanges, defaultChanges)} onClick={() => handleConfirm()} />
-                </>
-            </RelationContainer>
+            {isRelationListPending
+                ? <LoadingSpinner />
+                : <RelationContainer>
+                    <div>
+                        <Select
+                            options={remainingOptions.map(x => { return { label: x[labelTerm] }; })}
+                            selectedIndex={pendingSelection}
+                            // searchable={true}
+                            // icon={'search'}
+                            onSelect={(value) => setPendingSelection(value)}
+                        />
+                        <Button disabled={!pendingSelection} icon="plus" type="secondary" label='' onClick={() => handleAddPendingRelation()} />
+                    </div>
+                    <>
+                        {pendingChanges.map((pendingChange, index) => {
+                            return (
+                                <Relation key={index}>
+                                    <span className="pendingRelation">{`${pendingChange[labelTerm]} (${pendingChange.id})`}</span>
+                                    <Button icon="minus" type="secondary" label='' onClick={() => handleRemovePendingRelation(index)} />
+                                </Relation>
+                            );
+                        })}
+                        <ConfirmCancelButtonGroup>
+                            <Button type="secondary" label='Cancel' disabled={isJSONEqual(pendingChanges, defaultChanges)} onClick={() => handleCancel()} />
+                            <Button type="primary" label='Confirm' disabled={isJSONEqual(pendingChanges, defaultChanges)} onClick={() => handleConfirm()} />
+                        </ConfirmCancelButtonGroup>
+                    </>
+                </RelationContainer>
+            }
         </div>
     );
 }
@@ -156,6 +203,7 @@ export default function RelationEditCard (props) {
 RelationEditCard.propTypes = {
     relationList: PropTypes.array.isRequired,
     getRelationList: PropTypes.func.isRequired,
+    isRelationListPending: PropTypes.bool.isRequired,
     postRelation: PropTypes.func.isRequired,
     putRelation: PropTypes.func.isRequired,
     deleteRelation: PropTypes.func.isRequired,
