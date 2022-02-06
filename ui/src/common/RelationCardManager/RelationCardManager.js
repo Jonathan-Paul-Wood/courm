@@ -6,12 +6,20 @@ import RelationViewCard from './RelationViewCard';
 import RelationEditCard from './RelationEditCard';
 
 const RelationsContainer = styled.div`
-    display: flex;
-    justify-content: space-between;
+    width: 50%;
+    margin: 1em;
 
-    .relationsList {
-        min-width: 50%;
-        margin: 1em;
+    .relationTypeTitle {
+        width: 100%;
+    }
+
+    .relationList {
+        min-height: 3em;
+        margin-bottom: 0.5em;
+        border: 2px solid #d9d9d9;
+        border-radius: 0.15em;
+        display: flex;
+        width: 100%;
     }
 `;
 
@@ -56,26 +64,40 @@ export default function RelationCardManager (props) {
         break;
     }
 
+    const labelTerm = relationType === 'contact' ? 'firstName' : 'title'; // CONSTANTS
+
+    function handleRelationListUpdate (value) {
+        getRelationList(`${parentType}Id`, `${parentId}`);
+        onChange(value);
+    }
+
     return (
         <RelationsContainer>
-            <div>
+            <div className="relationTypeTitle">
                 {`${relationType.toUpperCase()}S`}
             </div>
-            {(isRelationListPending || isContactListPending || isEventListPending || isNoteListPending)
-                ? <LoadingSpinner />
-                : (editMode
-                    ? <RelationViewCard relationType={relationType} />
-                    : <RelationEditCard
-                        parentType={parentType}
-                        parentId={parentId}
-                        relationType={relationType}
-                        relatedEntityList={relatedEntityList}
-                        editMode={editMode}
-                        disableEdit={disableEdit}
-                        onChange={onChange}
-                    />
-                )
-            }
+            <div className="relationList">
+                {(isRelationListPending || isContactListPending || isEventListPending || isNoteListPending)
+                    ? <LoadingSpinner />
+                    : (editMode
+                        ? <RelationEditCard
+                            parentType={parentType}
+                            parentId={parentId}
+                            relationType={relationType}
+                            relatedEntityList={relatedEntityList}
+                            onChange={handleRelationListUpdate}
+                            labelTerm={labelTerm}
+                        />
+                        : <RelationViewCard
+                            relationType={relationType}
+                            relatedEntityList={relatedEntityList}
+                            enableEdit={handleRelationListUpdate}
+                            disableEdit={disableEdit}
+                            labelTerm={labelTerm}
+                        />
+                    )
+                }
+            </div>
         </RelationsContainer>
     );
 }

@@ -2,47 +2,57 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
+import Button from '../../Button';
 
 const RelationContainer = styled.div`
-    min-height: 3em;
-    margin-bottom: 0.5em;
-    border: 2px solid #d9d9d9;
-    border-radius: 0.15em;
-    .input-field {
-        padding: 0 3em;
-    }
-
     #relationListError {
         font-size: 0.75em;
         font-style: italic;
         padding-left: 1em;
     }
+
+    #editButton {
+        margin-left: auto;
+    }
 `;
 
 export default function RelationViewCard (props) {
-    const { relationList, relationType } = props;
+    const { relationList, relationType, relatedEntityList, enableEdit, disableEdit, labelTerm } = props;
 
     const history = useHistory();
-    console.log('relationList: ', JSON.stringify(relationList));
+    console.log('VIEW relationList: ', JSON.stringify(relationList));
 
     const filteredRelations = relationList.length ? relationList.filter(r => r[relationType + 'Id'] !== null) : [];
+    console.log('VIEW filteredRelations: ', filteredRelations);
+    const filteredEntities = filteredRelations.map(relation => relatedEntityList.find(entity => entity.id === relation[relationType + 'Id']));
+    console.log('VIEW filteredEntities: ', filteredEntities);
 
     return (
         <RelationContainer>
-            {filteredRelations.length
-                ? filteredRelations.map((relation, index) => {
-                    return (
-                        <div key={index} onClick={() => history.push(`/${relationType.toLowerCase()}s/${relation[relationType + 'Id']}`)}>
-                            <span className="relationId">{relation[relationType + 'Id']}</span>
-                        </div>
-                    );
-                })
-                : <span id="relationListError">{`No ${relationType.toLowerCase()}s to display`}</span>}
+            <div>
+                {filteredEntities.length
+                    ? filteredEntities.map((entity, index) => {
+                        return (
+                            <div key={index} onClick={() => history.push(`/${relationType.toLowerCase()}s/${entity.id}`)}>
+                                <span className="relationId">{entity[labelTerm]} ({entity.id})</span>
+                            </div>
+                        );
+                    })
+                    : <span id="relationListError">{`No ${relationType.toLowerCase()}s to display`}</span>
+                }
+            </div>
+            <div>
+                <Button id="editButton" label='' icon='edit' disabled={disableEdit} onClick={() => enableEdit(true)} />
+            </div>
         </RelationContainer>
     );
 }
 
 RelationViewCard.propTypes = {
     relationList: PropTypes.array.isRequired,
-    relationType: PropTypes.string.isRequired
+    relationType: PropTypes.string.isRequired,
+    relatedEntityList: PropTypes.array.isRequired,
+    enableEdit: PropTypes.func.isRequired,
+    disableEdit: PropTypes.bool.isRequired,
+    labelTerm: PropTypes.string.isRequired
 };

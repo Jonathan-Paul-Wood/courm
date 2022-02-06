@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Select from '../../Select';
 import Button from '../../Button';
-import LoadingSpinner from '../../LoadingSpinner/LoadingSpinner';
 import { deepCopy, isJSONEqual } from '../../../utilities/utilities';
 
 const RelationContainer = styled.div`
@@ -54,18 +53,15 @@ export default function RelationEditCard (props) {
     const {
         relatedEntityList,
         relationList,
-        getRelationList,
-        isRelationListPending,
         postRelation,
         putRelation,
         deleteRelation,
         parentType,
         parentId,
         relationType,
-        onChange
+        onChange,
+        labelTerm
     } = props;
-
-    const labelTerm = relationType === 'contact' ? 'firstName' : 'title'; // CONSTANTS
 
     const [relationsOfCurrentType, setRelationsOfCurrentType] = useState([]);
     const [defaultChanges, setDefaultChages] = useState([]);
@@ -75,30 +71,28 @@ export default function RelationEditCard (props) {
     const [pendingSelection, setPendingSelection] = useState(0);
 
     useEffect(() => {
-        if (!isRelationListPending) {
-            // return relations where id of relationType is not null
-            const filteredExistingRelations = relationList.filter(relation => relation[`${relationType}Id`]);
-            setRelationsOfCurrentType(filteredExistingRelations);
-            const filteredExistingRelationIds = filteredExistingRelations.map(rel => rel[`${relationType}Id`]);
-            console.log('filteredExistingRelationIds: ', filteredExistingRelationIds);
-            const existingRelationValues = [];
-            const remainingRelationValues = [{ firstName: 'Select Option', title: 'Select Option' }]; // CONSTANTS
+        // return relations where id of relationType is not null
+        const filteredExistingRelations = relationList.filter(relation => relation[`${relationType}Id`]);
+        setRelationsOfCurrentType(filteredExistingRelations);
+        const filteredExistingRelationIds = filteredExistingRelations.map(rel => rel[`${relationType}Id`]);
+        console.log('filteredExistingRelationIds: ', filteredExistingRelationIds);
+        const existingRelationValues = [];
+        const remainingRelationValues = [{ firstName: 'Select Option', title: 'Select Option' }]; // CONSTANTS
 
-            relatedEntityList.forEach(entity => {
-                console.log('entity: ', entity);
-                if (filteredExistingRelationIds.indexOf(entity.id) >= 0) {
-                    existingRelationValues.push(entity);
-                } else {
-                    remainingRelationValues.push(entity);
-                }
-            });
+        relatedEntityList.forEach(entity => {
+            console.log('entity: ', entity);
+            if (filteredExistingRelationIds.indexOf(entity.id) >= 0) {
+                existingRelationValues.push(entity);
+            } else {
+                remainingRelationValues.push(entity);
+            }
+        });
 
-            setPendingChanges(existingRelationValues);
-            setDefaultChages(existingRelationValues);
-            setRemainingOptions(remainingRelationValues);
-            setDefaultOptions(remainingRelationValues);
-        }
-    }, [isRelationListPending]);
+        setPendingChanges(existingRelationValues);
+        setDefaultChages(existingRelationValues);
+        setRemainingOptions(remainingRelationValues);
+        setDefaultOptions(remainingRelationValues);
+    }, []);
 
     function handleRemovePendingRelation (index) {
         setRemainingOptions([...remainingOptions, pendingChanges[index]]);
@@ -152,13 +146,11 @@ export default function RelationEditCard (props) {
             deleteRelation(relation.id);
         });
 
-        getRelationList(`${parentType}Id`, parentId);
         onChange(false);
     }
 
-    return (isRelationListPending
-        ? <LoadingSpinner />
-        : <RelationContainer>
+    return (
+        <RelationContainer>
             <div>
                 <Select
                     options={remainingOptions.map(x => { return { label: x[labelTerm] }; })}
@@ -179,7 +171,7 @@ export default function RelationEditCard (props) {
                     );
                 })}
                 <ConfirmCancelButtonGroup>
-                    <Button type="secondary" label='Cancel' disabled={isJSONEqual(pendingChanges, defaultChanges)} onClick={() => handleCancel()} />
+                    <Button type="secondary" label='Cancel' onClick={() => handleCancel()} />
                     <Button type="primary" label='Confirm' disabled={isJSONEqual(pendingChanges, defaultChanges)} onClick={() => handleConfirm()} />
                 </ConfirmCancelButtonGroup>
             </>
@@ -190,13 +182,12 @@ export default function RelationEditCard (props) {
 RelationEditCard.propTypes = {
     relatedEntityList: PropTypes.array.isRequired,
     relationList: PropTypes.array.isRequired,
-    getRelationList: PropTypes.func.isRequired,
-    isRelationListPending: PropTypes.bool.isRequired,
     postRelation: PropTypes.func.isRequired,
     putRelation: PropTypes.func.isRequired,
     deleteRelation: PropTypes.func.isRequired,
     parentType: PropTypes.string.isRequired,
     parentId: PropTypes.number.isRequired,
     relationType: PropTypes.string.isRequired,
-    onChange: PropTypes.func.isRequired
+    onChange: PropTypes.func.isRequired,
+    labelTerm: PropTypes.string.isRequired
 };
