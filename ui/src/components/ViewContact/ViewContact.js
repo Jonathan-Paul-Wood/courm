@@ -10,7 +10,7 @@ import icons from '../../assets/icons/bootstrapIcons';
 import LoadingSpinner from '../../common/LoadingSpinner/LoadingSpinner';
 import { exportDataList } from '../../common/Utilities/utilities';
 import PropTypes from 'prop-types';
-import RelationViewCard from '../../common/RelationViewCard/RelationViewCard';
+import RelationCardManager from '../../common/RelationCardManager';
 
 const ContentWrapper = styled.div`
     padding: 0 1em;
@@ -77,19 +77,17 @@ export default function ViewContact (props) {
         contact,
         isContactPending,
         contactError,
-        getContact,
-        getRelationList,
-        relationList,
-        isRelationListPending
+        getContact
     } = props;
     const [entityType, setEntityType] = useState('');
     const [firstLoad, setFirstLoad] = useState(true);
+    const [firstRelationCardEdit, setFirstRelationCardEdit] = useState(false);
+    const [secondRelationCardEdit, setSecondRelationCardEdit] = useState(false);
 
     useEffect(() => {
         // initial GET of contact
         if (contactId) {
             getContact(contactId);
-            getRelationList('contactId', contactId);
         }
     }, [contactId]);
 
@@ -117,7 +115,7 @@ export default function ViewContact (props) {
                             type='Contact'
                         />
                         <ContentWrapper>
-                            {(isContactPending || isRelationListPending || firstLoad)
+                            {(isContactPending || firstLoad)
                                 ? (<LoadingSpinner />)
                                 : (
                                     <ScrollContainer>
@@ -206,8 +204,22 @@ export default function ViewContact (props) {
                                         </div>
                                     </div> */}
                                             <div className="relationsRow">
-                                                <RelationViewCard relationList={relationList} relationType='note'/>
-                                                <RelationViewCard relationList={relationList} relationType='event'/>
+                                                <RelationCardManager
+                                                    parentType={'contact'}
+                                                    parentId={parseInt(contactId)}
+                                                    relationType='note'
+                                                    editMode={firstRelationCardEdit}
+                                                    disableEdit={secondRelationCardEdit}
+                                                    onChange={setFirstRelationCardEdit}
+                                                />
+                                                <RelationCardManager
+                                                    parentType={'contact'}
+                                                    parentId={parseInt(contactId)}
+                                                    relationType='event'
+                                                    editMode={secondRelationCardEdit}
+                                                    disableEdit={firstRelationCardEdit}
+                                                    onChange={setSecondRelationCardEdit}
+                                                />
                                             </div>
                                         </GridWrapper>
                                     </ScrollContainer>
@@ -223,8 +235,5 @@ ViewContact.propTypes = {
     contact: PropTypes.object.isRequired,
     isContactPending: PropTypes.bool.isRequired,
     contactError: PropTypes.string.isRequired,
-    getContact: PropTypes.func.isRequired,
-    getRelationList: PropTypes.func.isRequired,
-    relationList: PropTypes.array.isRequired,
-    isRelationListPending: PropTypes.bool.isRequired
+    getContact: PropTypes.func.isRequired
 };

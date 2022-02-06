@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import Select from '../Select';
-import Button from '../Button';
-import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
-import { deepCopy, isJSONEqual } from '../../utilities/utilities';
+import Select from '../../Select';
+import Button from '../../Button';
+import LoadingSpinner from '../../LoadingSpinner/LoadingSpinner';
+import { deepCopy, isJSONEqual } from '../../../utilities/utilities';
 
 const RelationContainer = styled.div`
     min-height: 3em;
@@ -52,6 +52,7 @@ const ConfirmCancelButtonGroup = styled.div`
 
 export default function RelationEditCard (props) {
     const {
+        relatedEntityList,
         relationList,
         getRelationList,
         isRelationListPending,
@@ -61,7 +62,6 @@ export default function RelationEditCard (props) {
         parentType,
         parentId,
         relationType,
-        relatedEntityList,
         onChange
     } = props;
 
@@ -73,10 +73,6 @@ export default function RelationEditCard (props) {
     const [remainingOptions, setRemainingOptions] = useState([{ label: 'Select Option' }]);
     const [pendingChanges, setPendingChanges] = useState([]);
     const [pendingSelection, setPendingSelection] = useState(0);
-
-    useEffect(() => {
-        getRelationList(`${parentType}Id`, parentId);
-    }, []);
 
     useEffect(() => {
         if (!isRelationListPending) {
@@ -104,10 +100,6 @@ export default function RelationEditCard (props) {
         }
     }, [isRelationListPending]);
 
-    useEffect(() => {
-        onChange(!isJSONEqual(pendingChanges, defaultChanges)); // update parent state whenever pendingChanges is updated
-    }, [pendingChanges]);
-
     function handleRemovePendingRelation (index) {
         setRemainingOptions([...remainingOptions, pendingChanges[index]]);
         const newPending = pendingChanges.filter((_, i) => i !== index);
@@ -124,6 +116,7 @@ export default function RelationEditCard (props) {
     function handleCancel () {
         setPendingChanges(defaultChanges);
         setRemainingOptions(defaultOptions);
+        onChange(false);
     }
 
     function handleConfirm () {
@@ -160,47 +153,42 @@ export default function RelationEditCard (props) {
         });
 
         getRelationList(`${parentType}Id`, parentId);
+        onChange(false);
     }
 
-    return (
-        <div className="relationsList">
+    return (isRelationListPending
+        ? <LoadingSpinner />
+        : <RelationContainer>
             <div>
-                {`${relationType.toUpperCase()}S`}
+                <Select
+                    options={remainingOptions.map(x => { return { label: x[labelTerm] }; })}
+                    selectedIndex={pendingSelection}
+                    // searchable={true}
+                    // icon={'search'}
+                    onSelect={(value) => setPendingSelection(value)}
+                />
+                <Button disabled={!pendingSelection} icon="plus" type="secondary" label='' onClick={() => handleAddPendingRelation()} />
             </div>
-            {isRelationListPending
-                ? <LoadingSpinner />
-                : <RelationContainer>
-                    <div>
-                        <Select
-                            options={remainingOptions.map(x => { return { label: x[labelTerm] }; })}
-                            selectedIndex={pendingSelection}
-                            // searchable={true}
-                            // icon={'search'}
-                            onSelect={(value) => setPendingSelection(value)}
-                        />
-                        <Button disabled={!pendingSelection} icon="plus" type="secondary" label='' onClick={() => handleAddPendingRelation()} />
-                    </div>
-                    <>
-                        {pendingChanges.map((pendingChange, index) => {
-                            return (
-                                <Relation key={index}>
-                                    <span className="pendingRelation">{`${pendingChange[labelTerm]} (${pendingChange.id})`}</span>
-                                    <Button icon="minus" type="secondary" label='' onClick={() => handleRemovePendingRelation(index)} />
-                                </Relation>
-                            );
-                        })}
-                        <ConfirmCancelButtonGroup>
-                            <Button type="secondary" label='Cancel' disabled={isJSONEqual(pendingChanges, defaultChanges)} onClick={() => handleCancel()} />
-                            <Button type="primary" label='Confirm' disabled={isJSONEqual(pendingChanges, defaultChanges)} onClick={() => handleConfirm()} />
-                        </ConfirmCancelButtonGroup>
-                    </>
-                </RelationContainer>
-            }
-        </div>
+            <>
+                {pendingChanges.map((pendingChange, index) => {
+                    return (
+                        <Relation key={index}>
+                            <span className="pendingRelation">{`${pendingChange[labelTerm]} (${pendingChange.id})`}</span>
+                            <Button icon="minus" type="secondary" label='' onClick={() => handleRemovePendingRelation(index)} />
+                        </Relation>
+                    );
+                })}
+                <ConfirmCancelButtonGroup>
+                    <Button type="secondary" label='Cancel' disabled={isJSONEqual(pendingChanges, defaultChanges)} onClick={() => handleCancel()} />
+                    <Button type="primary" label='Confirm' disabled={isJSONEqual(pendingChanges, defaultChanges)} onClick={() => handleConfirm()} />
+                </ConfirmCancelButtonGroup>
+            </>
+        </RelationContainer>
     );
 }
 
 RelationEditCard.propTypes = {
+    relatedEntityList: PropTypes.array.isRequired,
     relationList: PropTypes.array.isRequired,
     getRelationList: PropTypes.func.isRequired,
     isRelationListPending: PropTypes.bool.isRequired,
@@ -210,6 +198,5 @@ RelationEditCard.propTypes = {
     parentType: PropTypes.string.isRequired,
     parentId: PropTypes.number.isRequired,
     relationType: PropTypes.string.isRequired,
-    relatedEntityList: PropTypes.array.isRequired,
     onChange: PropTypes.func.isRequired
 };

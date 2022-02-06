@@ -1,8 +1,8 @@
 import RelationEditCard from './RelationEditCard';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { getRelationList } from '../../store/RelationList/actions';
-import { postRelation, putRelation, deleteRelation } from '../../store/Relation/actions';
+import { getRelationList } from '../../../store/RelationList/actions';
+import { postRelation, putRelation, deleteRelation } from '../../../store/Relation/actions';
 
 function mapStateToProps (state) {
     return {
