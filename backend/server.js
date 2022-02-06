@@ -78,9 +78,9 @@ function initializeDB() {
         db.run(`
         CREATE TABLE IF NOT EXISTS relations (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            contactId INTEGER,
-            noteId INTEGER,
-            eventId INTEGER,
+            contactId INTEGER DEFAULT NULL,
+            noteId INTEGER DEFAULT NULL,
+            eventId INTEGER DEFAULT NULL,
             createdOn datetime default current_timestamp,
             lastModifiedOn datetime default current_timestamp
             );
@@ -109,6 +109,10 @@ function closeDB() {
 
 function cleanseString(str) {
     return str.replace(/'/g, "''");
+}
+
+function confirmInt(value) {
+    return Number.isSafeInteger(value) ? value : null;
 }
 
 app.post("/api/initialize", (req, res) => {
@@ -595,9 +599,9 @@ app.post('/api/relations/new', (req, res) => {
             noteId,
             eventId) 
         VALUES(
-            '${req.body.contactId}',
-            '${req.body.noteId}',
-            '${req.body.eventId}'
+            ${confirmInt(req.body.contactId)},
+            ${confirmInt(req.body.noteId)},
+            ${confirmInt(req.body.eventId)}
             )`, (err, rows) => {
                 console.log('error: ', err);
                 if (err) {
