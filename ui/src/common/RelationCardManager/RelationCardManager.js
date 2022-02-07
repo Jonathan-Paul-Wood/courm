@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import LoadingSpinner from '../LoadingSpinner/LoadingSpinner';
 import RelationViewCard from './RelationViewCard';
 import RelationEditCard from './RelationEditCard';
+import { PURPLE } from '../../assets/colorsConstants';
 
 const RelationsContainer = styled.div`
     width: 50%;
@@ -11,6 +12,8 @@ const RelationsContainer = styled.div`
 
     .relationTypeTitle {
         width: 100%;
+        color: ${PURPLE};
+        font-weight: 600;
     }
 
     .relationList {
