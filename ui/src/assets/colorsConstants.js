@@ -9,3 +9,4 @@ export const RED_FOCUS = '#e63900';
 export const YELLOW = '#ffff4d';
 export const YELLOW_FOCUS = '#e6e619';
 export const GREY = '#e6e6e6';
+export const PURPLE = '#512da8';
