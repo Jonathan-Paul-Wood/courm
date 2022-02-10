@@ -15,7 +15,10 @@ function mapStateToProps (state) {
         noteList: state.noteList.notes,
         isNoteListPending: state.noteList.isNoteListPending,
         relationList: state.relationList.relations,
-        isRelationListPending: state.relationList.isRelationListPending
+        isRelationListPending: state.relationList.isRelationListPending,
+        isRelationPostPending: state.relation.isRelationPostPending,
+        isRelationPutPending: state.relation.isRelationPutPending,
+        isRelationDeletePending: state.relation.isRelationDeletePending
     };
 }
 

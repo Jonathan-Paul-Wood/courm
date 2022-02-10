@@ -44,7 +44,10 @@ export default function RelationCardManager (props) {
         isEventListPending,
         noteList,
         getNoteList,
-        isNoteListPending
+        isNoteListPending,
+        isRelationPostPending,
+        isRelationPutPending,
+        isRelationDeletePending
     } = props;
 
     useEffect(() => {
@@ -53,6 +56,12 @@ export default function RelationCardManager (props) {
         getEventList(100000);
         getNoteList(100000);
     }, []);
+
+    useEffect(() => {
+        if (!isRelationPostPending && !isRelationPutPending && !isRelationDeletePending) {
+            getRelationList(`${parentType}Id`, `${parentId}`); // get updated list when all changes resolve
+        }
+    }, [isRelationPostPending, isRelationPutPending, isRelationDeletePending]);
 
     let relatedEntityList = [];
     switch (relationType) {
@@ -122,5 +131,8 @@ RelationCardManager.propTypes = {
     getNoteList: PropTypes.func.isRequired,
     isNoteListPending: PropTypes.bool.isRequired,
     getRelationList: PropTypes.func.isRequired,
-    isRelationListPending: PropTypes.bool.isRequired
+    isRelationListPending: PropTypes.bool.isRequired,
+    isRelationPostPending: PropTypes.bool.isRequired,
+    isRelationPutPending: PropTypes.bool.isRequired,
+    isRelationDeletePending: PropTypes.bool.isRequired
 };
