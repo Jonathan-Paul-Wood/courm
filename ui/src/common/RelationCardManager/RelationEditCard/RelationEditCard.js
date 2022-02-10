@@ -4,14 +4,38 @@ import styled from 'styled-components';
 import Select from '../../Select';
 import Button from '../../Button';
 import { deepCopy, isJSONEqual } from '../../../utilities/utilities';
+import { GREY, WHITE } from '../../../assets/colorsConstants';
 
 const RelationContainer = styled.div`
-    min-height: 3em;
-    margin-bottom: 0.5em;
-    border: 2px solid #d9d9d9;
-    border-radius: 0.15em;
-    .input-field {
-        padding: 0 3em;
+    margin: 0.25em;
+    width: calc(100% - 0.5em);
+
+    .relationSelectRow {
+        display: flex;
+        justify-content: space-between;
+        
+        Select {
+            display: flex;
+            flex: 3;
+            height: 2em;
+
+            .input-field {
+                width: 100%;
+                height: 2em;
+            }
+        }
+        Button {
+            display: flex;
+            flex: 1;
+            margin-left: 2em;
+        }
+    }
+
+    .selectedRelationsBox {
+        background-color: ${GREY};
+        padding: 0.25em;
+        margin: 0.5em 0;
+        border-radius: 0.25em;
     }
 
     svg {
@@ -22,25 +46,34 @@ const RelationContainer = styled.div`
 const Relation = styled.div`
     display: flex;
     justify-content: space-between;
-    margin: 0.25em 0 0.25em 0.25em;
+    margin: 0.25em 0;
 
-    .reference-element {
+    padding: 0.25em;
+    background-color: ${WHITE};
+    border-radius: 0.25em;
+
+    .pendingRelationText {
+        width: calc(100% - 5em);
+        white-space: nowrap;
         display: flex;
-        flex: 5;
-        margin-right: 0.5em;
+        cursor: default;
+
+        .pendingRelationLabel {
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 2em;
+            height: 2em;
+        }
+        .pendingRelationId {
+            line-height: 2em;
+            height: 2em;
+            display: flex;
+            flex: 1;
+        }
     }
 
-    .button-group {
-        display: flex;
-        flex: 2;
-        justify-content: right;
-
-        button {
-            display: flex;
-            justify-content: space-between;
-            flex: 1;
-            margin: auto 0.25em;
-        }
+    Button {
+        margin-left: 1em;
     }
 `;
 
@@ -151,7 +184,7 @@ export default function RelationEditCard (props) {
 
     return (
         <RelationContainer>
-            <div>
+            <div className="relationSelectRow">
                 <Select
                     options={remainingOptions.map(x => { return { label: x[labelTerm] }; })}
                     selectedIndex={pendingSelection}
@@ -161,20 +194,23 @@ export default function RelationEditCard (props) {
                 />
                 <Button disabled={!pendingSelection} icon="plus" type="secondary" label='' onClick={() => handleAddPendingRelation()} />
             </div>
-            <>
+            <div className="selectedRelationsBox">
                 {pendingChanges.map((pendingChange, index) => {
                     return (
                         <Relation key={index}>
-                            <span className="pendingRelation">{`${pendingChange[labelTerm]} (${pendingChange.id})`}</span>
+                            <div className="pendingRelationText">
+                                <span className="pendingRelationLabel" title={pendingChange[labelTerm]}>{pendingChange[labelTerm]}</span>
+                                <span className="pendingRelationId">{` (Id: ${pendingChange.id})`}</span>
+                            </div>
                             <Button icon="minus" type="secondary" label='' onClick={() => handleRemovePendingRelation(index)} />
                         </Relation>
                     );
                 })}
-                <ConfirmCancelButtonGroup>
-                    <Button type="secondary" label='Cancel' onClick={() => handleCancel()} />
-                    <Button type="primary" label='Confirm' disabled={isJSONEqual(pendingChanges, defaultChanges)} onClick={() => handleConfirm()} />
-                </ConfirmCancelButtonGroup>
-            </>
+            </div>
+            <ConfirmCancelButtonGroup>
+                <Button type="secondary" label='Cancel' onClick={() => handleCancel()} />
+                <Button type="primary" label='Confirm' disabled={isJSONEqual(pendingChanges, defaultChanges)} onClick={() => handleConfirm()} />
+            </ConfirmCancelButtonGroup>
         </RelationContainer>
     );
 }

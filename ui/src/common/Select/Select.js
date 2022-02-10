@@ -3,6 +3,10 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import { Manager, Reference, Popper } from 'react-popper';
 
+const SelectReferenceElement = styled.span`
+    width: 100%;
+`;
+
 const StyledSelect = styled.select`
     align-content: center;
     display: inline-block;
@@ -43,8 +47,8 @@ export default function Select (props) {
         <Manager>
             <Reference>
                 {({ ref }) => (
-                    <span
-                        className="reference-element"
+                    <SelectReferenceElement
+                        className="select-reference-element"
                         ref={ref}
                         onClick={() => {
                             setPopup(!showPopup);
@@ -66,7 +70,7 @@ export default function Select (props) {
                                 )}
                             </Popper>
                         </StyledSelect>
-                    </span>
+                    </SelectReferenceElement>
                 )}
             </Reference>
         </Manager>
