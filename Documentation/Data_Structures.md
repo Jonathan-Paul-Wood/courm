@@ -86,17 +86,15 @@ CREATE TABLE IF NOT EXISTS notes (
     );
 ```
 
-## Events
-
 ## Relations
 
 ### Table Structure
 ```
 CREATE TABLE IF NOT EXISTS relations (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    contactId TEXT,
-    noteId TEXT,
-    eventId TEXT,
+    contactId INTEGER DEFAULT NULL,
+    noteId INTEGER DEFAULT NULL,
+    eventId INTEGER DEFAULT NULL,
     createdOn datetime default current_timestamp,
     lastModifiedOn datetime default current_timestamp
     );
