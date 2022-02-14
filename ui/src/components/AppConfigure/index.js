@@ -7,6 +7,8 @@ import { getEventList } from '../../store/EventList/actions';
 import { postEvent, deleteEvent } from '../../store/Event/actions';
 import { getNoteList } from '../../store/NoteList/actions';
 import { postNote, deleteNote } from '../../store/Note/actions';
+import { getAllRelations } from '../../store/RelationList/actions';
+import { postRelation, deleteRelation } from '../../store/Relation/actions';
 
 function mapStateToProps (state) {
     return {
@@ -16,21 +18,21 @@ function mapStateToProps (state) {
         isContactPostPending: state.contact.isContactPostPending,
         contactPostError: state.contact.contactPostError,
         isContactDeletePending: state.contact.isContactDeletePending,
-        contactDeleteError: state.contact.contactDeleteError,
         events: state.eventList.events,
         isEventListPending: state.eventList.isEventListPending,
         eventListError: state.eventList.eventListError,
         isEventPostPending: state.event.isEventPostPending,
         eventPostError: state.event.eventPostError,
         isEventDeletePending: state.event.isEventDeletePending,
-        eventDeleteError: state.event.eventDeleteError,
         notes: state.noteList.notes,
         isNoteListPending: state.noteList.isNoteListPending,
         noteListError: state.noteList.noteListError,
         isNotePostPending: state.note.isNotePostPending,
         notePostError: state.note.notePostError,
         isNoteDeletePending: state.note.isNoteDeletePending,
-        noteDeleteError: state.note.noteDeleteError
+        relations: state.relationList.relations,
+        isRelationListPending: state.relationList.isRelationListPending,
+        relationListError: state.relationList.relationListError
     };
 }
 
@@ -45,7 +47,10 @@ const mapDispatchToProps = dispatch =>
             deleteEvent,
             getNoteList,
             postNote,
-            deleteNote
+            deleteNote,
+            getAllRelations,
+            postRelation,
+            deleteRelation
         },
         dispatch
     );

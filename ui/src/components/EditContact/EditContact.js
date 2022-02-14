@@ -6,7 +6,9 @@ import Button from '../../common/Button';
 import Input from '../../common/Input/Input';
 import DateInput from '../../common/DateInput/DateInput';
 import CommonModal from '../../common/CommonModal/CommonModal';
+import LoadingSpinner from '../../common/LoadingSpinner/LoadingSpinner';
 import PropTypes from 'prop-types';
+import { deepCopy } from '../../utilities/utilities';
 
 const ScrollContainer = styled.div`
     margin: 2em 2em 0 2em;
@@ -204,14 +206,17 @@ export default function EditContact (props) {
             setPageLoaded(true);
         }
     }, [isContactPending]);
+
     useEffect(() => {
         setPendingChanges(defaultChanges);
     }, [isContactPostPending]);
+
     useEffect(() => {
         if (pageLoaded && !isContactPutPending) {
             history.push(`/contacts/${contactId}`);
         }
     }, [isContactPutPending]);
+
     useEffect(() => {
         if (pageLoaded && !isContactDeletePending) {
             history.push('/contacts');
@@ -220,40 +225,42 @@ export default function EditContact (props) {
 
     function updateData (field, value) {
         // clear any errors
-        const updateError = {};
-        updateError[field] = '';
-        setError({ ...error, ...updateError });
+        const updatedError = deepCopy(error);
+        updatedError[field] = '';
+        setError(updatedError);
 
         // update the value
-        const updatedValue = {};
+        const updatedValue = deepCopy(pendingChanges);
         updatedValue[field] = value;
-        setPendingChanges({ ...pendingChanges, ...updatedValue });
+        setPendingChanges(updatedValue);
     }
 
     function handleSaveContact () {
         // validate inputs, prompt user with actionable errors
         let valid = true;
+        const updatedError = deepCopy(error);
         if (!pendingChanges.firstName) {
             valid = false;
-            setError({ ...error, ...{ firstName: 'Please enter name' } });
+            updatedError.firstName = 'Please enter name';
         }
         if (pendingChanges.email && !pendingChanges.email.match(/^.{1,}@[a-zA-Z0-9-_]{1,}\.[a-z]{1,}$/g)) { // ^ and $ to match pattern on entire string, not subset
             valid = false;
-            setError({ ...error, ...{ email: 'Expected format: name@example.com' } });
+            updatedError.email = 'Expected format: name@example.com';
         }
         if (pendingChanges.phoneNumber && !pendingChanges.phoneNumber.match(/^[0-9]{3}-[0-9]{3}-[0-9]{4}$/g)) {
             valid = false;
-            setError({ ...error, ...{ phoneNumber: 'Expected format: ###-###-####' } });
+            updatedError.phoneNumber = 'Expected format: ###-###-####';
         }
         if (!entityIsOrganization &&
-                pendingChanges.dateOfBirth &&
-                (pendingChanges.dateOfBirth &&
-                    !pendingChanges.dateOfBirth.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/g)
-                )
+            pendingChanges.dateOfBirth &&
+            (pendingChanges.dateOfBirth &&
+                !pendingChanges.dateOfBirth.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/g)
+            )
         ) {
             valid = false;
-            setError({ ...error, ...{ dateOfBirth: 'Expected format: YYYY-MM-DD' } });
+            updatedError.dateOfBirth = 'Expected format: YYYY-MM-DD';
         }
+        setError(updatedError);
 
         if (valid) {
             let dob = pendingChanges.dateOfBirth;
@@ -273,7 +280,6 @@ export default function EditContact (props) {
             if (isNewContact) {
                 postContact(submitChanges);
             } else {
-                console.log('putting');
                 putContact(contactId, submitChanges);
             }
         }
@@ -304,137 +310,131 @@ export default function EditContact (props) {
                 type='Contact'
             />
             <ScrollContainer>
-                <GridWrapper>
-                    <div className="imageRow">
-                        <div id="profile-picture">
-                            <img src={contact.profilePicture ? `../../assets/images/contact-${contactId}-picture/` : '../../assets/images/default-profile.png'} alt="profile picture"/>
-                            <br/>
-                            <input id="picture-upload" type="file" accept="image/*" onChange={(event) => handlePictureUpload(event)} capture />
+                {isContactPending
+                    ? <LoadingSpinner />
+                    : <GridWrapper>
+                        <div className="imageRow">
+                            <div id="profile-picture">
+                                <img src={contact.profilePicture ? `../../assets/images/contact-${contactId}-picture/` : '../../assets/images/default-profile.png'} alt="profile picture" />
+                                <br />
+                                <input id="picture-upload" type="file" accept="image/*" onChange={(event) => handlePictureUpload(event)} capture />
+                            </div>
+                            <ToggleSwitch>
+                                <span>
+                                    {entityIsOrganization
+                                        ? 'Organization'
+                                        : 'Person'}
+                                </span>
+                                <label className={`switch ${isNewContact ? '' : 'hidden'}`}>
+                                    <input
+                                        active={`${entityIsOrganization}`}
+                                        type="checkbox"
+                                        onClick={() => setEntityIsOrganization(!entityIsOrganization)}
+                                        disabled={!isNewContact}
+                                    />
+                                    <span className="slider round"></span>
+                                </label>
+                            </ToggleSwitch>
                         </div>
-                        <ToggleSwitch>
-                            <span>
-                                {entityIsOrganization
-                                    ? 'Organization'
-                                    : 'Person'}
-                            </span>
-                            <label className={`switch ${isNewContact ? '' : 'hidden'}`}>
-                                <input
-                                    active={`${entityIsOrganization}`}
-                                    type="checkbox"
-                                    onClick={() => setEntityIsOrganization(!entityIsOrganization)}
-                                    disabled={!isNewContact}
-                                />
-                                <span className="slider round"></span>
-                            </label>
-                        </ToggleSwitch>
-                    </div>
-                    <div className="metadataRow">
+                        <div className="metadataRow">
 
-                        <div id="nameData" className="inputRow rowMargin">
-                            <Input
-                                placeholder="Enter Name"
-                                value={pendingChanges.firstName}
-                                label={entityIsOrganization ? 'Firm Name *' : 'First Name *'}
-                                error={error.firstName}
-                                onChange={(event) => updateData('firstName', event.target.value)}
-                            />
-                            <Input
-                                placeholder={entityIsOrganization ? 'eg: LLC, Corp, 401(c)3' : 'Enter Name'}
-                                value={pendingChanges.lastName}
-                                label={entityIsOrganization ? 'Firm Type' : 'Last Name'}
-                                error={error.lastName}
-                                onChange={(event) => updateData('lastName', event.target.value)}
-                            />
-                        </div>
-
-                        <div id="contactData" className="inputRow rowMargin">
-                            <Input
-                                placeholder="mail@example.com"
-                                value={pendingChanges.email}
-                                label="Email"
-                                error={error.email}
-                                onChange={(event) => updateData('email', event.target.value)}
-                                maxLength={254}
-                            />
-                            <Input
-                                placeholder="###-###-####"
-                                value={pendingChanges.phoneNumber}
-                                label="Phone Number"
-                                error={error.phoneNumber}
-                                onChange={(event) => updateData('phoneNumber', event.target.value)}
-                                maxLength={12}
-                            />
-                        </div>
-
-                        {!entityIsOrganization && (
-                            <div id="personOnlyData" className="inputRow rowMargin">
+                            <div id="nameData" className="inputRow rowMargin">
                                 <Input
-                                    placeholder="Company X, LLC"
-                                    value={pendingChanges.firm}
-                                    label="Firm"
-                                    error={error.firm}
-                                    onChange={(event) => updateData('firm', event.target.value)}
+                                    placeholder="Enter Name"
+                                    value={pendingChanges.firstName}
+                                    label={entityIsOrganization ? 'Firm Name *' : 'First Name *'}
+                                    error={error.firstName}
+                                    onChange={(event) => updateData('firstName', event.target.value)}
                                 />
-                                <DateInput
-                                    placeholder="Enter or select YYYY/MM/DD"
-                                    value={pendingChanges.dateOfBirth}
-                                    label="Date of Birth"
-                                    error={error.dateOfBirth}
-                                    onChange={(event) => updateData('dateOfBirth', event)}
-                                    maxLength={11}
+                                <Input
+                                    placeholder={entityIsOrganization ? 'eg: LLC, Corp, 401(c)3' : 'Enter Name'}
+                                    value={pendingChanges.lastName}
+                                    label={entityIsOrganization ? 'Firm Type' : 'Last Name'}
+                                    error={error.lastName}
+                                    onChange={(event) => updateData('lastName', event.target.value)}
                                 />
                             </div>
-                        )}
 
-                        <div id="placementData" className="inputRow rowMargin">
+                            <div id="contactData" className="inputRow rowMargin">
+                                <Input
+                                    placeholder="mail@example.com"
+                                    value={pendingChanges.email}
+                                    label="Email"
+                                    error={error.email}
+                                    onChange={(event) => updateData('email', event.target.value)}
+                                    maxLength={254}
+                                />
+                                <Input
+                                    placeholder="###-###-####"
+                                    value={pendingChanges.phoneNumber}
+                                    label="Phone Number"
+                                    error={error.phoneNumber}
+                                    onChange={(event) => updateData('phoneNumber', event.target.value)}
+                                    maxLength={12}
+                                />
+                            </div>
+
+                            {!entityIsOrganization && (
+                                <div id="personOnlyData" className="inputRow rowMargin">
+                                    <Input
+                                        placeholder="Company X, LLC"
+                                        value={pendingChanges.firm}
+                                        label="Firm"
+                                        error={error.firm}
+                                        onChange={(event) => updateData('firm', event.target.value)}
+                                    />
+                                    <DateInput
+                                        placeholder="Enter or select YYYY/MM/DD"
+                                        value={pendingChanges.dateOfBirth}
+                                        label="Date of Birth"
+                                        error={error.dateOfBirth}
+                                        onChange={(event) => updateData('dateOfBirth', event)}
+                                        maxLength={11}
+                                    />
+                                </div>
+                            )}
+
+                            <div id="placementData" className="inputRow rowMargin">
+                                <Input
+                                    placeholder="212 Oak PL, Neverland OH 12345"
+                                    value={pendingChanges.address}
+                                    label="Address"
+                                    error={error.address}
+                                    onChange={(event) => updateData('address', event.target.value)}
+                                />
+                                <Input
+                                    placeholder="eg: Retail, Academia, In School"
+                                    value={pendingChanges.industry}
+                                    label="Industry"
+                                    error={error.industry}
+                                    onChange={(event) => updateData('industry', event.target.value)}
+                                />
+                            </div>
+                            {/* TODO: have all the fields as inputs, dis-/en-abled based on editState */}
+                        </div>
+                        <div className="bioRow">
                             <Input
-                                placeholder="212 Oak PL, Neverland OH 12345"
-                                value={pendingChanges.address}
-                                label="Address"
-                                error={error.address}
-                                onChange={(event) => updateData('address', event.target.value)}
-                            />
-                            <Input
-                                placeholder="eg: Retail, Academia, In School"
-                                value={pendingChanges.industry}
-                                label="Industry"
-                                error={error.industry}
-                                onChange={(event) => updateData('industry', event.target.value)}
+                                placeholder="Add biographical notes here"
+                                value={pendingChanges.bio}
+                                label="Bio"
+                                error={error.bio}
+                                onChange={(event) => updateData('bio', event.target.value)}
+                                height="18vh"
+                                maxLength={750}
                             />
                         </div>
-                        {/* TODO: have all the fields as inputs, dis-/en-abled based on editState */}
-                    </div>
-                    <div className="bioRow">
-                        <Input
-                            placeholder="Add biographical notes here"
-                            value={pendingChanges.bio}
-                            label="Bio"
-                            error={error.bio}
-                            onChange={(event) => updateData('bio', event.target.value)}
-                            height="18vh"
-                            maxLength={750}
-                        />
-                    </div>
-                    <div className="tagsRow">
-
-                    </div>
-                    {/* <div className="InteractionsRow">
-                        <h3>Recent Interactions</h3>
-                        <div>
-                            cards go here, or none available message...
-                        </div>
-                    </div> */}
-                    {!isNewContact && <div id="dangerRow">
-                        <div></div>
-                        <Button
-                            id="delete-contact-button"
-                            label="DELETE"
-                            type="danger"
-                            icon="trashCan"
-                            onClick={() => setShowDeleteModal(true)}
-                        />
-                    </div>}
-                </GridWrapper>
+                        {!isNewContact && <div id="dangerRow">
+                            <div></div>
+                            <Button
+                                id="delete-contact-button"
+                                label="DELETE"
+                                type="danger"
+                                icon="trashCan"
+                                onClick={() => setShowDeleteModal(true)}
+                            />
+                        </div>}
+                    </GridWrapper>
+                }
             </ScrollContainer>
 
             <CommonModal

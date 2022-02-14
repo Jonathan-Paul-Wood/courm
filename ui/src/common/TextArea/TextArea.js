@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
+import { PURPLE } from '../../assets/colorsConstants';
 
 const StyleContainer = styled.div`
 width: 100%;
@@ -125,7 +126,7 @@ textarea + label {
     font-weight: 600;
     line-height: 24px;
     opacity: 1;
-    color: #512da8;
+    color: ${PURPLE};
     pointer-events: none;
 }
 

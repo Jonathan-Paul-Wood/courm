@@ -78,8 +78,6 @@ export default function EditEvent (props) {
         title: '',
         date: '',
         address: '',
-        contacts: '',
-        tags: '',
         description: ''
     };
     const [pendingChanges, setPendingChanges] = useState(defaultChanges);
@@ -169,7 +167,6 @@ export default function EditEvent (props) {
             if (isNewEvent) {
                 postEvent(submitChanges);
             } else {
-                console.log('putting');
                 putEvent(eventId, submitChanges);
             }
         }

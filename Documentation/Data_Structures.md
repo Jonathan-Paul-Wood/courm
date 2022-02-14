@@ -69,6 +69,36 @@ Backups of the contacts are saved as JSON in the following structure:
 }
 ```
 
+## Notes
+
+### Table Structure
+```
+CREATE TABLE IF NOT EXISTS notes (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    date datetime NOT NULL,
+    title TEXT,
+    record TEXT,
+    address TEXT,
+    contacts TEXT,
+    tags TEXT,
+    createdOn datetime default current_timestamp,
+    lastModifiedOn datetime default current_timestamp
+    );
+```
+
+## Relations
+
+### Table Structure
+```
+CREATE TABLE IF NOT EXISTS relations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    contactId INTEGER DEFAULT NULL,
+    noteId INTEGER DEFAULT NULL,
+    eventId INTEGER DEFAULT NULL,
+    createdOn datetime default current_timestamp,
+    lastModifiedOn datetime default current_timestamp
+    );
+
 ## Events
 
 ### Table Structure

@@ -76,6 +76,16 @@ function initializeDB() {
             );
         `);
         db.run(`
+        CREATE TABLE IF NOT EXISTS relations (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            contactId INTEGER DEFAULT NULL,
+            noteId INTEGER DEFAULT NULL,
+            eventId INTEGER DEFAULT NULL,
+            createdOn datetime default current_timestamp,
+            lastModifiedOn datetime default current_timestamp
+            );
+        `);
+        db.run(`
         CREATE TABLE IF NOT EXISTS events (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             date datetime NOT NULL,
@@ -99,6 +109,10 @@ function closeDB() {
 
 function cleanseString(str) {
     return str.replace(/'/g, "''");
+}
+
+function confirmInt(value) {
+    return Number.isSafeInteger(value) ? value : null;
 }
 
 app.post("/api/initialize", (req, res) => {
@@ -443,12 +457,12 @@ app.post('/api/events/new', (req, res) => {
             date,
             title,
             description,
-            address) 
-        VALUES(
-            '${req.body.date}',
-            '${cleanseString(req.body.title)}',
-            '${cleanseString(req.body.description)}',
-            '${cleanseString(req.body.address)}'
+            address)
+            VALUES(
+                '${req.body.date}',
+                '${cleanseString(req.body.title)}',
+                '${cleanseString(req.body.description)}',
+                '${cleanseString(req.body.address)}'
             )`, (err, rows) => {
                 console.log('error: ', err);
                 if (err) {
@@ -466,13 +480,12 @@ app.post('/api/events/new', (req, res) => {
                 }
             }
         );
-});
+    });
 
 //accepts requests of the form: /api/events?order=id?results=3&page=1?direction=[ASC|DESC]?search=string
 app.get("/api/events", (req, res) => {
     const { results, page, order, direction, searchTerm, filters } = req.query;
     let sql = `SELECT * FROM events`;
-
     //apply search
     if(searchTerm && filters) {
         const searchFilters = filters.split(',');
@@ -576,6 +589,133 @@ app.delete("/api/events/:id", (req, res) => {
 });
 
 // END EVENTS APIS
+
+// RELATIONS APIS
+
+app.post('/api/relations/new', (req, res) => {
+    db.run(
+        `INSERT INTO relations(
+            contactId,
+            noteId,
+            eventId) 
+        VALUES(
+            ${confirmInt(req.body.contactId)},
+            ${confirmInt(req.body.noteId)},
+            ${confirmInt(req.body.eventId)}
+            )`, (err, rows) => {
+                console.log('error: ', err);
+                if (err) {
+                    res.status = ERROR_CODE;
+                    res.json(err);
+                } else {
+                    res.status = SUCCESS_CODE;
+                    db.run(`SELECT id FROM relations WHERE createdOn=${req.body.createdOn}`, (err, id) => {
+                        if (err) {
+                            res.json({'message': 'could not get new Id'});
+                        } else {
+                            res.json({'newId': id});
+                        }
+                    });
+                }
+            }
+        );
+});
+
+app.get('/api/relations/all', (req, res) => {
+    let sql = `SELECT * FROM relations`;
+
+    db.all(sql, (err, rows) => {
+        if (err) {
+            console.log(err);
+            res.status = ERROR_CODE;
+            res.json(err);
+        } else if (!rows) {
+            res.status = NOT_FOUND_CODE;
+            res.json({message: 'NOT FOUND'});
+        } else {
+            res.json(rows);
+        }
+    });
+});
+
+app.get('/api/relations/:id', (req, res) => {
+    let sql = `SELECT * FROM relations WHERE id = ${req.params.id}`;
+
+    db.all(sql, (err, rows) => {
+        if (err) {
+            console.log(err);
+            res.status = ERROR_CODE;
+            res.json(err);
+        } else if (!rows) {
+            res.status = NOT_FOUND_CODE;
+            res.json({message: 'NOT FOUND'});
+        } else {
+            res.json(rows);
+        }
+    });
+});
+
+//accepts requests of the form: /api/relations?entity=[contactId | noteId | eventId]&id=string
+app.get("/api/relations", (req, res) => {
+    const { entity, id } = req.query;
+    let sql = `SELECT * FROM relations WHERE ${entity} = ${id}`;
+
+    db.all(sql, (err, rows) => {
+        if (err) {
+            console.log(err);
+            res.status = ERROR_CODE;
+            res.json(err);
+        } else if (!rows) {
+            res.status = NOT_FOUND_CODE;
+            res.json({message: 'NOT FOUND'});
+        } else {
+            res.json(rows);
+        }
+    });
+});
+
+app.put("/api/relations/:id", (req, res) => {
+    const b = req.body;
+    let sql = `UPDATE relations SET`;
+    Object.keys(b).map(key => {
+        if(key !== 'id' && key !== 'eventId') {
+            sql = sql+`, ${key}='${cleanseString(b[key])}'`
+        } else if (key === 'eventId') {
+            sql = sql+` ${key}='${b[key]}'`
+        }
+    });
+    sql = sql+` WHERE id=${req.params.id}`;
+    db.run(sql, (err, row) => {
+        if (err) {
+            res.status = ERROR_CODE;
+            res.json(err);
+        } else if (!row) {
+            res.status = NOT_FOUND_CODE;
+            res.json({'response': 'NOT FOUND'});
+        } else {
+            res.status = SUCCESS_CODE;
+            res.json({'response': row});
+        }
+    });
+});
+
+app.delete("/api/relations/:id", (req, res) => {
+    const sql = `DELETE FROM relations WHERE id = ${req.params.id}`;
+    db.run(sql, (err, row) => {
+        if (err) {
+            res.status = ERROR_CODE;
+            res.json(err);
+        } else if (!row) {
+            res.status = NOT_FOUND_CODE;
+            res.json({'response': 'NOT FOUND'});
+        } else {
+            res.status = SUCCESS_CODE;
+            res.json({'response': row});
+        }
+    });
+});
+
+// END RELATIONS APIS
   
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;

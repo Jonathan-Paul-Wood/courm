@@ -6,6 +6,8 @@ import contactList from './store/ContactList/reducer';
 import note from './store/Note/reducer';
 import noteList from './store/NoteList/reducer';
 import configure from './store/Configure/reducer';
+import relation from './store/Relation/reducer';
+import relationList from './store/RelationList/reducer';
 import event from './store/Event/reducer';
 import eventList from './store/EventList/reducer';
 
@@ -17,6 +19,8 @@ const rootReducer = combineReducers({
     note,
     noteList,
     configure,
+    relation,
+    relationList,
     event,
     eventList
 });

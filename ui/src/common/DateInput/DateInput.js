@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { PURPLE } from '../../assets/colorsConstants';
 
 const StyleContainer = styled.div`
     width: 100%;
@@ -69,7 +70,7 @@ const StyleContainer = styled.div`
         line-height: 24px;
         top: 4px;
         opacity: 1;
-        color: #512da8;
+        color: ${PURPLE};
         pointer-events: none;
     }
 
@@ -134,7 +135,7 @@ const StyleContainer = styled.div`
         line-height: 24px;
         top: 4px;
         opacity: 1;
-        color: #512da8;
+        color: ${PURPLE};
         pointer-events: none;
     }
 

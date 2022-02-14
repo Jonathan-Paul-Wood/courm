@@ -10,6 +10,7 @@ import icons from '../../assets/icons/bootstrapIcons';
 import LoadingSpinner from '../../common/LoadingSpinner/LoadingSpinner';
 import { exportDataList } from '../../common/Utilities/utilities';
 import PropTypes from 'prop-types';
+import RelationCardManager from '../../common/RelationCardManager';
 
 const ContentWrapper = styled.div`
     padding: 0 1em;
@@ -58,6 +59,16 @@ const GridWrapper = styled.div`
     tagsRow {
         height: 20rem;
     }
+
+    .relationsRow {
+        display: flex;
+        justify-content: space-between;
+
+        .relationsList {
+            min-width: 50%;
+            margin: 1em;
+        }
+    }
 `;
 
 export default function ViewContact (props) {
@@ -70,6 +81,8 @@ export default function ViewContact (props) {
     } = props;
     const [entityType, setEntityType] = useState('');
     const [firstLoad, setFirstLoad] = useState(true);
+    const [firstRelationCardEdit, setFirstRelationCardEdit] = useState(false);
+    const [secondRelationCardEdit, setSecondRelationCardEdit] = useState(false);
 
     useEffect(() => {
         // initial GET of contact
@@ -190,6 +203,24 @@ export default function ViewContact (props) {
                                             cards go here, or none available message...
                                         </div>
                                     </div> */}
+                                            <div className="relationsRow">
+                                                <RelationCardManager
+                                                    parentType={'contact'}
+                                                    parentId={parseInt(contactId)}
+                                                    relationType='note'
+                                                    editMode={firstRelationCardEdit}
+                                                    disableEdit={secondRelationCardEdit}
+                                                    onChange={setFirstRelationCardEdit}
+                                                />
+                                                <RelationCardManager
+                                                    parentType={'contact'}
+                                                    parentId={parseInt(contactId)}
+                                                    relationType='event'
+                                                    editMode={secondRelationCardEdit}
+                                                    disableEdit={firstRelationCardEdit}
+                                                    onChange={setSecondRelationCardEdit}
+                                                />
+                                            </div>
                                         </GridWrapper>
                                     </ScrollContainer>
                                 )}

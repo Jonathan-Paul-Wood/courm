@@ -169,7 +169,6 @@ export default function EditNote (props) {
             if (isNewNote) {
                 postNote(submitChanges);
             } else {
-                console.log('putting');
                 putNote(noteId, submitChanges);
             }
         }

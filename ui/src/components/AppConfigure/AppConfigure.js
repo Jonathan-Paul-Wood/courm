@@ -26,7 +26,12 @@ export default function AppConfigure (props) {
         postNote,
         deleteNote,
         notes,
-        isNoteListPending
+        isNoteListPending,
+        getAllRelations,
+        postRelation,
+        deleteRelation,
+        relations,
+        isRelationListPending
     } = props;
 
     const fileTypeOptions = [
@@ -45,6 +50,10 @@ export default function AppConfigure (props) {
         {
             label: 'Notes',
             value: 'notes'
+        },
+        {
+            label: 'Relations',
+            value: 'relations'
         }
     ];
 
@@ -56,6 +65,7 @@ export default function AppConfigure (props) {
         getContactList(100000, 1, '', 'firstName', 'ASC'); // TODO: how to stop double calls
         getEventList(100000, 1, '', 'title', 'ASC');
         getNoteList(100000, 1, '', 'title', 'ASC');
+        getAllRelations();
     }, []);
 
     function handleListExport () {
@@ -66,8 +76,12 @@ export default function AppConfigure (props) {
             exportDataList(['events'], [events.results], 'eventList');
         } else if (type === 'notes') {
             exportDataList(['notes'], [notes.results], 'noteList');
+        } else if (type === 'events') {
+            exportDataList(['events'], [events.results], 'eventList');
+        } else if (type === 'relations') {
+            exportDataList(['relations'], [relations], 'relationList');
         } else if (type === 'all') {
-            exportDataList(['contacts', 'notes'], [contacts.results, notes.results], 'fullExport');
+            exportDataList(['contacts', 'events', 'notes', 'relations'], [contacts.results, events.results, notes.results, relations], 'fullExport');
         }
     }
 
@@ -96,7 +110,7 @@ export default function AppConfigure (props) {
                     postEvent(newEntity);
                     break;
                 case 'relations':
-                    // postRelation(newEntity);
+                    postRelation(newEntity);
                     break;
                 }
             });
@@ -110,6 +124,10 @@ export default function AppConfigure (props) {
             handleAddEntity('contacts');
             notes.results.forEach(note => deleteNote(note.id));
             handleAddEntity('notes');
+            events.results.forEach(event => deleteEvent(event.id));
+            handleAddEntity(type);
+            relations.forEach(event => deleteRelation(event.id));
+            handleAddEntity(type);
         } else if (type === 'contacts') {
             contacts.results.forEach(contact => deleteContact(contact.id));
             handleAddEntity(type);
@@ -118,6 +136,9 @@ export default function AppConfigure (props) {
             handleAddEntity(type);
         } else if (type === 'notes') {
             notes.results.forEach(note => deleteNote(note.id));
+            handleAddEntity(type);
+        } else if (type === 'relations') {
+            relations.forEach(event => deleteRelation(event.id));
             handleAddEntity(type);
         }
     }
@@ -128,6 +149,7 @@ export default function AppConfigure (props) {
             handleAddEntity('contacts');
             handleAddEntity('events');
             handleAddEntity('notes');
+            handleAddEntity('relations');
         } else {
             handleAddEntity(type);
         }
@@ -137,7 +159,7 @@ export default function AppConfigure (props) {
         <ConfigureWrapper>
             <h2>Configure Application</h2>
             <hr />
-            {(isContactListPending || isNoteListPending || isEventListPending)
+            {(isContactListPending || isEventListPending || isNoteListPending || isRelationListPending)
                 ? (<LoadingSpinner />)
                 : (<>
                     <h3>Manage Records</h3>
@@ -196,7 +218,6 @@ AppConfigure.propTypes = {
     isContactPostPending: PropTypes.bool.isRequired,
     contactPostError: PropTypes.string.isRequired,
     isContactDeletePending: PropTypes.bool.isRequired,
-    contactDeleteError: PropTypes.string.isRequired,
     getEventList: PropTypes.func.isRequired,
     postEvent: PropTypes.func.isRequired,
     deleteEvent: PropTypes.func.isRequired,
@@ -206,7 +227,6 @@ AppConfigure.propTypes = {
     isEventPostPending: PropTypes.bool.isRequired,
     eventPostError: PropTypes.string.isRequired,
     isEventDeletePending: PropTypes.bool.isRequired,
-    eventDeleteError: PropTypes.string.isRequired,
     getNoteList: PropTypes.func.isRequired,
     postNote: PropTypes.func.isRequired,
     deleteNote: PropTypes.func.isRequired,
@@ -216,5 +236,10 @@ AppConfigure.propTypes = {
     isNotePostPending: PropTypes.bool.isRequired,
     notePostError: PropTypes.string.isRequired,
     isNoteDeletePending: PropTypes.bool.isRequired,
-    noteDeleteError: PropTypes.string.isRequired
+    getAllRelations: PropTypes.func.isRequired,
+    postRelation: PropTypes.func.isRequired,
+    deleteRelation: PropTypes.func.isRequired,
+    relations: PropTypes.array.isRequired,
+    isRelationListPending: PropTypes.bool.isRequired,
+    relationListError: PropTypes.string.isRequired
 };

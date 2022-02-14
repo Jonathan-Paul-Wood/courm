@@ -176,7 +176,7 @@ export default function ContactsBrowse (props) {
                             <LoadingSpinner type="spinner" />
                         )
                         : (
-                            contacts.results.length
+                            contacts.results && contacts.results.length
                                 ? (
                                     contacts.results.map(contact => {
                                         return (
