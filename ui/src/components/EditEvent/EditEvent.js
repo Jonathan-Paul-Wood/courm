@@ -167,7 +167,6 @@ export default function EditEvent (props) {
             if (isNewEvent) {
                 postEvent(submitChanges);
             } else {
-                console.log('putting');
                 putEvent(eventId, submitChanges);
             }
         }

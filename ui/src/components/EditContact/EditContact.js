@@ -280,7 +280,6 @@ export default function EditContact (props) {
             if (isNewContact) {
                 postContact(submitChanges);
             } else {
-                console.log('putting');
                 putContact(contactId, submitChanges);
             }
         }

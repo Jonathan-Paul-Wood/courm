@@ -104,16 +104,13 @@ export default function RelationEditCard (props) {
     const [pendingSelection, setPendingSelection] = useState(0);
 
     useEffect(() => {
-        // return relations where id of relationType is not null
         const filteredExistingRelations = relationList.filter(relation => relation[`${relationType}Id`]);
         setRelationsOfCurrentType(filteredExistingRelations);
         const filteredExistingRelationIds = filteredExistingRelations.map(rel => rel[`${relationType}Id`]);
-        console.log('filteredExistingRelationIds: ', filteredExistingRelationIds);
         const existingRelationValues = [];
         const remainingRelationValues = [{ firstName: 'Select Option', title: 'Select Option' }]; // CONSTANTS
 
         relatedEntityList.forEach(entity => {
-            console.log('entity: ', entity);
             if (filteredExistingRelationIds.indexOf(entity.id) >= 0) {
                 existingRelationValues.push(entity);
             } else {
@@ -159,7 +156,6 @@ export default function RelationEditCard (props) {
                 const newBody = {};
                 newBody[`${parentType}Id`] = parentId;
                 newBody[`${relationType}Id`] = change.id;
-                console.log('put new body: ', newBody);
                 putRelation(change.id, newBody);
             } else {
                 const newBody = {
@@ -169,12 +165,10 @@ export default function RelationEditCard (props) {
                 };
                 newBody[`${parentType}Id`] = parentId;
                 newBody[`${relationType}Id`] = change.id;
-                console.log('post new body: ', newBody);
                 postRelation(newBody);
             }
         });
         // existingDatabaseRelations that did not have corresponding pendingChanges have been removed
-        console.log('delete these: ', existingDatabaseRelations);
         existingDatabaseRelations.forEach(relation => {
             deleteRelation(relation.id);
         });
