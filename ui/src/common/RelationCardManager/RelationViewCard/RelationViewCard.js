@@ -51,12 +51,9 @@ export default function RelationViewCard (props) {
     const { relationList, relationType, relatedEntityList, enableEdit, disableEdit, labelTerm } = props;
 
     const history = useHistory();
-    console.log('VIEW relationList: ', JSON.stringify(relationList));
 
     const filteredRelations = relationList.length ? relationList.filter(r => r[relationType + 'Id'] !== null) : [];
-    console.log('VIEW filteredRelations: ', filteredRelations);
     const filteredEntities = filteredRelations.map(relation => relatedEntityList.find(entity => entity.id === relation[relationType + 'Id']));
-    console.log('VIEW filteredEntities: ', filteredEntities);
 
     return (
         <RelationContainer>
