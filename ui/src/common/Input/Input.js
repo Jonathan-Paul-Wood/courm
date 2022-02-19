@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
-import { PURPLE } from '../../assets/colorsConstants';
+import { SECONDARY } from '../../assets/colorsConstants';
 
 const StyleContainer = styled.div`
     width: 100%;
@@ -70,7 +70,7 @@ const StyleContainer = styled.div`
         line-height: 24px;
         top: 4px;
         opacity: 1;
-        color: ${PURPLE};
+        color: ${SECONDARY};
         pointer-events: none;
     }
 

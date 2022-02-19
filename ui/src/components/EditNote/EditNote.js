@@ -8,11 +8,7 @@ import DateInput from '../../common/DateInput/DateInput';
 import TextArea from '../../common/TextArea/TextArea';
 import CommonModal from '../../common/CommonModal/CommonModal';
 import PropTypes from 'prop-types';
-
-const ScrollContainer = styled.div`
-    margin: 2em 2em 0 2em;
-    padding: 0 1em;
-`;
+import ScrollContainer from '../../common/ScrollContainer';
 
 const GridWrapper = styled.div`
     .rowMargin {
@@ -193,7 +189,12 @@ export default function EditNote (props) {
                 }
                 type='Note'
             />
-            <ScrollContainer>
+            <ScrollContainer
+                style={{
+                    margin: '2em 2em 0 2em',
+                    padding: '0 1em'
+                }}
+            >
                 <GridWrapper>
                     <div className="metadataRow">
                         <div id="titleData" className="inputRow rowMargin">

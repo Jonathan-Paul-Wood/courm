@@ -8,14 +8,11 @@ import DateInput from '../../common/DateInput/DateInput';
 import TextArea from '../../common/TextArea/TextArea';
 import LoadingSpinner from '../../common/LoadingSpinner/LoadingSpinner';
 import { exportDataList } from '../../common/Utilities/utilities';
+import ScrollContainer from '../../common/ScrollContainer';
 import PropTypes from 'prop-types';
 
 const ContentWrapper = styled.div`
     padding: 0 1em;
-`;
-
-const ScrollContainer = styled.div`
-    margin: 2em 2em 0 2em;
 `;
 
 const GridWrapper = styled.div`
@@ -96,7 +93,9 @@ export default function ViewEvent (props) {
                             {isEventPending
                                 ? (<LoadingSpinner />)
                                 : (
-                                    <ScrollContainer>
+                                    <ScrollContainer
+                                        style={{ margin: '2em 2em 0 2em' }}
+                                    >
                                         <GridWrapper>
                                             <div className="metadataRow">
                                                 <div id="titleData" className="inputRow rowMargin">

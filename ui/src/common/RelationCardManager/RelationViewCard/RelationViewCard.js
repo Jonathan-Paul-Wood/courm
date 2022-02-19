@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { useHistory } from 'react-router-dom';
 import Button from '../../Button';
 import { GREY } from '../../../assets/colorsConstants';
+import ScrollContainer from '../../ScrollContainer';
 
 const RelationContainer = styled.div`
     dispaly: flex;
@@ -51,16 +52,18 @@ export default function RelationViewCard (props) {
     const { relationList, relationType, relatedEntityList, enableEdit, disableEdit, labelTerm } = props;
 
     const history = useHistory();
-    console.log('VIEW relationList: ', JSON.stringify(relationList));
 
     const filteredRelations = relationList.length ? relationList.filter(r => r[relationType + 'Id'] !== null) : [];
-    console.log('VIEW filteredRelations: ', filteredRelations);
     const filteredEntities = filteredRelations.map(relation => relatedEntityList.find(entity => entity.id === relation[relationType + 'Id']));
-    console.log('VIEW filteredEntities: ', filteredEntities);
 
     return (
         <RelationContainer>
-            <div>
+            <ScrollContainer
+                style={{
+                    height: '20em',
+                    width: '100%'
+                }}
+            >
                 {filteredEntities.length
                     ? filteredEntities.map((entity, index) => {
                         return (
@@ -72,7 +75,7 @@ export default function RelationViewCard (props) {
                     })
                     : <span id="relationListError">{`No ${relationType.toLowerCase()}s to display`}</span>
                 }
-            </div>
+            </ScrollContainer>
             <div className="editButton">
                 <Button label='' icon='edit' disabled={disableEdit} onClick={() => enableEdit(true)} />
             </div>

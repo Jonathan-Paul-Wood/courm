@@ -9,11 +9,7 @@ import CommonModal from '../../common/CommonModal/CommonModal';
 import LoadingSpinner from '../../common/LoadingSpinner/LoadingSpinner';
 import PropTypes from 'prop-types';
 import { deepCopy } from '../../utilities/utilities';
-
-const ScrollContainer = styled.div`
-    margin: 2em 2em 0 2em;
-    padding: 0 1em;
-`;
+import ScrollContainer from '../../common/ScrollContainer';
 
 const GridWrapper = styled.div`
     .imageRow {
@@ -309,7 +305,12 @@ export default function EditContact (props) {
                 }
                 type='Contact'
             />
-            <ScrollContainer>
+            <ScrollContainer
+                style={{
+                    margin: '2em 2em 0 2em',
+                    padding: '0 1em'
+                }}
+            >
                 {isContactPending
                     ? <LoadingSpinner />
                     : <GridWrapper>
