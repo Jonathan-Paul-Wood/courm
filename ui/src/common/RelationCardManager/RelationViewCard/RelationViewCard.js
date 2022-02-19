@@ -59,8 +59,10 @@ export default function RelationViewCard (props) {
     return (
         <RelationContainer>
             <ScrollContainer
-                height={'20em'}
-                width={'100%'}
+                style={{
+                    height: '20em',
+                    width: '100%'
+                }}
             >
                 {filteredEntities.length
                     ? filteredEntities.map((entity, index) => {

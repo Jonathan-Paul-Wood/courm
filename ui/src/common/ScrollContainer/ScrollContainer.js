@@ -7,17 +7,16 @@ const ScrollableContainer = styled.div`
 `;
 
 export default function ScrollContainer (props) {
-    const { height, width, children } = props;
+    const { children, style } = props;
 
     return (
-        <ScrollableContainer style={{ height, width }}>
+        <ScrollableContainer style={style}>
             {children}
         </ScrollableContainer>
     );
 }
 
 ScrollContainer.propTypes = {
-    height: PropTypes.string.isRequired,
-    width: PropTypes.string.isRequired,
+    style: PropTypes.object.isRequired,
     children: PropTypes.any.isRequired
 };

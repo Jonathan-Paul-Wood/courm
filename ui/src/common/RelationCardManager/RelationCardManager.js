@@ -7,7 +7,7 @@ import RelationEditCard from './RelationEditCard';
 import { SECONDARY } from '../../assets/colorsConstants';
 
 const RelationsContainer = styled.div`
-    width: 50%;
+    width: 49em;
     margin: 1em;
 
     .relationTypeTitle {
@@ -21,6 +21,7 @@ const RelationsContainer = styled.div`
         margin-bottom: 0.5em;
         border: 2px solid #d9d9d9;
         border-radius: 0.15em;
+        padding: 0.25em;
         display: flex;
         width: 100%;
     }

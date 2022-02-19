@@ -8,8 +8,7 @@ import { GREY, WHITE } from '../../../assets/colorsConstants';
 import ScrollContainer from '../../ScrollContainer';
 
 const RelationContainer = styled.div`
-    margin: 0.25em;
-    width: calc(100% - 0.5em);
+    width: calc(100% - 0em);
 
     .relationSelectRow {
         display: flex;
@@ -33,7 +32,6 @@ const RelationContainer = styled.div`
     }
 
     .selectedRelationsBox {
-        background-color: ${GREY};
         padding: 0.25em;
         margin: 0.5em 0;
         border-radius: 0.25em;
@@ -47,7 +45,7 @@ const RelationContainer = styled.div`
 const Relation = styled.div`
     display: flex;
     justify-content: space-between;
-    margin: 0.25em 0;
+    margin: 0.25em 1em;
 
     padding: 0.25em;
     background-color: ${WHITE};
@@ -190,8 +188,13 @@ export default function RelationEditCard (props) {
                 <Button disabled={!pendingSelection} icon="plus" type="secondary" label='' onClick={() => handleAddPendingRelation()} />
             </div>
             <ScrollContainer
-                height={'17.5em'}
-                width={'100%'}
+                style={{
+                    height: '17.5em',
+                    width: '100%',
+                    backgroundColor: `${GREY}`,
+                    margin: '0.25em 0',
+                    borderRadius: '0.25em'
+                }}
                 className="selectedRelationsBox"
             >
                 {pendingChanges.map((pendingChange, index) => {
