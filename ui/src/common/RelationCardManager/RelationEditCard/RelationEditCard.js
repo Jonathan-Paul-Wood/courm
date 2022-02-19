@@ -5,6 +5,7 @@ import Select from '../../Select';
 import Button from '../../Button';
 import { deepCopy, isJSONEqual } from '../../../utilities/utilities';
 import { GREY, WHITE } from '../../../assets/colorsConstants';
+import ScrollContainer from '../../ScrollContainer';
 
 const RelationContainer = styled.div`
     margin: 0.25em;
@@ -188,7 +189,11 @@ export default function RelationEditCard (props) {
                 />
                 <Button disabled={!pendingSelection} icon="plus" type="secondary" label='' onClick={() => handleAddPendingRelation()} />
             </div>
-            <div className="selectedRelationsBox">
+            <ScrollContainer
+                height={'17.5em'}
+                width={'100%'}
+                className="selectedRelationsBox"
+            >
                 {pendingChanges.map((pendingChange, index) => {
                     return (
                         <Relation key={index}>
@@ -200,7 +205,7 @@ export default function RelationEditCard (props) {
                         </Relation>
                     );
                 })}
-            </div>
+            </ScrollContainer>
             <ConfirmCancelButtonGroup>
                 <Button type="secondary" label='Cancel' onClick={() => handleCancel()} />
                 <Button type="primary" label='Confirm' disabled={isJSONEqual(pendingChanges, defaultChanges)} onClick={() => handleConfirm()} />

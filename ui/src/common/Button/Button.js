@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import icons from '../../assets/icons/bootstrapIcons';
 import LoadingLoop from '../LoadingLoop/LoadingLoop';
-import { BLACK, WHITE, BLUE, BLUE_FOCUS, GREY, GREEN, GREEN_FOCUS, RED, RED_FOCUS, YELLOW, YELLOW_FOCUS } from '../../assets/colorsConstants';
+import { BLACK, WHITE, PRIMARY, PRIMARY_FOCUS, GREY, SUCCESS, SUCCESS_FOCUS, ERROR, ERROR_FOCUS, WARNING, WARNING_FOCUS } from '../../assets/colorsConstants';
 
 const StyleContainer = styled.div`
     margin: auto 0;
@@ -14,16 +14,16 @@ const StyleContainer = styled.div`
     --text-dark-hover: ${BLACK};
     --text-white: ${WHITE};
     --text-light-hover: ${WHITE};
-    --primary-color: ${BLUE};
-    --primary-color-hover: ${BLUE_FOCUS};
+    --primary-color: ${PRIMARY};
+    --primary-color-hover: ${PRIMARY_FOCUS};
     --secondary-color: ${WHITE};
     --secondary-color-hover: ${GREY};
-    --success-color: ${GREEN};
-    --success-color-hover: ${GREEN_FOCUS};
-    --danger-color: ${RED};
-    --danger-color-hover: ${RED_FOCUS};
-    --warning-color: ${YELLOW};
-    --warning-color-hover: ${YELLOW_FOCUS};
+    --success-color: ${SUCCESS};
+    --success-color-hover: ${SUCCESS_FOCUS};
+    --danger-color: ${ERROR};
+    --danger-color-hover: ${ERROR_FOCUS};
+    --warning-color: ${WARNING};
+    --warning-color-hover: ${WARNING_FOCUS};
       
       .btn {
         padding: 0.5em 1em;
