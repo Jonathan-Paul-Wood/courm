@@ -4,6 +4,7 @@ import styled from 'styled-components';
 
 const ScrollableContainer = styled.div`
     overflow-y: auto;
+    overflow-x: hidden;
 `;
 
 export default function ScrollContainer (props) {

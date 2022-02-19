@@ -11,13 +11,10 @@ import LoadingSpinner from '../../common/LoadingSpinner/LoadingSpinner';
 import { exportDataList } from '../../common/Utilities/utilities';
 import PropTypes from 'prop-types';
 import RelationCardManager from '../../common/RelationCardManager';
+import ScrollContainer from '../../common/ScrollContainer';
 
 const ContentWrapper = styled.div`
     padding: 0 1em;
-`;
-
-const ScrollContainer = styled.div`
-    margin: 2em 2em 0 2em;
 `;
 
 const GridWrapper = styled.div`
@@ -118,7 +115,9 @@ export default function ViewContact (props) {
                             {(isContactPending || firstLoad)
                                 ? (<LoadingSpinner />)
                                 : (
-                                    <ScrollContainer>
+                                    <ScrollContainer
+                                        style={{ margin: '2em 2em 0 2em' }}
+                                    >
                                         <GridWrapper>
                                             <div className="imageRow">
                                                 <div id="profile-picture">

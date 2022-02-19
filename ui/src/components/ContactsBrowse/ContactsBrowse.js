@@ -7,6 +7,7 @@ import Paginate from './Paginate/Paginate';
 import { RESULTS_PER_PAGE } from '../../common/constants/constants';
 import PropTypes from 'prop-types';
 import LoadingSpinner from '../../common/LoadingSpinner/LoadingSpinner';
+import ScrollContainer from '../../common/ScrollContainer';
 
 const ContentWrapper = styled.div`
     padding: 0 1em;
@@ -26,10 +27,6 @@ const ContentWrapper = styled.div`
     .paginate {
         grid-area: "paginate";
     }
-`;
-
-const ScrollContainer = styled.div`
-    margin: 2em 2em 0 2em;
 `;
 
 const NoResultsMessage = styled.div`
@@ -170,7 +167,7 @@ export default function ContactsBrowse (props) {
                     currentDirection={direction}
                     handleDirectionUpdate={setDirection}
                 />
-                <ScrollContainer className="scroll-container">
+                <ScrollContainer style={ { margin: '2em 2em 0 2em' } } className="scroll-container">
                     {isContactListPending
                         ? (
                             <LoadingSpinner type="spinner" />
