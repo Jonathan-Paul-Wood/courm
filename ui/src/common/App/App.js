@@ -53,5 +53,5 @@ export default function App () {
         </div>)
         : (
             <LoadingLoop type='spinner' styleGroup='primary' />
-        ); // todo: make loading spinner
+        );
 }
