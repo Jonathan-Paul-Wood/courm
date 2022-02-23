@@ -5,7 +5,8 @@ import EntityTitleHeader from '../../common/EntityTitleHeader/EntityTitleHeader'
 import Button from '../../common/Button';
 import Input from '../../common/Input/Input';
 import DateInput from '../../common/DateInput/DateInput';
-import CommonModal from '../../common/CommonModal/CommonModal';
+import CommonModal from '../../common/CommonModal';
+import UnsavedChangesModal from '../../common/UnsavedChangesModal';
 import LoadingSpinner from '../../common/LoadingSpinner/LoadingSpinner';
 import PropTypes from 'prop-types';
 import { deepCopy } from '../../utilities/utilities';
@@ -450,6 +451,11 @@ export default function EditContact (props) {
                     Are you certain you would like to delete {contact.firstName}? This cannot be undone.
                 </div>
             </CommonModal>
+            <UnsavedChangesModal
+                show={true}
+                onClose={() => {}}
+                onSubmit={() => {}}
+            />
         </>
     );
 }

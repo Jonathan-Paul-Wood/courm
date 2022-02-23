@@ -10,9 +10,6 @@ const IconContainer = styled.span`
 `;
 
 const ModalContainer = styled(Modal)`
-    .close {
-        margin-top: 1rem;
-    }
     Button {
         margin: 0 0.5rem;
     }
