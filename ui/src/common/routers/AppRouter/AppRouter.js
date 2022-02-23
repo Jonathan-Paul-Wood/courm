@@ -44,8 +44,6 @@ export default function AppRouter () {
                 <AppLayout path="/notes/:noteId" component={ViewNote} {...commonRouteProps} />
                 <AppLayout path="/configure" component={AppConfigure} {...commonRouteProps} />
                 <AppLayout path="/faq" component={FaqHome} {...commonRouteProps} />
-                {/* <AppLayout path="/interactions/:interactionsId" component={Interaction} />
-                <AppLayout path="/interactions" component={InteractionsBrowse} /> */}
             </Switch>
         </React.Fragment>
     );
