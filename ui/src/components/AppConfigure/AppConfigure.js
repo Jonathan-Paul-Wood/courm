@@ -5,6 +5,7 @@ import Button from '../../common/Button';
 import Select from '../../common/Select';
 import { exportDataList } from '../../common/Utilities/utilities';
 import LoadingSpinner from '../../common/LoadingSpinner';
+import UploadValidationModal from './UploadValidationModal';
 
 const ConfigureWrapper = styled.div`
     padding: 0 1em;
@@ -59,6 +60,7 @@ export default function AppConfigure (props) {
 
     const [selectedTypeIndex, setSelectedTypeIndex] = useState(0);
     const [pendingUpload, setPendingUpload] = useState(null);
+    const [showValidationModal, setShowValidationModal] = useState(true);
 
     useEffect(() => {
         // TODO: replace with getAll endpoints once made
@@ -202,6 +204,11 @@ export default function AppConfigure (props) {
                                 notes: [],
                             }
                     */}
+                    <UploadValidationModal
+                        showModal={showValidationModal}
+                        setShowModal={setShowValidationModal}
+                        onSubmit={setShowValidationModal}
+                    />
                 </>)
             }
         </ConfigureWrapper>
