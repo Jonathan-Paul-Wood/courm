@@ -1,7 +1,6 @@
 import * as types from './types';
 import ServiceError from '../ServiceError';
 import ContactListService from '../../services/ContactListService';
-// todo: import notification toasts success/error
 
 function getContactListLoading () {
     return {
