@@ -1,7 +1,7 @@
 import * as types from './types';
 import ServiceError from '../ServiceError';
 import ContactService from '../../services/ContactService';
-// todo: import notification toasts success/error
+import { toast } from 'react-toastify';
 
 function getContactLoading () {
     return {
