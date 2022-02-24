@@ -18,7 +18,6 @@ const ToastWrapperContainer = styled(ToastContainer)`
         background-color: ${WARNING};
     }
 
-
     .Toastify__toast {
         display: flex;
         border-radius: 0.5em;
