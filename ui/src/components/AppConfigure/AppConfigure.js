@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import Button from '../../common/Button';
 import { exportContactList } from '../../common/Utilities/utilities';
 import LoadingSpinner from '../../common/LoadingSpinner';
+import ErrorNotification from '../../common/ToastNotifications/ErrorNotification/';
 
 const ConfigureWrapper = styled.div`
     padding: 0 1em;
@@ -12,7 +13,6 @@ const ConfigureWrapper = styled.div`
 export default function AppConfigure (props) {
     const {
         getContactList,
-        postContact,
         deleteContact,
         contacts,
         isContactListPending
@@ -37,19 +37,25 @@ export default function AppConfigure (props) {
 
     function handleAddContacts () {
         const uploadedJSON = JSON.parse(pendingUpload.result);
-        uploadedJSON.data.contacts.data.forEach(contact => {
-            console.log(contact);
-            const newContact = {
-                ...contact,
-                lastModifiedOn: new Date().toISOString()
-            };
-            delete newContact.id;
-            postContact(newContact);
-        });
+        if (uploadedJSON.data && uploadedJSON.data.contacts && uploadedJSON.data.contacts.data) {
+            uploadedJSON.data.contacts.data.forEach(contact => {
+                const newContact = {
+                    ...contact,
+                    lastModifiedOn: new Date().toISOString()
+                };
+                delete newContact.id;
+                console.log(newContact);
+                // postContact(newContact);
+            });
+            // todo: check length, verify keys match expected shape
+        } else {
+            console.log('updating contact FAILED');
+            <ErrorNotification message={"Whoops, that doesn't look like a Contacts File. Check the templates."} />;
+        }
     }
 
     function handleRestoreContacts () {
-        contacts.forEach(contact => deleteContact(contact.id));
+        contacts.results.forEach(contact => deleteContact(contact.id));
         handleAddContacts();
     }
 
@@ -72,9 +78,9 @@ export default function AppConfigure (props) {
                             <p>Upload your saved JSON files, then restore or add the contacts.</p>
                             <input type="file" name="contactFile" id="contactFile" accept="application/json" onChange={e => captureUpload(e)} />
                             <p>Adding contacts will create new records. This does not check for duplicates of existing contacts.</p>
-                            <Button icon="upload" label="Add Contacts" type="secondary" onClick={handleAddContacts} />
+                            <Button disabled={!pendingUpload} icon="upload" label="Add Contacts" type="secondary" onClick={handleAddContacts} />
                             <p>Restoring contacts will remove all existing contacts and replace them with those in the uploaded file.</p>
-                            <Button icon="upload" label="Restore Contacts" type="secondary" onClick={handleRestoreContacts} />
+                            <Button disabled={!pendingUpload} icon="upload" label="Restore Contacts" type="secondary" onClick={handleRestoreContacts} />
                         </div>
                     </div>
                     {/*

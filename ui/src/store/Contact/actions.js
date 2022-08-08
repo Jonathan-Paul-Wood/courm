@@ -1,7 +1,7 @@
 import * as types from './types';
 import ServiceError from '../ServiceError';
 import ContactService from '../../services/ContactService';
-// todo: import notification toasts success/error
+import SuccessNotification from '../../../src/common/ToastNotifications/SuccessNotification';
 
 function getContactLoading () {
     return {
@@ -67,6 +67,8 @@ function putContactLoading () {
     };
 }
 function putContactSuccess (payload) {
+    console.log('successfully saved');
+    SuccessNotification('Contact Saved');
     return {
         type: types.PUT_CONTACT_SUCCESS,
         payload
