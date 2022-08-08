@@ -61,10 +61,10 @@ export default function FaqHome () {
                 </div>
                 <div className="answer">
                     <p>
-                        Simply visit <a target="_blank" rel="noreferrer" href="https://github.com/Jonathan-Paul-Wood/courm">CouRM's public repository</a> and open a ticket. Here's a good guide for <a target="_blank" rel="noreferrer" href="https://github.com/Jonathan-Paul-Wood/courm">how to write constructive tickets</a>.
+                        Simply visit <a target="_blank" rel="noreferrer" href="https://github.com/Jonathan-Paul-Wood/courm/issues">CouRM's public repository</a> and open a ticket. You can use the search function there to ensure your issue is a new one.
                     </p>
                     <p>
-                        When you do create a ticket, please first check existing tickets to make sure you're not creating a duplicate. These steps will help ensure that reports are detailed and easy to address.
+                        When you do create a ticket, be descriptive in what the issue is by including steps to reproduce (screenshots can be extra helpful). These steps will help ensure that issues reported are clear and easy to address.
                     </p>
                 </div>
             </div>
