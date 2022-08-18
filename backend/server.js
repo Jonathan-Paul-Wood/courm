@@ -32,11 +32,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 
 // If running in production mode enter here
-// const breadcrumbtrail = path.join(__dirname, 'build/');
-// app.use('/', express.static(breadcrumbtrail));
-// app.get('/', function(req, res) {
-//     res.sendFile(path.join(breadcrumbtrail, 'index.html'));
-// });
+const breadcrumbtrail = path.join(__dirname, 'build/');
+app.use('/', express.static(breadcrumbtrail));
+app.get('/', function(req, res) {
+    res.sendFile(path.join(breadcrumbtrail, 'index.html'));
+});
 
 function initializeDB() {
     db.serialize(function() {
@@ -716,6 +716,76 @@ app.delete("/api/relations/:id", (req, res) => {
 });
 
 // END RELATIONS APIS
+
+// START COMBINATORIAL SEARCH APIS
+
+/* getRecordsByRelations
+    CONSUMES:
+    - params.recordType: 'contact' || 'event' || 'note' // The type of records to be returned
+    - params.body: [{
+        relationType: 'contact' || 'event' || 'note',
+        ids: Array<number>
+    }] // each Object has the id of the relation and the type of relation to check for
+    PRODUCES:
+    - Array<contact || event || note> (only one type). An array of the records (of specified type) that have all the relations specified in the body
+*/
+// TODO: will need to make these calls asyncronous
+app.get("/api/records-by-relation/recordType/:recordType", async (req, res) => {
+    const recordType = req.params.recordType; // 'contact' || 'event' || 'note'
+    const relationships = req.body;
+    const relationMatches = new Map();
+    console.log(relationships);
+
+    const foundRelations = [];
+    // TODO: replace following block with a ForEach relationType, SELECT * ... IN (ids)
+    await relationships.forEach(rel => {
+        let sql = `SELECT * FROM relations WHERE ${rel.relationType}Id = ${rel.id}`;
+        db.get(sql, (err, row) => {
+            if (err) {
+                console.log(err);
+                res.status = ERROR_CODE;
+                res.json(err);
+            } else if (!row) {
+                res.status = NOT_FOUND_CODE;
+                res.json({message: 'NOT FOUND'});
+            } else {
+                console.log('found relation: ', row);
+                return row;
+            }
+        }).then((row) => foundRelations.push(row));
+    });
+
+    
+    relationMatches.set(
+        row[`${recordType}Id`],
+        [...(relationMatches.get(row[`${recordType}Id`]) ?? []), row[`${relationType}Id`]]
+    ); // add each found relation to the map
+
+    console.log('relationMatches', relationMatches);
+    const resultingRecordIds = [...relationMatches].filter(([relation, match]) => match.length === relationships.length); // filter for matches with all requested relations
+    console.log('resultingRecordIds', resultingRecordIds);
+
+    const results = [];
+    await resultingRecordIds.forEach(recordId => {
+        const sql = `SELECT * FROM ${relationType}s WHERE id = ${recordId}`;
+        db.get(sql, (err, row) => {
+            if (err) {
+                res.status(ERROR_CODE).send({message: err.message});
+            } else if (!row) {
+                res.status(NOT_FOUND_CODE).send({message: 'No such event'});
+            } else {
+                console.log('push result: ', row);
+                results.push(row);
+            }
+        });
+    });
+
+    console.log('finishing: ', results);
+    res.status(SUCCESS_CODE);
+    res.json(results);
+});
+
+// END COMBINATORIAL SEARCH APIS
   
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
@@ -723,5 +793,5 @@ app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}/`);
 
     // if in production mode: opens the url in the default browser 
-    //open(`http://localhost:${PORT}/`);
+    open(`http://localhost:${PORT}/`);
 });
