@@ -733,13 +733,14 @@ app.delete("/api/relations/:id", (req, res) => {
 // TODO: will need to make these calls asyncronous
 app.get("/api/records-by-relation/recordType/:recordType", async (req, res) => {
     const recordType = req.params.recordType; // 'contact' || 'event' || 'note'
-    // const relationships = req.body;
+    const relationships = req.body;
+    console.log('relationships', relationships);
 
-    const sql = //SELECT * FROM (
-    `SELECT contacts.id FROM contacts LEFT JOIN relations ON contacts.id = relations.contactId`;
-    //) WHERE 
-
-    console.log(sql);
+    const sql =
+    `SELECT *
+    FROM relations
+    LEFT JOIN ${recordType}s
+    ON relations.${recordType}Id = ${recordType}s.id`;
 
     db.all(sql, (err, rows) => {
         if (err) {
@@ -750,8 +751,72 @@ app.get("/api/records-by-relation/recordType/:recordType", async (req, res) => {
             res.status = NOT_FOUND_CODE;
             res.json({message: 'NOT FOUND'});
         } else {
-            res.status(SUCCESS_CODE);
-            res.json(rows);
+            const relatedRecordMap = new Map();
+
+            // create map where each record id has an object of their existing relationsships
+            rows.forEach((row) => {
+                if (row.id) {
+                    if (!relatedRecordMap.get(row.id)) {
+                        relatedRecordMap.set(row.id, {
+                            contacts: [],
+                            events: [],
+                            notes: []
+                        });
+                    }
+                    const thisRecordEntry = relatedRecordMap.get(row.id);
+                    if (row.contactId && !thisRecordEntry.contacts.includes(row.contactId)) {
+                        relatedRecordMap.set(row.id, {
+                            ...thisRecordEntry,
+                            contacts: [...thisRecordEntry.contacts, row.contactId]
+                        });
+                    }
+                    if (row.eventId && !thisRecordEntry.events.includes(row.eventId)) {
+                        relatedRecordMap.set(row.id, {
+                            ...thisRecordEntry,
+                            events: [...thisRecordEntry.events, row.eventId]
+                        });
+                    }
+                    if (row.noteId && !thisRecordEntry.notes.includes(row.noteId)) {
+                        relatedRecordMap.set(row.id, {
+                            ...thisRecordEntry,
+                            notes: [...thisRecordEntry.notes, row.noteId]
+                        });
+                    }
+                }
+            });
+
+            // filter for just the record ids with the expected relations
+            const filteredIds = [];
+            const mapKeys = relatedRecordMap.keys();
+            let nextMapKey = mapKeys.next();
+            while (nextMapKey.done === false) {
+                const key = nextMapKey.value;
+                const recordRelations = relatedRecordMap.get(key);
+                const hasAllExpectedRelations = Object.keys(relationships).every((recordIdType) => {
+                    return relationships[recordIdType].every((id) => {
+                        return recordRelations[recordIdType].find(i => i === id);
+                    });
+                });
+                if (hasAllExpectedRelations) {
+                    filteredIds.push(key);
+                }
+
+                nextMapKey = mapKeys.next();
+            }
+
+            const sql2 = `SELECT * FROM ${recordType}s WHERE id IN (${filteredIds})`;
+            db.all(sql2, (err2, rows2) => {
+                if (err2) {
+                    res.status = ERROR_CODE;
+                    res.json(err2);
+                } else if (!rows2) {
+                    res.status = NOT_FOUND_CODE;
+                    res.json({'response': 'NOT FOUND'});
+                } else {
+                    res.status = SUCCESS_CODE;
+                    res.json(rows2);
+                }
+            });
         }
     });
 });
