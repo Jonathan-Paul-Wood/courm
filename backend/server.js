@@ -898,6 +898,28 @@ app.get("/api/records-by-relation/recordType/:recordType", async (req, res) => {
 });
 
 // END COMBINATORIAL SEARCH APIS
+
+// GET NAMES OF RECORDS
+app.get("/api/title-list/recordType/:recordType", async (req, res) => {
+    const recordType = req.params.recordType; // 'contact' || 'event' || 'note'
+    const fields = recordType === 'contact' ? `firstName, lastName` : `title`
+
+    const sql =
+    `SELECT id, ${fields} FROM ${recordType}s`;
+
+    db.all(sql, (err, rows) => {
+        if (err) {
+            res.status = ERROR_CODE;
+            res.json(err);
+        } else if (!rows) {
+            res.status = NOT_FOUND_CODE;
+            res.json({message: 'NOT FOUND'});
+        } else {
+            res.status = SUCCESS_CODE;
+            res.json({ results: rows });
+        }
+    });
+});
   
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
