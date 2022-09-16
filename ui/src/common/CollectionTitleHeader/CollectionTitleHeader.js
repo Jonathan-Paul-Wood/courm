@@ -39,6 +39,7 @@ export default function CollectionTitleHeader (props) {
     return (
         <ContentWrapper>
             <Button
+                icon={'arrowLeft'}
                 label="Back"
                 type="secondary"
                 onClick={history.goBack}
