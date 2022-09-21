@@ -22,10 +22,11 @@ function getContactListError (error) {
     };
 }
 
-export function getContactList (results, page, searchTerm, order, direction, filters) {
+export function getContactList (results, page, searchTerm, order, direction, filters, appliedEvents, appliedNotes) {
     return async dispatch => {
         dispatch(getContactListLoading());
         try {
+            console.log(appliedEvents, appliedNotes);
             const response = await ContactListService.getContactList(results, page, searchTerm, order, direction, filters);
             dispatch(getContactListSuccess(response));
         } catch (e) {
