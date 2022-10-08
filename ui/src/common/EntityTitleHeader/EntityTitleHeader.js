@@ -59,8 +59,9 @@ export default function EntityTitleHeader (props) {
     return (
         <ContentWrapper>
             <Button
+                icon={'arrowLeft'}
                 className="back"
-                label={'BACK'}
+                label={'Back'}
                 type="secondary"
                 onClick={history.goBack}
             />
@@ -79,6 +80,7 @@ export default function EntityTitleHeader (props) {
                     : (
                         <Button
                             label="EDIT"
+                            icon="edit"
                             type="secondary"
                             onClick={() => history.push(editPath)}
                         />

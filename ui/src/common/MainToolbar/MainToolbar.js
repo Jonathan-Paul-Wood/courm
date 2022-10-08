@@ -9,10 +9,6 @@ import SortOrderControls from './SortOrderControls';
 import { exportDataList } from '../../common/Utilities/utilities';
 import FilterControls from './FilterControls';
 
-const ContentWrapper = styled.div`
-
-`;
-
 const ControlContainer = styled.div`
     display: flex;
     justify-content: space-between;
@@ -71,7 +67,7 @@ export default function MainToolbar (props) {
     }
 
     return (
-        <ContentWrapper>
+        <>
             <ControlContainer>
                 <Button
                     icon="plusCircle"
@@ -130,7 +126,7 @@ export default function MainToolbar (props) {
                     />
                 </Tooltip>
             </ControlContainer>
-        </ContentWrapper>
+        </>
     );
 }
 

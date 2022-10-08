@@ -8,6 +8,7 @@ import { RESULTS_PER_PAGE } from '../../common/constants/constants';
 import PropTypes from 'prop-types';
 import LoadingSpinner from '../../common/LoadingSpinner/LoadingSpinner';
 import ScrollContainer from '../../common/ScrollContainer';
+import MultiSelect from '../../common/MultiSelect';
 
 const ContentWrapper = styled.div`
     padding: 0 1em;
@@ -35,17 +36,31 @@ const NoResultsMessage = styled.div`
     padding-left: 6em;
 `;
 
+const RelationMatchContainer = styled.div`
+    display: flex;
+    justify-content: space-between;
+    margin: 0 2.5em;
+`;
+
 export default function ContactsBrowse (props) {
     const {
         contacts,
         isContactListPending,
-        getContactList
+        getContactList,
+        events,
+        isEventListPending,
+        getEventList,
+        notes,
+        isNoteListPending,
+        getNoteList
     } = props;
     const [activeFilters, setActiveFilters] = useState([]);
     const [page, setPage] = useState(1);
     const [searchTerm, setSearchTerm] = useState('');
     const [searchOrderBy, setSearchOrderBy] = useState('firstName');
     const [direction, setDirection] = useState('ASC'); // ASC if ascending, DESC if descending
+    const [appliedEvents, setAppliedEvents] = useState('');
+    const [appliedNotes, setAppliedNotes] = useState('');
 
     const searchFields = [
         {
@@ -113,11 +128,13 @@ export default function ContactsBrowse (props) {
 
     useEffect(() => {
         initiateSearch();
+        getEventList();
+        getNoteList();
     }, []);
 
     useEffect(() => {
         initiateSearch();
-    }, [page, searchOrderBy, direction]);
+    }, [page, searchOrderBy, direction, appliedEvents, appliedNotes]);
 
     useEffect(() => {
         if (searchTerm !== '') {
@@ -147,7 +164,7 @@ export default function ContactsBrowse (props) {
     }
 
     function initiateSearch () {
-        getContactList(RESULTS_PER_PAGE, page, searchTerm, searchOrderBy, direction, activeFilters);
+        getContactList(RESULTS_PER_PAGE, page, searchTerm, searchOrderBy, direction, activeFilters, appliedEvents, appliedNotes);
     }
 
     return (
@@ -167,6 +184,23 @@ export default function ContactsBrowse (props) {
                     currentDirection={direction}
                     handleDirectionUpdate={setDirection}
                 />
+                {isEventListPending || isNoteListPending
+                    ? <></>
+                    : (
+                        <RelationMatchContainer>
+                            <MultiSelect
+                                title={'EVENT RELATIONS'}
+                                options={events.results}
+                                onChange={(val) => { setAppliedEvents(val.map(v => v.id)); }}
+                            />
+                            <MultiSelect
+                                title={'NOTE RELATIONS'}
+                                options={notes.results}
+                                onChange={(val) => setAppliedNotes(val.map(v => v.id))}
+                            />
+                        </RelationMatchContainer>
+                    )}
+
                 <ScrollContainer style={ { margin: '2em 2em 0 2em' } } className="scroll-container">
                     {isContactListPending
                         ? (
@@ -207,5 +241,13 @@ ContactsBrowse.propTypes = {
     contacts: PropTypes.object.isRequired,
     isContactListPending: PropTypes.bool.isRequired,
     contactListError: PropTypes.string.isRequired,
-    getContactList: PropTypes.func.isRequired
+    getContactList: PropTypes.func.isRequired,
+    events: PropTypes.object.isRequired,
+    isEventListPending: PropTypes.bool.isRequired,
+    eventListError: PropTypes.string.isRequired,
+    getEventList: PropTypes.func.isRequired,
+    notes: PropTypes.object.isRequired,
+    isNoteListPending: PropTypes.bool.isRequired,
+    noteListError: PropTypes.string.isRequired,
+    getNoteList: PropTypes.func.isRequired
 };
