@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import Button from '../Button';
 import PropTypes from 'prop-types';
+import { title2 } from '../../styles/typography';
 
 const ContentWrapper = styled.div`
     height: 4em;
@@ -32,6 +33,14 @@ const ContentWrapper = styled.div`
     }
 `;
 
+const classes = {
+    headerTitle: {
+        textAlign: 'center',
+        margin: 'auto 2em',
+        ...title2
+    }
+};
+
 export default function CollectionTitleHeader (props) {
     const history = useHistory();
     // const [listMode, setListMode] = useState(true);
@@ -43,7 +52,7 @@ export default function CollectionTitleHeader (props) {
                 type="secondary"
                 onClick={history.goBack}
             />
-            <h2 id="header-title">{props.title}</h2>
+            <h2 style={classes.headerTitle}>{props.title}</h2>
             <div id="header-right">
                 {/* {listMode ? (
                     <div className="switch">
