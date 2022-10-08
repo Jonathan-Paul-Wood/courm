@@ -340,8 +340,14 @@ app.post('/api/contacts/new', (req, res) => {
 //    "notes": Array<number>
 // }
 app.get("/api/contacts", (req, res) => {
-    const { results, page, order, direction, searchTerm, filters } = req.query;
-    const relationships = req.body;
+    const { results, page, order, direction, searchTerm, filters, relatedEvents, relatedNotes } = req.query;
+    const relationships = {};
+    if (relatedEvents) {
+        relationships.events = relatedEvents.split(',');
+    }
+    if (relatedNotes) {
+        relationships.notes = relatedNotes.split(',');
+    }
 
     const sqlPre =
     `SELECT *
@@ -360,7 +366,7 @@ app.get("/api/contacts", (req, res) => {
         } else {
             const relatedRecordMap = new Map();
 
-            // create map where each record id has an object of their existing relationsships
+            // create map where each record id has an object of their existing relationships
             rows.forEach((row) => {
                 if (row.id) {
                     if (!relatedRecordMap.get(row.id)) {
@@ -401,7 +407,7 @@ app.get("/api/contacts", (req, res) => {
                 const recordRelations = relatedRecordMap.get(key);
                 const hasAllExpectedRelations = Object.keys(relationships).every((recordIdType) => {
                     return relationships[recordIdType].every((id) => {
-                        return recordRelations[recordIdType].find(i => i === id);
+                        return recordRelations[recordIdType].find(i => i === parseInt(id));
                     });
                 });
                 if (hasAllExpectedRelations) {

@@ -59,8 +59,8 @@ export default function ContactsBrowse (props) {
     const [searchTerm, setSearchTerm] = useState('');
     const [searchOrderBy, setSearchOrderBy] = useState('firstName');
     const [direction, setDirection] = useState('ASC'); // ASC if ascending, DESC if descending
-    const [appliedEvents, setAppliedEvents] = useState([]);
-    const [appliedNotes, setAppliedNotes] = useState([]);
+    const [appliedEvents, setAppliedEvents] = useState('');
+    const [appliedNotes, setAppliedNotes] = useState('');
 
     const searchFields = [
         {
@@ -134,7 +134,7 @@ export default function ContactsBrowse (props) {
 
     useEffect(() => {
         initiateSearch();
-    }, [page, searchOrderBy, direction]);
+    }, [page, searchOrderBy, direction, appliedEvents, appliedNotes]);
 
     useEffect(() => {
         if (searchTerm !== '') {
@@ -191,12 +191,12 @@ export default function ContactsBrowse (props) {
                             <MultiSelect
                                 title={'EVENT RELATIONS'}
                                 options={events.results}
-                                onChange={(val) => setAppliedEvents(val)}
+                                onChange={(val) => { setAppliedEvents(val.map(v => v.id)); }}
                             />
                             <MultiSelect
                                 title={'NOTE RELATIONS'}
                                 options={notes.results}
-                                onChange={(val) => setAppliedNotes(val)}
+                                onChange={(val) => setAppliedNotes(val.map(v => v.id))}
                             />
                         </RelationMatchContainer>
                     )}

@@ -26,8 +26,8 @@ export function getContactList (results, page, searchTerm, order, direction, fil
     return async dispatch => {
         dispatch(getContactListLoading());
         try {
-            console.log(appliedEvents, appliedNotes);
-            const response = await ContactListService.getContactList(results, page, searchTerm, order, direction, filters);
+            console.log(appliedEvents);
+            const response = await ContactListService.getContactList(results, page, searchTerm, order, direction, filters, appliedEvents, appliedNotes);
             dispatch(getContactListSuccess(response));
         } catch (e) {
             dispatch(getContactListError(e));
