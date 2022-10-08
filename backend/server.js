@@ -805,18 +805,16 @@ app.delete("/api/relations/:id", (req, res) => {
     CONSUMES:
     - params.recordType: 'contact' || 'event' || 'note' // The type of records to be returned
     - params.body: {
-        contact?: Array<number>
-        event?: Array<number>
-        note?: Array<number>
+        contacts?: Array<number>
+        events?: Array<number>
+        notes?: Array<number>
     } // arrays of the ids of each relation type
     PRODUCES:
     - Array<contact || event || note> (only one type). An array of the records (of specified type) that have all the relations specified in the body
 */
-// TODO: will need to make these calls asyncronous
 app.get("/api/records-by-relation/recordType/:recordType", async (req, res) => {
     const recordType = req.params.recordType; // 'contact' || 'event' || 'note'
     const relationships = req.body;
-    console.log('relationships', relationships);
 
     const sql =
     `SELECT *

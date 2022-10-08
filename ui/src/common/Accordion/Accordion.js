@@ -116,6 +116,6 @@ export default function Accordion (props) {
     );
 }
 
-MainToolbar.propTypes = {
-    sections: PropTypes.arrayOf(objects).isRequired
+Accordion.propTypes = {
+    sections: PropTypes.array.isRequired
 };
