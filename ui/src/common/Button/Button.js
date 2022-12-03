@@ -7,7 +7,6 @@ import { BLACK, WHITE, PRIMARY, PRIMARY_FOCUS, GREY, SUCCESS, SUCCESS_FOCUS, ERR
 
 const StyleContainer = styled.div`
     margin: auto 0;
-    display: flex;
     align-content: center;
 
     --text-dark: ${BLACK};
@@ -26,6 +25,7 @@ const StyleContainer = styled.div`
     --warning-color-hover: ${WARNING_FOCUS};
       
       .btn {
+        display: flex;
         padding: 0.5em 1em;
         font-size: 15px;
         border: none;

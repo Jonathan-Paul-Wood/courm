@@ -334,57 +334,139 @@ app.post('/api/contacts/new', (req, res) => {
 });
 
 //accepts requests of the form: /api/contacts?order=id?results=3&page=1?direction=[ASC|DESC]?search=string
+// {
+//    "contacts": Array<number>,
+//    "events": Array<number>,
+//    "notes": Array<number>
+// }
 app.get("/api/contacts", (req, res) => {
-    const { results, page, order, direction, searchTerm, filters } = req.query;
-    let sql = `SELECT * FROM contacts`;
-    //apply clause for each filter
-    // if(filters.entityType) {
-    //     sql = sql+` WHERE entityType LIKE ${filters.entityType}`;
-    // }
-
-    //apply search
-    if(searchTerm && filters) {
-        const searchFilters = filters.split(',');
-        sql = sql + ` WHERE ${searchFilters[0]} LIKE '%${searchTerm}%'`;
-        searchFilters.forEach((filter, index) => {
-            if(index) {
-                sql = sql + ` OR ${filter} LIKE '%${searchTerm}%'`
-            }
-        })
-        // sql = sql+` WHERE firstName LIKE '%${searchTerm}%' OR lastName LIKE '%${searchTerm}%' OR email LIKE '%${searchTerm}%'`;
-        // sql = sql+` OR phoneNumber LIKE '%${searchTerm}%' OR address LIKE '%${searchTerm}%' OR firm LIKE '%${searchTerm}%' or industry LIKE '%${searchTerm}%'`;
-        
-        // use % to match >=0 chars before and after search term
+    const { results, page, order, direction, searchTerm, filters, relatedEvents, relatedNotes } = req.query;
+    const relationships = {};
+    if (relatedEvents) {
+        relationships.events = relatedEvents.split(',');
+    }
+    if (relatedNotes) {
+        relationships.notes = relatedNotes.split(',');
     }
 
-    const sql_metadata = sql;
+    const sqlPre =
+    `SELECT *
+    FROM relations
+    LEFT JOIN contacts
+    ON relations.contactId = contacts.id`;
 
-    //apply sort order and pagination
-    sql = sql+` ORDER BY ${order} ${direction} LIMIT ${results} OFFSET ((${page - 1})* ${results})`;
-    db.all(sql, (err, rows) => {
+    db.all(sqlPre, (err, rows) => {
         if (err) {
+            console.log(err);
             res.status = ERROR_CODE;
             res.json(err);
         } else if (!rows) {
             res.status = NOT_FOUND_CODE;
             res.json({message: 'NOT FOUND'});
         } else {
-            db.all(sql_metadata, (err, result) => {
+            const relatedRecordMap = new Map();
+
+            // create map where each record id has an object of their existing relationships
+            rows.forEach((row) => {
+                if (row.id) {
+                    if (!relatedRecordMap.get(row.id)) {
+                        relatedRecordMap.set(row.id, {
+                            contacts: [],
+                            events: [],
+                            notes: []
+                        });
+                    }
+                    const thisRecordEntry = relatedRecordMap.get(row.id);
+                    if (row.contactId && !thisRecordEntry.contacts.includes(row.contactId)) {
+                        relatedRecordMap.set(row.id, {
+                            ...thisRecordEntry,
+                            contacts: [...thisRecordEntry.contacts, row.contactId]
+                        });
+                    }
+                    if (row.eventId && !thisRecordEntry.events.includes(row.eventId)) {
+                        relatedRecordMap.set(row.id, {
+                            ...thisRecordEntry,
+                            events: [...thisRecordEntry.events, row.eventId]
+                        });
+                    }
+                    if (row.noteId && !thisRecordEntry.notes.includes(row.noteId)) {
+                        relatedRecordMap.set(row.id, {
+                            ...thisRecordEntry,
+                            notes: [...thisRecordEntry.notes, row.noteId]
+                        });
+                    }
+                }
+            });
+
+            // filter for just the record ids with the expected relations
+            const filteredIds = [];
+            const mapKeys = relatedRecordMap.keys();
+            let nextMapKey = mapKeys.next();
+            while (nextMapKey.done === false) {
+                const key = nextMapKey.value;
+                const recordRelations = relatedRecordMap.get(key);
+                const hasAllExpectedRelations = Object.keys(relationships).every((recordIdType) => {
+                    return relationships[recordIdType].every((id) => {
+                        return recordRelations[recordIdType].find(i => i === parseInt(id));
+                    });
+                });
+                if (hasAllExpectedRelations) {
+                    filteredIds.push(key);
+                }
+
+                nextMapKey = mapKeys.next();
+            }
+
+            let sql = `SELECT * FROM contacts`;
+
+            //apply search
+            if(searchTerm && filters) {
+                const searchFilters = filters.split(',');
+                sql = sql + ` WHERE ${searchFilters[0]} LIKE '%${searchTerm}%'`;
+                searchFilters.forEach((filter, index) => {
+                    if(index) {
+                        sql = sql + ` OR ${filter} LIKE '%${searchTerm}%'`;
+                    }
+                });
+                sql = sql+` AND id IN (${filteredIds})`;
+                // sql = sql+` WHERE firstName LIKE '%${searchTerm}%' OR lastName LIKE '%${searchTerm}%' OR email LIKE '%${searchTerm}%'`;
+                // sql = sql+` OR phoneNumber LIKE '%${searchTerm}%' OR address LIKE '%${searchTerm}%' OR firm LIKE '%${searchTerm}%' or industry LIKE '%${searchTerm}%'`;
+                
+                // use % to match >=0 chars before and after search term
+            } else {
+                sql = sql+` WHERE id IN (${filteredIds})`;
+            }
+
+            const sql_metadata = sql;
+            //apply sort order and pagination
+            sql = sql+` ORDER BY ${order} ${direction} LIMIT ${results} OFFSET ((${page - 1})* ${results})`;
+            console.log(sql);
+            db.all(sql, (err, rows) => {
                 if (err) {
                     res.status = ERROR_CODE;
-                    return console.error(err.message);
-                } else if (!result) {
+                    res.json(err);
+                } else if (!rows) {
                     res.status = NOT_FOUND_CODE;
-                    return;
+                    res.json({message: 'NOT FOUND'});
                 } else {
-                    totalResults = result.length;
-                    res.json({
-                        results: rows,
-                        resultCount: rows.length,
-                        pageSize: parseInt(results),
-                        totalCount: totalResults,
-                        pageCount: Math.ceil(totalResults / parseInt(results)),
-                        currentPage: parseInt(page),
+                    db.all(sql_metadata, (err, result) => {
+                        if (err) {
+                            res.status = ERROR_CODE;
+                            return console.error(err.message);
+                        } else if (!result) {
+                            res.status = NOT_FOUND_CODE;
+                            return;
+                        } else {
+                            totalResults = result.length;
+                            res.json({
+                                results: rows,
+                                resultCount: rows.length,
+                                pageSize: parseInt(results),
+                                totalCount: totalResults,
+                                pageCount: Math.ceil(totalResults / parseInt(results)),
+                                currentPage: parseInt(page),
+                            });
+                        }
                     });
                 }
             });
@@ -716,6 +798,132 @@ app.delete("/api/relations/:id", (req, res) => {
 });
 
 // END RELATIONS APIS
+
+// START COMBINATORIAL SEARCH APIS
+
+/* getRecordsByRelations
+    CONSUMES:
+    - params.recordType: 'contact' || 'event' || 'note' // The type of records to be returned
+    - params.body: {
+        contacts?: Array<number>
+        events?: Array<number>
+        notes?: Array<number>
+    } // arrays of the ids of each relation type
+    PRODUCES:
+    - Array<contact || event || note> (only one type). An array of the records (of specified type) that have all the relations specified in the body
+*/
+app.get("/api/records-by-relation/recordType/:recordType", async (req, res) => {
+    const recordType = req.params.recordType; // 'contact' || 'event' || 'note'
+    const relationships = req.body;
+
+    const sql =
+    `SELECT *
+    FROM relations
+    LEFT JOIN ${recordType}s
+    ON relations.${recordType}Id = ${recordType}s.id`;
+
+    db.all(sql, (err, rows) => {
+        if (err) {
+            console.log(err);
+            res.status = ERROR_CODE;
+            res.json(err);
+        } else if (!rows) {
+            res.status = NOT_FOUND_CODE;
+            res.json({message: 'NOT FOUND'});
+        } else {
+            const relatedRecordMap = new Map();
+
+            // create map where each record id has an object of their existing relationsships
+            rows.forEach((row) => {
+                if (row.id) {
+                    if (!relatedRecordMap.get(row.id)) {
+                        relatedRecordMap.set(row.id, {
+                            contacts: [],
+                            events: [],
+                            notes: []
+                        });
+                    }
+                    const thisRecordEntry = relatedRecordMap.get(row.id);
+                    if (row.contactId && !thisRecordEntry.contacts.includes(row.contactId)) {
+                        relatedRecordMap.set(row.id, {
+                            ...thisRecordEntry,
+                            contacts: [...thisRecordEntry.contacts, row.contactId]
+                        });
+                    }
+                    if (row.eventId && !thisRecordEntry.events.includes(row.eventId)) {
+                        relatedRecordMap.set(row.id, {
+                            ...thisRecordEntry,
+                            events: [...thisRecordEntry.events, row.eventId]
+                        });
+                    }
+                    if (row.noteId && !thisRecordEntry.notes.includes(row.noteId)) {
+                        relatedRecordMap.set(row.id, {
+                            ...thisRecordEntry,
+                            notes: [...thisRecordEntry.notes, row.noteId]
+                        });
+                    }
+                }
+            });
+
+            // filter for just the record ids with the expected relations
+            const filteredIds = [];
+            const mapKeys = relatedRecordMap.keys();
+            let nextMapKey = mapKeys.next();
+            while (nextMapKey.done === false) {
+                const key = nextMapKey.value;
+                const recordRelations = relatedRecordMap.get(key);
+                const hasAllExpectedRelations = Object.keys(relationships).every((recordIdType) => {
+                    return relationships[recordIdType].every((id) => {
+                        return recordRelations[recordIdType].find(i => i === id);
+                    });
+                });
+                if (hasAllExpectedRelations) {
+                    filteredIds.push(key);
+                }
+
+                nextMapKey = mapKeys.next();
+            }
+
+            const sql2 = `SELECT * FROM ${recordType}s WHERE id IN (${filteredIds})`;
+            db.all(sql2, (err2, rows2) => {
+                if (err2) {
+                    res.status = ERROR_CODE;
+                    res.json(err2);
+                } else if (!rows2) {
+                    res.status = NOT_FOUND_CODE;
+                    res.json({'response': 'NOT FOUND'});
+                } else {
+                    res.status = SUCCESS_CODE;
+                    res.json(rows2);
+                }
+            });
+        }
+    });
+});
+
+// END COMBINATORIAL SEARCH APIS
+
+// GET NAMES OF RECORDS
+app.get("/api/title-list/recordType/:recordType", async (req, res) => {
+    const recordType = req.params.recordType; // 'contact' || 'event' || 'note'
+    const fields = recordType === 'contact' ? `firstName, lastName` : `title`
+
+    const sql =
+    `SELECT id, ${fields} FROM ${recordType}s`;
+
+    db.all(sql, (err, rows) => {
+        if (err) {
+            res.status = ERROR_CODE;
+            res.json(err);
+        } else if (!rows) {
+            res.status = NOT_FOUND_CODE;
+            res.json({message: 'NOT FOUND'});
+        } else {
+            res.status = SUCCESS_CODE;
+            res.json({ results: rows });
+        }
+    });
+});
   
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;
@@ -723,5 +931,5 @@ app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}/`);
 
     // if in production mode: opens the url in the default browser 
-    //open(`http://localhost:${PORT}/`);
+    // open(`http://localhost:${PORT}/`);
 });
