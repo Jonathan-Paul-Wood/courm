@@ -18,7 +18,7 @@ import FaqHome from '../../../components/FaqHome';
 
 export default function AppRouter () {
     useEffect(() => {
-        document.title = 'Personal CRM';
+        document.title = 'Personal CRM'; //todo: move this to index file
     }, []);
 
     const commonRouteProps = {
