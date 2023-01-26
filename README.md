@@ -10,7 +10,7 @@ CouRM is open source and built to be run 100% locally, so that you have full con
 ## Installation
 In both the `ui` and `backend` directories, install dependencies
 
-    npm install
+    npm install --python=python2.7
 
 In the `backend` directory, create a database file by running one of the following commands:
 

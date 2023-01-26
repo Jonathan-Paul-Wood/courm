@@ -328,7 +328,7 @@ export default function EditContact (props) {
                                 </span>
                                 <label className={`switch ${isNewContact ? '' : 'hidden'}`}>
                                     <input
-                                        active={`${entityIsOrganization}`}
+                                        // active={`${entityIsOrganization}`}
                                         type="checkbox"
                                         onClick={() => setEntityIsOrganization(!entityIsOrganization)}
                                         disabled={!isNewContact}
