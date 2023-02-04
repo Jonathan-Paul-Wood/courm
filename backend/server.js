@@ -32,11 +32,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 
 // If running in production mode enter here
-// const breadcrumbtrail = path.join(__dirname, 'build/');
-// app.use('/', express.static(breadcrumbtrail));
-// app.get('/', function(req, res) {
-//     res.sendFile(path.join(breadcrumbtrail, 'index.html'));
-// });
+const breadcrumbtrail = path.join(__dirname, 'build/');
+app.use('/', express.static(breadcrumbtrail));
+app.get('/', function(req, res) {
+    res.sendFile(path.join(breadcrumbtrail, 'index.html'));
+});
 
 function initializeDB() {
     db.serialize(function() {
@@ -931,5 +931,5 @@ app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}/`);
 
     // if in production mode: opens the url in the default browser 
-    // open(`http://localhost:${PORT}/`);
+    open(`http://localhost:${PORT}/`);
 });
