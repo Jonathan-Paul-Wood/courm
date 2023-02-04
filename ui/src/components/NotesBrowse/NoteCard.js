@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const CardWrapper = styled.div`
     height: 15vh;
@@ -35,10 +35,10 @@ const CardWrapper = styled.div`
 
 export default function NoteCard (props) {
     const { note } = props;
-    const history = useHistory();
+    const navigate = useNavigate();
 
     return (
-        <CardWrapper className="a-cursor-pointer" onClick={() => history.push(`/notes/${note.id}`)}>
+        <CardWrapper className="a-cursor-pointer" onClick={() => navigate(`/notes/${note.id}`)}>
             <div className="details-row">
                 <h3>{note.title} {note.date}</h3>
                 <span>Created: {note.createdOn}</span>

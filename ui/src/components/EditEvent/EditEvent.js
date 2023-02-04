@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory, useLocation, useParams } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import EntityTitleHeader from '../../common/EntityTitleHeader/EntityTitleHeader';
 import Button from '../../common/Button';
@@ -78,7 +78,7 @@ export default function EditEvent (props) {
     };
     const [pendingChanges, setPendingChanges] = useState(defaultChanges);
     const [error, setError] = useState(defaultChanges);
-    const history = useHistory();
+    const navigate = useNavigate();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [pageLoaded, setPageLoaded] = useState(false);
 
@@ -110,12 +110,12 @@ export default function EditEvent (props) {
     }, [isEventPostPending]);
     useEffect(() => {
         if (pageLoaded && !isEventPutPending) {
-            history.push(`/events/${eventId}`);
+            navigate(`/events/${eventId}`);
         }
     }, [isEventPutPending]);
     useEffect(() => {
         if (pageLoaded && !isEventDeletePending) {
-            history.push('/events');
+            navigate('/events');
         }
     }, [isEventDeletePending]);
 
