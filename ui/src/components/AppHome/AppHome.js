@@ -55,7 +55,7 @@ export default function AppHome (props) {
             </ul>
             <h2>Background</h2>
             <p>
-                We're looking to create an intuitive tool that lets you track your social and professional life without the all-seeing eye of social media and other panopticons. We're still very early in this journey and would love to hear your feedback! Checkout the <span className="link" onClick={() => navigate('/faq')}>FAG page</span> if you have questions, and have a wonderful day!
+                We're looking to create an intuitive tool that lets you track your social and professional life without the all-seeing eye of social media or other panopticons. We're still very early in this journey and would love to hear your feedback! Checkout the <span className="link" onClick={() => navigate('/faq')}>FAG page</span> if you have questions, and have a wonderful day!
             </p>
         </HomeWrapper>
     );
