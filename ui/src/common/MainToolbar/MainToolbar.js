@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Input from '../../common/Input/Input';
@@ -34,7 +34,7 @@ export default function MainToolbar (props) {
         contactList,
         noteList
     } = props;
-    const history = useHistory();
+    const navigate = useNavigate();
     const [selectedSearchFields, setSelectedSearchFields] = useState(searchFields);
     const [filtersApplied, setFiltersApplied] = useState(false);
 
@@ -72,7 +72,7 @@ export default function MainToolbar (props) {
                 <Button
                     icon="plusCircle"
                     label={`Add ${type}`}
-                    onClick={() => history.push(`/${type.toLowerCase()}s/new`)}
+                    onClick={() => navigate(`/${type.toLowerCase()}s/new`)}
                 />
                 <Button
                     icon="download"

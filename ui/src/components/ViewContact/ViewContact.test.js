@@ -36,8 +36,8 @@ describe('Test ViewContacts and displayed values', () => {
     beforeEach(() => {
         jest.resetAllMocks();
     });
-    const history = createMemoryHistory();
-    history.push('/contacts/8');
+    const navigate = createMemoryHistory();
+    navigate('/contacts/8');
 
     it('Displays loaded contact values in header and textboxes', () => {
         render(<Router history={history}>

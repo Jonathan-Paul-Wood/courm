@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 
@@ -16,15 +16,15 @@ const HomeWrapper = styled.div`
 
 export default function AppHome (props) {
     const { initializeDB } = props;
-    const history = useHistory();
+    const navigate = useNavigate();
 
     function handleActionSelection (action, object) {
         switch (action) {
         case 'view':
-            history.push(`${object}`);
+            navigate(`/${object}`);
             break;
         case 'create':
-            history.push(`${object}/new`);
+            navigate(`/${object}/new`);
             break;
         default:
             console.log('error, invalid action: ', action);
@@ -43,9 +43,9 @@ export default function AppHome (props) {
             <h2>Actions</h2>
             <ul className="action-list">
                 <li onClick={() => handleActionSelection('create', 'contacts')}>Create Contact</li>
-                <li onClick={() => history.push('/notes/new')}>Record Note</li>
+                <li onClick={() => navigate('/notes/new')}>Record Note</li>
                 <li onClick={() => handleActionSelection('view', 'contacts')}>View & Search Contacts</li>
-                <li onClick={() => history.push('/notes')}>View & Search Notes</li>
+                <li onClick={() => navigate('/notes')}>View & Search Notes</li>
             </ul>
         </HomeWrapper>
     );

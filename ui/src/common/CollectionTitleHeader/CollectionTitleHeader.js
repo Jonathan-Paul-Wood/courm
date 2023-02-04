@@ -1,5 +1,5 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import Button from '../Button';
 import PropTypes from 'prop-types';
@@ -42,7 +42,7 @@ const classes = {
 };
 
 export default function CollectionTitleHeader (props) {
-    const history = useHistory();
+    const navigate = useNavigate();
     // const [listMode, setListMode] = useState(true);
 
     return (
@@ -51,7 +51,7 @@ export default function CollectionTitleHeader (props) {
                 icon={'arrowLeft'}
                 label="Back"
                 type="secondary"
-                onClick={history.goBack}
+                onClick={() => navigate(-1)}
             />
             <h2 style={classes.headerTitle}>{props.title}</h2>
             <div id="header-right">

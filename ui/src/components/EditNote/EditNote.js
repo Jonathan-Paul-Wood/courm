@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory, useLocation, useParams } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import EntityTitleHeader from '../../common/EntityTitleHeader/EntityTitleHeader';
 import Button from '../../common/Button';
@@ -80,7 +80,7 @@ export default function EditNote (props) {
     };
     const [pendingChanges, setPendingChanges] = useState(defaultChanges);
     const [error, setError] = useState(defaultChanges);
-    const history = useHistory();
+    const navigate = useNavigate();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [pageLoaded, setPageLoaded] = useState(false);
 
@@ -112,12 +112,12 @@ export default function EditNote (props) {
     }, [isNotePostPending]);
     useEffect(() => {
         if (pageLoaded && !isNotePutPending) {
-            history.push(`/notes/${noteId}`);
+            navigate(`/notes/${noteId}`);
         }
     }, [isNotePutPending]);
     useEffect(() => {
         if (pageLoaded && !isNoteDeletePending) {
-            history.push('/notes');
+            navigate('/notes');
         }
     }, [isNoteDeletePending]);
 

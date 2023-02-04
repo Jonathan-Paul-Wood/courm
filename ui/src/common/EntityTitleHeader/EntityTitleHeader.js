@@ -1,5 +1,5 @@
 import React from 'react';
-import { useHistory, useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import Button from '../Button';
@@ -45,7 +45,7 @@ const RightSideContent = styled.div`
 export default function EntityTitleHeader (props) {
     const { title, handleSave, editMode, disableSave, type } = props;
     const { contactId, noteId, eventId } = useParams();
-    const history = useHistory();
+    const navigate = useNavigate();
 
     let editPath;
     if (type === 'Contact') {
@@ -63,7 +63,7 @@ export default function EntityTitleHeader (props) {
                 className="back"
                 label={'Back'}
                 type="secondary"
-                onClick={history.goBack}
+                onClick={() => navigate(-1)}
             />
             <h2 className="pageTitle" title={title}>{title}</h2>
             <RightSideContent className="save-edit">
@@ -82,7 +82,7 @@ export default function EntityTitleHeader (props) {
                             label="EDIT"
                             icon="edit"
                             type="secondary"
-                            onClick={() => history.push(editPath)}
+                            onClick={() => navigate(editPath)}
                         />
                     )}
             </RightSideContent>

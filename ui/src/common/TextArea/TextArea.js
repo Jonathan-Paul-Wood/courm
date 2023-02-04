@@ -153,7 +153,6 @@ export default function TextArea (props) {
                     readOnly={locked}
                     onFocus={() => !locked && setActive(true)}
                     onBlur={() => !locked && setActive(false)}
-                    resize="none"
                 />
                 <label className={error ? 'error' : ''}>
                     {error || label}

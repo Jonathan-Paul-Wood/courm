@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory, useLocation, useParams } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import EntityTitleHeader from '../../common/EntityTitleHeader/EntityTitleHeader';
 import Button from '../../common/Button';
@@ -174,7 +174,7 @@ export default function EditContact (props) {
     const [entityIsOrganization, setEntityIsOrganization] = useState(false);
     const [pendingChanges, setPendingChanges] = useState(defaultChanges);
     const [error, setError] = useState(defaultChanges);
-    const history = useHistory();
+    const navigate = useNavigate();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [pageLoaded, setPageLoaded] = useState(false);
 
@@ -209,13 +209,13 @@ export default function EditContact (props) {
 
     useEffect(() => {
         if (pageLoaded && !isContactPutPending) {
-            history.push(`/contacts/${contactId}`);
+            navigate(`/contacts/${contactId}`);
         }
     }, [isContactPutPending]);
 
     useEffect(() => {
         if (pageLoaded && !isContactDeletePending) {
-            history.push('/contacts');
+            navigate('/contacts');
         }
     }, [isContactDeletePending]);
 
@@ -328,7 +328,7 @@ export default function EditContact (props) {
                                 </span>
                                 <label className={`switch ${isNewContact ? '' : 'hidden'}`}>
                                     <input
-                                        active={`${entityIsOrganization}`}
+                                        // active={`${entityIsOrganization}`} TODO: need to use flag in toggle
                                         type="checkbox"
                                         onClick={() => setEntityIsOrganization(!entityIsOrganization)}
                                         disabled={!isNewContact}
