@@ -85,7 +85,7 @@ export default function ViewNote (props) {
                 : (
                     <>
                         <EntityTitleHeader
-                            title={`${note.title} ${note.date}`}
+                            title={`${note.title} ${note.date.split('T')[0]}`}
                             editMode={false}
                             type='Note'
                         />

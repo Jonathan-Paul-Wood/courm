@@ -142,7 +142,7 @@ export default function EditNote (props) {
         }
         if (pendingChanges.date &&
                 (pendingChanges.date &&
-                    !pendingChanges.date.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/g)
+                    !pendingChanges.date.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}$/g)
                 )
         ) {
             valid = false;
@@ -210,7 +210,7 @@ export default function EditNote (props) {
                                 value={pendingChanges.date}
                                 label="Date"
                                 error={error.date}
-                                onChange={(event) => updateData('date', event.target.value)}
+                                onChange={(newDate) => updateData('date', newDate)}
                                 maxLength={11}
                             />
                         </div>

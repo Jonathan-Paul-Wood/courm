@@ -85,7 +85,7 @@ export default function ViewEvent (props) {
                 : (
                     <>
                         <EntityTitleHeader
-                            title={`${event.title} ${event.date}`}
+                            title={`${event.title} ${event.date.split('T')[0]}`}
                             editMode={false}
                             type='Event'
                         />

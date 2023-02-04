@@ -250,7 +250,7 @@ export default function EditContact (props) {
         if (!entityIsOrganization &&
             pendingChanges.dateOfBirth &&
             (pendingChanges.dateOfBirth &&
-                !pendingChanges.dateOfBirth.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/g)
+                !pendingChanges.dateOfBirth.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}$/g)
             )
         ) {
             valid = false;
