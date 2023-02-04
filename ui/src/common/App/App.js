@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Switch, Redirect } from 'react-router-dom';
+import { Routes } from 'react-router-dom';
 import styled from 'styled-components';
 import './App.css';
 import '../../../node_modules/bootstrap/scss/bootstrap.scss';
@@ -21,24 +21,23 @@ export default function App () {
     return isSetupComplete
         ? (<div>
             <ErrorBoundary>
-                <Switch>
-                    <Redirect exact from="/" to="home" />
-                    <AppRouter path="/home" component={AppRouter} />
-                    <AppRouter path="/contacts/:contactId" component={AppRouter} />
-                    <AppRouter path="/contacts/new" component={AppRouter} />
-                    <AppRouter path="/contacts" component={AppRouter} />
-                    <AppRouter path="/events/:contactId" component={AppRouter} />
-                    <AppRouter path="/events/new" component={AppRouter} />
-                    <AppRouter path="/events" component={AppRouter} />
-                    <AppRouter path="/notes/:noteId" component={AppRouter} />
-                    <AppRouter path="/notes/new" component={AppRouter} />
-                    <AppRouter path="/notes" component={AppRouter} />
-                    <AppRouter path="/configure" component={AppRouter} />
-                    <AppRouter path="/faq" component={AppRouter} />
-                    {/* <Route path="/interactions/:interactionId" component={App} /> */}
-                    {/* <Route path="/interactions" component={App} /> */}
-                    {/* <Route exact path="/statistics" component={App} /> */}
-                </Switch>
+                <Routes>
+                    <AppRouter path="/home" element={<AppRouter />} />
+                    <AppRouter path="/contacts/:contactId" element={<AppRouter />} />
+                    <AppRouter path="/contacts/new" element={<AppRouter />} />
+                    <AppRouter path="/contacts" element={<AppRouter />} />
+                    <AppRouter path="/events/:contactId" element={<AppRouter />} />
+                    <AppRouter path="/events/new" element={<AppRouter />} />
+                    <AppRouter path="/events" element={<AppRouter />} />
+                    <AppRouter path="/notes/:noteId" element={<AppRouter />} />
+                    <AppRouter path="/notes/new" element={<AppRouter />} />
+                    <AppRouter path="/notes" element={<AppRouter />} />
+                    <AppRouter path="/configure" element={<AppRouter />} />
+                    <AppRouter path="/faq" element={<AppRouter />} />
+                    {/* <Route path="/interactions/:interactionId" element={<App />} /> */}
+                    {/* <Route path="/interactions" element={<App />} /> */}
+                    {/* <Route exact path="/statistics" element={<App />} /> */}
+                </Routes>
             </ErrorBoundary>
             <ToastWrapper />
 

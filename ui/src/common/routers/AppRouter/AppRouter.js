@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { Switch, Redirect } from 'react-router-dom';
+import React from 'react';
+import { Routes } from 'react-router-dom';
 
 // import { PropTypes } from 'prop-types';
 import AppLayout from '../../../layouts/AppLayout/AppLayout';
@@ -17,36 +17,32 @@ import AppConfigure from '../../../components/AppConfigure';
 import FaqHome from '../../../components/FaqHome';
 
 export default function AppRouter () {
-    useEffect(() => {
-        document.title = 'Personal CRM';
-    }, []);
-
     const commonRouteProps = {
         showWarning: false
     };
 
     return (
         <React.Fragment>
-            <Switch>
-                <Redirect exact from="/" to="/home" />
-                <AppLayout path="/home" component={AppHome} {...commonRouteProps} />
-                <AppLayout path="/contacts" exact component={ContactsBrowse} {...commonRouteProps} />
-                <AppLayout path="/contacts/new" exact component={EditContact} {...commonRouteProps} />
-                <AppLayout path="/contacts/:contactId/edit" component={EditContact} {...commonRouteProps} />
-                <AppLayout path="/contacts/:contactId" component={ViewContact} {...commonRouteProps} />
-                <AppLayout path="/events" exact component={EventsBrowse} {...commonRouteProps} />
-                <AppLayout path="/events/new" exact component={EditEvent} {...commonRouteProps} />
-                <AppLayout path="/events/:eventId/edit" component={EditEvent} {...commonRouteProps} />
-                <AppLayout path="/events/:eventId" component={ViewEvent} {...commonRouteProps} />
-                <AppLayout path="/notes" exact component={NotesBrowse} {...commonRouteProps} />
-                <AppLayout path="/notes/new" exact component={EditNote} {...commonRouteProps} />
-                <AppLayout path="/notes/:noteId/edit" component={EditNote} {...commonRouteProps} />
-                <AppLayout path="/notes/:noteId" component={ViewNote} {...commonRouteProps} />
-                <AppLayout path="/configure" component={AppConfigure} {...commonRouteProps} />
-                <AppLayout path="/faq" component={FaqHome} {...commonRouteProps} />
-                {/* <AppLayout path="/interactions/:interactionsId" component={Interaction} />
-                <AppLayout path="/interactions" component={InteractionsBrowse} /> */}
-            </Switch>
+            <Routes>
+                <AppLayout path="/" element={<AppHome />} {...commonRouteProps} />
+                <AppLayout path="/home" element={<AppHome />} {...commonRouteProps} />
+                <AppLayout path="/contacts" exact element={<ContactsBrowse />} {...commonRouteProps} />
+                <AppLayout path="/contacts/new" exact element={<EditContact />} {...commonRouteProps} />
+                <AppLayout path="/contacts/:contactId/edit" element={<EditContact />} {...commonRouteProps} />
+                <AppLayout path="/contacts/:contactId" element={<ViewContact />} {...commonRouteProps} />
+                <AppLayout path="/events" exact element={<EventsBrowse />} {...commonRouteProps} />
+                <AppLayout path="/events/new" exact element={<EditEvent />} {...commonRouteProps} />
+                <AppLayout path="/events/:eventId/edit" element={<EditEvent />} {...commonRouteProps} />
+                <AppLayout path="/events/:eventId" element={<ViewEvent />} {...commonRouteProps} />
+                <AppLayout path="/notes" exact element={<NotesBrowse />} {...commonRouteProps} />
+                <AppLayout path="/notes/new" exact element={<EditNote />} {...commonRouteProps} />
+                <AppLayout path="/notes/:noteId/edit" element={<EditNote />} {...commonRouteProps} />
+                <AppLayout path="/notes/:noteId" element={<ViewNote />} {...commonRouteProps} />
+                <AppLayout path="/configure" element={<AppConfigure />} {...commonRouteProps} />
+                <AppLayout path="/faq" element={<FaqHome />} {...commonRouteProps} />
+                {/* <AppLayout path="/interactions/:interactionsId" element={<Interaction />} />
+                <AppLayout path="/interactions" element={<InteractionsBrowse />} /> */}
+            </Routes>
         </React.Fragment>
     );
 }

@@ -1,34 +1,36 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import App from './common/App';
 import { Provider } from 'react-redux';
 import store from './configureStore';
 import { createBrowserHistory } from 'history';
-import { Router, Switch, Route } from 'react-router-dom';
+import { Router, Routes, Route } from 'react-router-dom';
 import './styles/index.scss';
 // import PageNotFound from './components/pages/PageNotFound';
 
-ReactDOM.render(
-    <Router history={createBrowserHistory()}>
+const container = document.getElementById('root');
+const root = createRoot(container);
+
+root.render(
+    <Router navigator={createBrowserHistory()}>
         <Provider store={store}>
-            <Switch>
-                <Route path="/home" component={App} />
-                <Route exact path="/" component={App} />
-                <Route path="/contacts" component={App} />
-                <Route path="/contacts/new" component={App} />
-                <Route path="/contacts/:contactId" component={App} />
-                <Route path="/events" component={App} />
-                <Route path="/events/new" component={App} />
-                <Route path="/events/:contactId" component={App} />
-                <Route path="/notes" component={App} />
-                <Route path="/notes/new" component={App} />
-                <Route path="/notes/:noteId" component={App} />
-                <Route path="/configure" component={App} />
-                <Route path="/faq" component={App} />
-                {/* <Route path="/statistics" component={App} /> */}
-                {/* <Route component={PageNotFound} /> */}
-            </Switch>
+            <Routes>
+                <Route path="/home" element={<App />} />
+                <Route path="/" element={<App />} />
+                <Route path="/contacts" element={<App />} />
+                <Route path="/contacts/new" element={<App />} />
+                <Route path="/contacts/:contactId" element={<App />} />
+                <Route path="/events" element={<App />} />
+                <Route path="/events/new" element={<App />} />
+                <Route path="/events/:contactId" element={<App />} />
+                <Route path="/notes" element={<App />} />
+                <Route path="/notes/new" element={<App />} />
+                <Route path="/notes/:noteId" element={<App />} />
+                <Route path="/configure" element={<App />} />
+                <Route path="/faq" element={<App />} />
+                {/* <Route path="/statistics" element={<App />} /> */}
+                {/* <Route element={<PageNotFound />} /> */}
+            </Routes>
         </Provider>
-    </Router>,
-    document.getElementById('root')
+    </Router>
 );

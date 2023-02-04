@@ -1,5 +1,5 @@
 import React from 'react';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
 import icons from '../../../../assets/icons/bootstrapIcons';
@@ -36,10 +36,10 @@ const ItemContainer = styled.div`
 `;
 
 export default function SideBarNavItem (props) {
-    const history = useHistory();
+    const navigate = useNavigate();
 
     function handleNavigation (path) {
-        history.push(`${path}`);
+        navigate(`${path}`);
     }
 
     return (
