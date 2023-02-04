@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import styled from 'styled-components';
 import './App.css';
 import '../../../node_modules/bootstrap/scss/bootstrap.scss';
@@ -49,7 +49,7 @@ export default function App () {
                     <LeftSidebar />
                     <div className="content">
                         <Routes>
-                            <Route path="/" element={<AppHome />} />
+                            <Route path="/" element={<Navigate to="/home" replace /> } />
                             <Route path="home" element={<AppHome />} />
                             <Route path="contacts/*">
                                 <Route path="" exact element={<ContactsBrowse />} />
@@ -67,7 +67,7 @@ export default function App () {
                             <Route path="/notes/:noteId" element={<ViewNote />} />
                             <Route path="configure" element={<AppConfigure />} />
                             <Route path="faq" element={<FaqHome />} />
-                            <Route path="*" element={<AppHome />} />
+                            <Route path="*" element={<Navigate to="/home" replace /> } />
                         </Routes>
                         <div id="layout-footer"></div>
                     </div>
