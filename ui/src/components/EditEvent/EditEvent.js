@@ -140,7 +140,7 @@ export default function EditEvent (props) {
         }
         if (pendingChanges.date &&
                 (pendingChanges.date &&
-                    !pendingChanges.date.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/g)
+                    !pendingChanges.date.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}$/g)
                 )
         ) {
             valid = false;
@@ -208,7 +208,7 @@ export default function EditEvent (props) {
                                 value={pendingChanges.date}
                                 label="Date"
                                 error={error.date}
-                                onChange={(event) => { console.log('event date event: ', JSON.stringify(event)); updateData('date', event); } }
+                                onChange={(newDate) => { console.log('event date event: ', JSON.stringify(newDate)); updateData('date', newDate); } }
                                 maxLength={11}
                             />
                         </div>
