@@ -32,11 +32,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 
 // If running in production mode enter here
-const breadcrumbtrail = path.join(__dirname, 'build/');
-app.use('/', express.static(breadcrumbtrail));
-app.get('/', function(req, res) {
-    res.sendFile(path.join(breadcrumbtrail, 'index.html'));
-});
+// const breadcrumbtrail = path.join(__dirname, 'build/');
+// app.use('/', express.static(breadcrumbtrail));
+// app.get('/', function(req, res) {
+//     res.sendFile(path.join(breadcrumbtrail, 'index.html'));
+// });
 
 function initializeDB() {
     db.serialize(function() {
@@ -268,7 +268,6 @@ app.delete("/api/notes/:id", (req, res) => {
         }
     });
 });
-
 // END NOTES APIS
 
 // CONTACTS APIS
@@ -528,7 +527,6 @@ app.delete("/api/contacts/:id", (req, res) => {
         }
     });
 });
-
 // END CONTACTS APIS
 
 // EVENTS APIS
@@ -669,7 +667,6 @@ app.delete("/api/events/:id", (req, res) => {
         }
     });
 });
-
 // END EVENTS APIS
 
 // RELATIONS APIS
@@ -796,7 +793,6 @@ app.delete("/api/relations/:id", (req, res) => {
         }
     });
 });
-
 // END RELATIONS APIS
 
 // START COMBINATORIAL SEARCH APIS
@@ -900,7 +896,6 @@ app.get("/api/records-by-relation/recordType/:recordType", async (req, res) => {
         }
     });
 });
-
 // END COMBINATORIAL SEARCH APIS
 
 // GET NAMES OF RECORDS
@@ -931,5 +926,5 @@ app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}/`);
 
     // if in production mode: opens the url in the default browser 
-    open(`http://localhost:${PORT}/`);
+    // open(`http://localhost:${PORT}/`);
 });
