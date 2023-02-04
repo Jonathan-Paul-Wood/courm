@@ -50,17 +50,15 @@ export default function App () {
                     <div className="content">
                         <Routes>
                             <Route path="/" element={<Navigate to="/home" replace /> } />
-                            <Route path="home" element={<AppHome />} />
-                            <Route path="contacts/*">
-                                <Route path="" exact element={<ContactsBrowse />} />
-                                <Route path="new" exact element={<EditContact />} />
-                                <Route path=":contactId" element={<ViewContact />} />
-                                <Route path=":contactId/edit" element={<EditContact />} />
-                            </Route>
-                            <Route path="events" exact element={<EventsBrowse />} />
-                            <Route path="events/new" exact element={<EditEvent />} />
-                            <Route path="events/:eventId/edit" element={<EditEvent />} />
-                            <Route path="events/:eventId" element={<ViewEvent />} />
+                            <Route path="/home" element={<AppHome />} />
+                            <Route path="/contacts" exact element={<ContactsBrowse />} />
+                            <Route path="/contacts/new" exact element={<EditContact />} />
+                            <Route path="/contacts/:contactId" element={<ViewContact />} />
+                            <Route path="/contacts/:contactId/edit" element={<EditContact />} />
+                            <Route path="/events" exact element={<EventsBrowse />} />
+                            <Route path="/events/new" exact element={<EditEvent />} />
+                            <Route path="/events/:eventId/edit" element={<EditEvent />} />
+                            <Route path="/events/:eventId" element={<ViewEvent />} />
                             <Route path="/notes" exact element={<NotesBrowse />} />
                             <Route path="/notes/new" exact element={<EditNote />} />
                             <Route path="/notes/:noteId/edit" element={<EditNote />} />

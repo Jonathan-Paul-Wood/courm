@@ -21,10 +21,10 @@ export default function AppHome (props) {
     function handleActionSelection (action, object) {
         switch (action) {
         case 'view':
-            navigate(`${object}`);
+            navigate(`/${object}`);
             break;
         case 'create':
-            navigate(`${object}/new`);
+            navigate(`/${object}/new`);
             break;
         default:
             console.log('error, invalid action: ', action);
