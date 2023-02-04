@@ -1,15 +1,38 @@
 import React, { useEffect, useState } from 'react';
-import { Routes } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import styled from 'styled-components';
 import './App.css';
 import '../../../node_modules/bootstrap/scss/bootstrap.scss';
 import axiosSingleton from '../../configs/axiosSingleton';
-import AppRouter from '../routers/AppRouter/AppRouter';
 import LoadingLoop from '../LoadingLoop/LoadingLoop';
 import ToastWrapper from './ToastWrapper';
+import AppHome from '../../components/AppHome';
+import ContactsBrowse from '../../components/ContactsBrowse';
+import ViewContact from '../../components/ViewContact';
+import EditContact from '../../components/EditContact';
+import EventsBrowse from '../../components/EventsBrowse';
+import ViewEvent from '../../components/ViewEvent';
+import EditEvent from '../../components/EditEvent';
+import NotesBrowse from '../../components/NotesBrowse';
+import ViewNote from '../../components/ViewNote';
+import EditNote from '../../components/EditNote';
+import AppConfigure from '../../components/AppConfigure';
+import FaqHome from '../../components/FaqHome';
+import LeftSidebar from '../../layouts/AppLayout/LeftSideBar/LeftSideBar';
 
 const ErrorBoundary = styled.div`
 `;// todo: make it's own component. Wraps around and overlays screen if there is an error message
+
+const AppWrapper = styled.div`
+    background-color: #ffffff;
+
+    .content {
+        position: relative;
+        left: 8em;
+        padding: 1em 0em;
+        width: calc(100% - 10em);
+    }
+`;
 
 export default function App () {
     const [isSetupComplete, setIsSetupComplete] = useState(false);
@@ -18,26 +41,37 @@ export default function App () {
         axiosSingleton.request();
         setIsSetupComplete(true);
     }, []);
+
     return isSetupComplete
         ? (<div>
             <ErrorBoundary>
-                <Routes>
-                    <AppRouter path="/home" element={<AppRouter />} />
-                    <AppRouter path="/contacts/:contactId" element={<AppRouter />} />
-                    <AppRouter path="/contacts/new" element={<AppRouter />} />
-                    <AppRouter path="/contacts" element={<AppRouter />} />
-                    <AppRouter path="/events/:contactId" element={<AppRouter />} />
-                    <AppRouter path="/events/new" element={<AppRouter />} />
-                    <AppRouter path="/events" element={<AppRouter />} />
-                    <AppRouter path="/notes/:noteId" element={<AppRouter />} />
-                    <AppRouter path="/notes/new" element={<AppRouter />} />
-                    <AppRouter path="/notes" element={<AppRouter />} />
-                    <AppRouter path="/configure" element={<AppRouter />} />
-                    <AppRouter path="/faq" element={<AppRouter />} />
-                    {/* <Route path="/interactions/:interactionId" element={<App />} /> */}
-                    {/* <Route path="/interactions" element={<App />} /> */}
-                    {/* <Route exact path="/statistics" element={<App />} /> */}
-                </Routes>
+                <AppWrapper>
+                    <LeftSidebar />
+                    <div className="content">
+                        <Routes>
+                            <Route path="/" element={<AppHome />} />
+                            <Route path="home" element={<AppHome />} />
+                            <Route path="contacts/*">
+                                <Route path="" exact element={<ContactsBrowse />} />
+                                <Route path="new" exact element={<EditContact />} />
+                                <Route path=":contactId" element={<ViewContact />} />
+                                <Route path=":contactId/edit" element={<EditContact />} />
+                            </Route>
+                            <Route path="events" exact element={<EventsBrowse />} />
+                            <Route path="events/new" exact element={<EditEvent />} />
+                            <Route path="events/:eventId/edit" element={<EditEvent />} />
+                            <Route path="events/:eventId" element={<ViewEvent />} />
+                            <Route path="/notes" exact element={<NotesBrowse />} />
+                            <Route path="/notes/new" exact element={<EditNote />} />
+                            <Route path="/notes/:noteId/edit" element={<EditNote />} />
+                            <Route path="/notes/:noteId" element={<ViewNote />} />
+                            <Route path="configure" element={<AppConfigure />} />
+                            <Route path="faq" element={<FaqHome />} />
+                            <Route path="*" element={<AppHome />} />
+                        </Routes>
+                        <div id="layout-footer"></div>
+                    </div>
+                </AppWrapper>
             </ErrorBoundary>
             <ToastWrapper />
 

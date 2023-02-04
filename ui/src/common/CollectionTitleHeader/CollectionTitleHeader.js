@@ -51,7 +51,7 @@ export default function CollectionTitleHeader (props) {
                 icon={'arrowLeft'}
                 label="Back"
                 type="secondary"
-                onClick={history.goBack}
+                onClick={() => navigate(-1)}
             />
             <h2 style={classes.headerTitle}>{props.title}</h2>
             <div id="header-right">

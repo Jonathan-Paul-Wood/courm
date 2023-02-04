@@ -63,7 +63,7 @@ export default function EntityTitleHeader (props) {
                 className="back"
                 label={'Back'}
                 type="secondary"
-                onClick={history.goBack}
+                onClick={() => navigate(-1)}
             />
             <h2 className="pageTitle" title={title}>{title}</h2>
             <RightSideContent className="save-edit">

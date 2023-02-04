@@ -1,7 +1,7 @@
 import React from 'react';
+import { Outlet } from 'react-router';
 import styled from 'styled-components';
-import PropTypes from 'prop-types';
-import { Route } from 'react-router-dom';
+// import { Route } from 'react-router-dom';
 import LeftSidebar from '../../layouts/AppLayout/LeftSideBar/LeftSideBar';
 
 const AppWrapper = styled.div`
@@ -15,23 +15,14 @@ const AppWrapper = styled.div`
     }
 `;
 
-export default function AppLayout ({ component: Component, ...props }) {
+export default function AppLayout () {
     return (
-        <Route
-            {...props}
-            render={matchProps => (
-                <AppWrapper>
-                    <LeftSidebar />
-                    <div className="content">
-                        <Component {...matchProps} />
-                        <div id="layout-footer"></div>
-                    </div>
-                </AppWrapper>
-            )}
-        />
+        <AppWrapper>
+            <LeftSidebar />
+            <div className="content">
+                <Outlet />
+                <div id="layout-footer"></div>
+            </div>
+        </AppWrapper>
     );
 }
-
-AppLayout.propTypes = {
-    component: PropTypes.any
-};
