@@ -355,6 +355,13 @@ app.put("/api/notes/:id", (req, res) => {
 });
 
 app.delete("/api/notes/:id", (req, res) => {
+    const wasErrorRemovingRelations = cleanUpRelations('note', req.params.id);
+    if (wasErrorRemovingRelations) {
+        res.status = ERROR_CODE;
+        res.json(wasErrorRemovingRelations);
+        return;
+    }
+
     const sql = `DELETE FROM notes WHERE id = ${req.params.id}`;
     db.run(sql, (err, row) => {
         if (err) {
@@ -594,6 +601,13 @@ app.put("/api/contacts/:id", (req, res) => {
 });
 
 app.delete("/api/contacts/:id", (req, res) => {
+    const wasErrorRemovingRelations = cleanUpRelations('contact', req.params.id);
+    if (wasErrorRemovingRelations) {
+        res.status = ERROR_CODE;
+        res.json(wasErrorRemovingRelations);
+        return;
+    }
+
     const sql = `DELETE FROM contacts WHERE id = ${req.params.id}`;
     db.run(sql, (err, row) => {
         if (err) {
@@ -846,6 +860,13 @@ app.put("/api/events/:id", (req, res) => {
 });
 
 app.delete("/api/events/:id", (req, res) => {
+    const wasErrorRemovingRelations = cleanUpRelations('event', req.params.id);
+    if (wasErrorRemovingRelations) {
+        res.status = ERROR_CODE;
+        res.json(wasErrorRemovingRelations);
+        return;
+    }
+
     const sql = `DELETE FROM events WHERE id = ${req.params.id}`;
     db.run(sql, (err, row) => {
         if (err) {
@@ -986,6 +1007,17 @@ app.delete("/api/relations/:id", (req, res) => {
         }
     });
 });
+
+function cleanUpRelations(recordType, recordId) {
+    const sql = `DELETE FROM relations WHERE ${recordType}Id = ${recordId}`;
+    db.run(sql, (err, _row) => {
+        if (err) {
+            return err;
+        } else {
+            return false; // no issues found
+        }
+    });
+}
 // END RELATIONS APIS
 
 // START COMBINATORIAL SEARCH APIS
