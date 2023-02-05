@@ -4,10 +4,15 @@ import styled from 'styled-components';
 import Button from '../../common/Button';
 import Select from '../../common/Select';
 import { exportDataList } from '../../common/Utilities/utilities';
+import { templateContact } from '../../constants/contactConstants';
 import LoadingSpinner from '../../common/LoadingSpinner';
 
 const ConfigureWrapper = styled.div`
     padding: 0 1em;
+
+    .error {
+        color: red;
+    }
 `;
 
 export default function AppConfigure (props) {
@@ -59,6 +64,10 @@ export default function AppConfigure (props) {
 
     const [selectedTypeIndex, setSelectedTypeIndex] = useState(0);
     const [pendingUpload, setPendingUpload] = useState(null);
+    const [pendingLinkedInUpload, setPendingLinkedInUpload] = useState(null);
+    const [linkedInUploadError, setLinkedInUploadError] = useState('');
+    const [isLinkedInFileUploading, setIsLinkedInFileUploading] = useState(false);
+    const [linkedInUploadInfo, setLinkedInUploadInfo] = useState('');
 
     useEffect(() => {
         // TODO: replace with getAll endpoints once made
@@ -89,6 +98,13 @@ export default function AppConfigure (props) {
         const reader = new FileReader();
         reader.readAsText(event.target.files[0]);
         setPendingUpload(reader);
+    }
+
+    function captureLIUpload (event) {
+        setLinkedInUploadError(null);
+        const reader = new FileReader();
+        reader.readAsText(event.target.files[0]);
+        setPendingLinkedInUpload(reader);
     }
 
     function handleAddEntity (entityType) {
@@ -143,6 +159,43 @@ export default function AppConfigure (props) {
         }
     }
 
+    function handleParseLinkedInContacts () {
+        setLinkedInUploadError(null);
+        setIsLinkedInFileUploading(true);
+        if (!pendingLinkedInUpload) {
+            setLinkedInUploadError('Please Browse and select a file');
+        }
+        const linkedInFileRows = pendingLinkedInUpload.result.split(/r\n|\n/);
+
+        linkedInFileRows.forEach((row, i) => {
+            const rowArr = row.split(',');
+
+            if (rowArr.length < 4) return; // skip some metadata rows
+            if (row === 'First Name,Last Name,Email Address,Company,Position,Connected On') return; // skip header
+
+            let connectedOn = row.match(/[0-9]{2} [A-Z][a-z]{2} [0-9]{4}/);
+            if (connectedOn && connectedOn.length) {
+                connectedOn = connectedOn[0];
+            } else {
+                console.log('no date found: ', row);
+                connectedOn = '01 Jan 1990';
+            }
+            setLinkedInUploadInfo(`Uploading ${i} of approximately ${row.length} contacts...`);
+            postContact({
+                ...templateContact,
+                firstName: rowArr[0],
+                lastName: rowArr[1],
+                email: rowArr[2],
+                firm: rowArr[3],
+                createdOn: new Date(connectedOn),
+                lastModifiedOn: new Date()
+            });
+        });
+
+        setIsLinkedInFileUploading(false);
+        setLinkedInUploadInfo('');
+    }
+
     function handleAddData () {
         const type = fileTypeOptions[selectedTypeIndex].value;
         if (type === 'all') {
@@ -185,6 +238,19 @@ export default function AppConfigure (props) {
                             <Button icon="upload" label={`Add ${fileTypeOptions[selectedTypeIndex].label}`} type="secondary" onClick={() => handleAddData()} />
                             <p>Restoring data will remove all existing data and replace them with those in the uploaded file.</p>
                             <Button icon="upload" label={`Restore ${fileTypeOptions[selectedTypeIndex].label}`} type="secondary" onClick={() => handleRestore()} />
+                        </div>
+                    </div>
+                    <hr />
+                    <div className="row">
+                        <div className="col-lg-6 col-md-6 col-sm-12 col-xs-12" />
+                        <div className="col-lg-6 col-md-6 col-sm-12 col-xs-12">
+                            <h4>Import LinkedIn Contacts</h4>
+                            <p>Upload the 'Contacts.csv' file:</p>
+                            <input type="file" name="linedinContacts" id="linedinContacts" accept="csv" onChange={e => captureLIUpload(e)} />
+                            <p>We will attempt to find contacts in the selected file and add them to your records</p>
+                            <Button isPending={isLinkedInFileUploading} icon="upload" label={'Extract & Upload'} type="secondary" onClick={() => handleParseLinkedInContacts()} />
+                            <p className='error'>{linkedInUploadError}</p>
+                            <p className='info'>{linkedInUploadInfo}</p>
                         </div>
                     </div>
                     {/*
