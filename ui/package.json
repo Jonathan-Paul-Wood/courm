@@ -58,7 +58,7 @@
   },
   "husky": {
     "hooks": {
-      "pre-push": "npm run ut && npm run lint"
+      "pre-push": "npm run test && npm run lint"
     }
   },
   "browserslist": {
