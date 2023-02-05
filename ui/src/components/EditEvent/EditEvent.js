@@ -139,7 +139,7 @@ export default function EditEvent (props) {
             setError({ ...error, ...{ title: 'Please enter title' } });
         }
         if (pendingChanges.date &&
-            !pendingChanges.date.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}$/g)
+            !pendingChanges.date.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}/g)
         ) {
             valid = false;
             setError({ ...error, ...{ date: 'Expected format: YYYY-MM-DD' } });
