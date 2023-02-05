@@ -208,7 +208,7 @@ export default function EditEvent (props) {
                                 value={pendingChanges.date}
                                 label="Date"
                                 error={error.date}
-                                onChange={(newDate) => { console.log('event date event: ', JSON.stringify(newDate)); updateData('date', newDate); } }
+                                onChange={(newDate) => { updateData('date', newDate); } }
                                 maxLength={11}
                             />
                         </div>

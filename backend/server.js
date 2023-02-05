@@ -32,11 +32,11 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 
 // If running in production mode enter here
-const breadcrumbtrail = path.join(__dirname, 'build/');
-app.use('/', express.static(breadcrumbtrail));
-app.get('/', function(req, res) {
-    res.sendFile(path.join(breadcrumbtrail, 'index.html'));
-});
+// const breadcrumbtrail = path.join(__dirname, 'build/');
+// app.use('/', express.static(breadcrumbtrail));
+// app.get('/', function(req, res) {
+//     res.sendFile(path.join(breadcrumbtrail, 'index.html'));
+// });
 
 function initializeDB() {
     db.serialize(function() {
@@ -162,6 +162,28 @@ app.post('/api/notes/new', (req, res) => {
         );
 });
 
+app.get('/api/notes/all', (req, res) => {
+    const sql = `SELECT * FROM notes`;
+    db.all(sql, (err, rows) => {
+        if (err) {
+            res.status(ERROR_CODE).send({message: err.message});
+        } else if (!rows) {
+            res.status(NOT_FOUND_CODE).send({message: 'Failed to get all notes'});
+        } else {
+            res.status = SUCCESS_CODE;
+            const resultCount = rows.length;
+            res.json({
+                results: rows,
+                resultCount: resultCount,
+                pageSize: resultCount,
+                totalCount: resultCount,
+                pageCount: 1,
+                currentPage: 1,
+            });
+        }
+    });
+});
+
 //accepts requests of the form: /api/notes?order=id?results=3&page=1?direction=[ASC|DESC]?search=string
 app.get("/api/notes", (req, res) => {
     const { results, page, order, direction, searchTerm, filters } = req.query;
@@ -268,7 +290,6 @@ app.delete("/api/notes/:id", (req, res) => {
         }
     });
 });
-
 // END NOTES APIS
 
 // CONTACTS APIS
@@ -331,6 +352,28 @@ app.post('/api/contacts/new', (req, res) => {
                 }
             }
         );
+});
+
+app.get('/api/contacts/all', (req, res) => {
+    const sql = `SELECT * FROM contacts`;
+    db.all(sql, (err, rows) => {
+        if (err) {
+            res.status(ERROR_CODE).send({message: err.message});
+        } else if (!rows) {
+            res.status(NOT_FOUND_CODE).send({message: 'Failed to get all contacts'});
+        } else {
+            res.status = SUCCESS_CODE;
+            const resultCount = rows.length;
+            res.json({
+                results: rows,
+                resultCount: resultCount,
+                pageSize: resultCount,
+                totalCount: resultCount,
+                pageCount: 1,
+                currentPage: 1,
+            });
+        }
+    });
 });
 
 //accepts requests of the form: /api/contacts?order=id?results=3&page=1?direction=[ASC|DESC]?search=string
@@ -528,7 +571,6 @@ app.delete("/api/contacts/:id", (req, res) => {
         }
     });
 });
-
 // END CONTACTS APIS
 
 // EVENTS APIS
@@ -563,6 +605,28 @@ app.post('/api/events/new', (req, res) => {
             }
         );
     });
+
+app.get('/api/events/all', (req, res) => {
+    const sql = `SELECT * FROM events`;
+    db.all(sql, (err, rows) => {
+        if (err) {
+            res.status(ERROR_CODE).send({message: err.message});
+        } else if (!rows) {
+            res.status(NOT_FOUND_CODE).send({message: 'Failed to get all events'});
+        } else {
+            res.status = SUCCESS_CODE;
+            const resultCount = rows.length;
+            res.json({
+                results: rows,
+                resultCount: resultCount,
+                pageSize: resultCount,
+                totalCount: resultCount,
+                pageCount: 1,
+                currentPage: 1,
+            });
+        }
+    });
+});
 
 //accepts requests of the form: /api/events?order=id?results=3&page=1?direction=[ASC|DESC]?search=string
 app.get("/api/events", (req, res) => {
@@ -669,7 +733,6 @@ app.delete("/api/events/:id", (req, res) => {
         }
     });
 });
-
 // END EVENTS APIS
 
 // RELATIONS APIS
@@ -796,7 +859,6 @@ app.delete("/api/relations/:id", (req, res) => {
         }
     });
 });
-
 // END RELATIONS APIS
 
 // START COMBINATORIAL SEARCH APIS
@@ -900,7 +962,6 @@ app.get("/api/records-by-relation/recordType/:recordType", async (req, res) => {
         }
     });
 });
-
 // END COMBINATORIAL SEARCH APIS
 
 // GET NAMES OF RECORDS
@@ -931,5 +992,5 @@ app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}/`);
 
     // if in production mode: opens the url in the default browser 
-    open(`http://localhost:${PORT}/`);
+    // open(`http://localhost:${PORT}/`);
 });

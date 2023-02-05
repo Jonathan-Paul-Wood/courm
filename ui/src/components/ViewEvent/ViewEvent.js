@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import EntityTitleHeader from '../../common/EntityTitleHeader/EntityTitleHeader';
@@ -8,6 +8,7 @@ import DateInput from '../../common/DateInput/DateInput';
 import TextArea from '../../common/TextArea/TextArea';
 import LoadingSpinner from '../../common/LoadingSpinner/LoadingSpinner';
 import { exportDataList } from '../../common/Utilities/utilities';
+import RelationCardManager from '../../common/RelationCardManager';
 import ScrollContainer from '../../common/ScrollContainer';
 import PropTypes from 'prop-types';
 
@@ -30,7 +31,6 @@ const GridWrapper = styled.div`
     }
 
     .metadataRow {
-        height: 45vh;
 
         .inputRow {
             width: 100%;
@@ -49,6 +49,16 @@ const GridWrapper = styled.div`
         height: 20rem;
     }
 
+    .relationsRow {
+        display: flex;
+        justify-content: space-between;
+
+        .relationsList {
+            min-width: 50%;
+            margin: 1em;
+        }
+    }
+
     .dateInfo {
         font-style: italic;
         font-size: 0.8rem;
@@ -63,6 +73,8 @@ export default function ViewEvent (props) {
         eventError,
         getEvent
     } = props;
+    const [firstRelationCardEdit, setFirstRelationCardEdit] = useState(false);
+    const [secondRelationCardEdit, setSecondRelationCardEdit] = useState(false);
 
     useEffect(() => {
         // initial GET of event
@@ -133,6 +145,24 @@ export default function ViewEvent (props) {
                             cards go here, or none available message...
                         </div>
                     </div> */}
+                                                <div className="relationsRow">
+                                                    <RelationCardManager
+                                                        parentType={'event'}
+                                                        parentId={parseInt(eventId)}
+                                                        relationType='contact'
+                                                        editMode={firstRelationCardEdit}
+                                                        disableEdit={secondRelationCardEdit}
+                                                        onChange={setFirstRelationCardEdit}
+                                                    />
+                                                    <RelationCardManager
+                                                        parentType={'event'}
+                                                        parentId={parseInt(eventId)}
+                                                        relationType='note'
+                                                        editMode={secondRelationCardEdit}
+                                                        disableEdit={firstRelationCardEdit}
+                                                        onChange={setSecondRelationCardEdit}
+                                                    />
+                                                </div>
                                             </div>
                                             <div className="descriptionRow">
                                                 <TextArea

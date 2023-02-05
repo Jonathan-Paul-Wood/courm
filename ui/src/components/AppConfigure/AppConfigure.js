@@ -12,21 +12,21 @@ const ConfigureWrapper = styled.div`
 
 export default function AppConfigure (props) {
     const {
-        getContactList,
+        getAllContacts,
         postContact,
         deleteContact,
         contacts,
-        isContactListPending,
-        getEventList,
+        isAllContactsPending,
+        getAllEvents,
         postEvent,
         deleteEvent,
         events,
-        isEventListPending,
-        getNoteList,
+        isAllEventsPending,
+        getAllNotes,
         postNote,
         deleteNote,
         notes,
-        isNoteListPending,
+        isAllNotesPending,
         getAllRelations,
         postRelation,
         deleteRelation,
@@ -62,9 +62,9 @@ export default function AppConfigure (props) {
 
     useEffect(() => {
         // TODO: replace with getAll endpoints once made
-        getContactList(100000, 1, '', 'firstName', 'ASC'); // TODO: how to stop double calls
-        getEventList(100000, 1, '', 'title', 'ASC');
-        getNoteList(100000, 1, '', 'title', 'ASC');
+        getAllContacts();
+        getAllEvents();
+        getAllNotes();
         getAllRelations();
     }, []);
 
@@ -159,7 +159,7 @@ export default function AppConfigure (props) {
         <ConfigureWrapper>
             <h2>Configure Application</h2>
             <hr />
-            {(isContactListPending || isEventListPending || isNoteListPending || isRelationListPending)
+            {(isAllContactsPending || isAllEventsPending || isAllNotesPending || isRelationListPending)
                 ? (<LoadingSpinner />)
                 : (<>
                     <h3>Manage Records</h3>
@@ -209,29 +209,29 @@ export default function AppConfigure (props) {
 }
 
 AppConfigure.propTypes = {
-    getContactList: PropTypes.func.isRequired,
+    getAllContacts: PropTypes.func.isRequired,
     postContact: PropTypes.func.isRequired,
     deleteContact: PropTypes.func.isRequired,
     contacts: PropTypes.object.isRequired,
-    isContactListPending: PropTypes.bool.isRequired,
+    isAllContactsPending: PropTypes.bool.isRequired,
     contactListError: PropTypes.string.isRequired,
     isContactPostPending: PropTypes.bool.isRequired,
     contactPostError: PropTypes.string.isRequired,
     isContactDeletePending: PropTypes.bool.isRequired,
-    getEventList: PropTypes.func.isRequired,
+    getAllEvents: PropTypes.func.isRequired,
     postEvent: PropTypes.func.isRequired,
     deleteEvent: PropTypes.func.isRequired,
     events: PropTypes.object.isRequired,
-    isEventListPending: PropTypes.bool.isRequired,
+    isAllEventsPending: PropTypes.bool.isRequired,
     eventListError: PropTypes.string.isRequired,
     isEventPostPending: PropTypes.bool.isRequired,
     eventPostError: PropTypes.string.isRequired,
     isEventDeletePending: PropTypes.bool.isRequired,
-    getNoteList: PropTypes.func.isRequired,
+    getAllNotes: PropTypes.func.isRequired,
     postNote: PropTypes.func.isRequired,
     deleteNote: PropTypes.func.isRequired,
     notes: PropTypes.object.isRequired,
-    isNoteListPending: PropTypes.bool.isRequired,
+    isAllNotesPending: PropTypes.bool.isRequired,
     noteListError: PropTypes.string.isRequired,
     isNotePostPending: PropTypes.bool.isRequired,
     notePostError: PropTypes.string.isRequired,

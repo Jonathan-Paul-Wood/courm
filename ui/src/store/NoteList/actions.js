@@ -34,3 +34,35 @@ export function getNoteList (results, page, searchTerm, order, direction, filter
         }
     };
 }
+
+function getAllNotesLoading () {
+    return {
+        type: types.GET_ALL_NOTES_PENDING
+    };
+}
+
+function getAllNotesSuccess (payload) {
+    return {
+        type: types.GET_ALL_NOTES_SUCCESS,
+        payload
+    };
+}
+
+function getAllNotesError (error) {
+    return {
+        type: types.GET_ALL_NOTES_ERROR,
+        error: new ServiceError('get notes list', error)
+    };
+}
+
+export function getAllNotes () {
+    return async dispatch => {
+        dispatch(getAllNotesLoading());
+        try {
+            const response = await NoteListService.getAllNotes();
+            dispatch(getAllNotesSuccess(response));
+        } catch (e) {
+            dispatch(getAllNotesError(e));
+        }
+    };
+}

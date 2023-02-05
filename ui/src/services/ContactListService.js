@@ -10,4 +10,8 @@ export default class ContactListService {
         searchTerm = searchTerm || '';
         return axios.get(`/contacts?results=${results}&page=${page}&order=${order}&direction=${direction}&searchTerm=${searchTerm}&filters=${filters}&relatedEvents=${appliedEvents}&relatedNotes=${appliedNotes}`);
     }
+
+    static getAllContacts () {
+        return axios.get('/contacts/all');
+    }
 }

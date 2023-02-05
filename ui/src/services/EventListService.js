@@ -10,4 +10,8 @@ export default class EventListService {
         searchTerm = searchTerm || '';
         return axios.get(`/events?results=${results}&page=${page}&order=${order}&direction=${direction}&searchTerm=${searchTerm}&filters=${filters}`);
     }
+
+    static getAllEvents () {
+        return axios.get('/events/all');
+    }
 }
