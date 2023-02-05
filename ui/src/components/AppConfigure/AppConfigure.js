@@ -246,7 +246,7 @@ export default function AppConfigure (props) {
                         <div className="col-lg-6 col-md-6 col-sm-12 col-xs-12">
                             <h4>Import LinkedIn Contacts</h4>
                             <p>Upload the 'Contacts.csv' file:</p>
-                            <input type="file" name="linedinContacts" id="linedinContacts" accept="csv" onChange={e => captureLIUpload(e)} />
+                            <input type="file" name="linkedinContacts" id="linkedinContacts" onChange={e => captureLIUpload(e)} />
                             <p>We will attempt to find contacts in the selected file and add them to your records</p>
                             <Button isPending={isLinkedInFileUploading} icon="upload" label={'Extract & Upload'} type="secondary" onClick={() => handleParseLinkedInContacts()} />
                             <p className='error'>{linkedInUploadError}</p>
