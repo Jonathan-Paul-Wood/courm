@@ -23,11 +23,11 @@ function getNoteListError (error) {
     };
 }
 
-export function getNoteList (results, page, searchTerm, order, direction, filters) {
+export function getNoteList (results, page, searchTerm, order, direction, filters, appliedContacts, appliedEvents) {
     return async dispatch => {
         dispatch(getNoteListLoading());
         try {
-            const response = await NoteListService.getNoteList(results, page, searchTerm, order, direction, filters);
+            const response = await NoteListService.getNoteList(results, page, searchTerm, order, direction, filters, appliedContacts, appliedEvents);
             dispatch(getNoteListSuccess(response));
         } catch (e) {
             dispatch(getNoteListError(e));
