@@ -144,7 +144,6 @@ export default function EditEvent (props) {
             valid = false;
             setError({ ...error, ...{ date: 'Expected format: YYYY-MM-DD' } });
         }
-        // TODO: if you open editor and don't change date, it will not have a timestamp at the end and we need to add it back upon save
 
         if (valid) {
             let d = pendingChanges.date;
