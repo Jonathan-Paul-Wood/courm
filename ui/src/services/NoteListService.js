@@ -10,4 +10,8 @@ export default class NoteListService {
         searchTerm = searchTerm || '';
         return axios.get(`/notes?results=${results}&page=${page}&order=${order}&direction=${direction}&searchTerm=${searchTerm}&filters=${filters}`);
     }
+
+    static getAllNotes () {
+        return axios.get('/notes/all');
+    }
 }

@@ -41,11 +41,11 @@ export default function RelationCardManager (props) {
         getAllContacts,
         isAllContactsPending,
         eventList,
-        getEventList,
-        isEventListPending,
+        getAllEvents,
+        isAllEventsPending,
         noteList,
-        getNoteList,
-        isNoteListPending,
+        getAllNotes,
+        isAllNotesPending,
         isRelationPostPending,
         isRelationPutPending,
         isRelationDeletePending
@@ -54,8 +54,8 @@ export default function RelationCardManager (props) {
     useEffect(() => {
         getRelationList(`${parentType}Id`, `${parentId}`);
         getAllContacts();
-        getEventList(100000);
-        getNoteList(100000);
+        getAllEvents();
+        getAllNotes();
     }, []);
 
     useEffect(() => {
@@ -90,7 +90,7 @@ export default function RelationCardManager (props) {
                 {`${relationType.toUpperCase()}S`}
             </div>
             <div className="relationList">
-                {(isRelationListPending || isAllContactsPending || isEventListPending || isNoteListPending)
+                {(isRelationListPending || isAllContactsPending || isAllEventsPending || isAllNotesPending)
                     ? <LoadingSpinner />
                     : (editMode
                         ? <RelationEditCard
@@ -126,11 +126,11 @@ RelationCardManager.propTypes = {
     getAllContacts: PropTypes.func.isRequired,
     isAllContactsPending: PropTypes.bool.isRequired,
     eventList: PropTypes.object.isRequired,
-    getEventList: PropTypes.func.isRequired,
-    isEventListPending: PropTypes.bool.isRequired,
+    getAllEvents: PropTypes.func.isRequired,
+    isAllEventsPending: PropTypes.bool.isRequired,
     noteList: PropTypes.object.isRequired,
-    getNoteList: PropTypes.func.isRequired,
-    isNoteListPending: PropTypes.bool.isRequired,
+    getAllNotes: PropTypes.func.isRequired,
+    isAllNotesPending: PropTypes.bool.isRequired,
     getRelationList: PropTypes.func.isRequired,
     isRelationListPending: PropTypes.bool.isRequired,
     isRelationPostPending: PropTypes.bool.isRequired,

@@ -3,17 +3,17 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { getRelationList } from '../../store/RelationList/actions';
 import { getAllContacts } from '../../store/ContactList/actions';
-import { getNoteList } from '../../store/NoteList/actions';
-import { getEventList } from '../../store/EventList/actions';
+import { getAllNotes } from '../../store/NoteList/actions';
+import { getAllEvents } from '../../store/EventList/actions';
 
 function mapStateToProps (state) {
     return {
         contactList: state.contactList.contacts,
         isAllContactsPending: state.contactList.isAllContactsPending,
         eventList: state.eventList.events,
-        isEventListPending: state.eventList.isEventListPending,
+        isAllEventsPending: state.eventList.isAllEventsPending,
         noteList: state.noteList.notes,
-        isNoteListPending: state.noteList.isNoteListPending,
+        isAllNotesPending: state.noteList.isAllNotesPending,
         relationList: state.relationList.relations,
         isRelationListPending: state.relationList.isRelationListPending,
         isRelationPostPending: state.relation.isRelationPostPending,
@@ -26,8 +26,8 @@ const mapDispatchToProps = dispatch =>
     bindActionCreators(
         {
             getAllContacts,
-            getEventList,
-            getNoteList,
+            getAllEvents,
+            getAllNotes,
             getRelationList
         },
         dispatch
