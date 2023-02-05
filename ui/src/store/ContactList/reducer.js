@@ -15,14 +15,12 @@ export default function contact (state = initialState, action) {
     case types.GET_CONTACT_LIST_ERROR:
         return { ...state, isContactListPending: false, contactListError: action.error };
     case types.GET_CONTACT_LIST_SUCCESS:
-        console.log('fetched some contacts: ', action.payload.data);
         return { ...state, isContactListPending: false, contactListError: '', contacts: action.payload.data };
     case types.GET_ALL_CONTACTS_PENDING:
         return { ...state, isAllContactsPending: true, allContactsError: '' };
     case types.GET_ALL_CONTACTS_ERROR:
         return { ...state, isAllContactsPending: false, allContactsError: action.error };
     case types.GET_ALL_CONTACTS_SUCCESS:
-        console.log('fetched all contacts: ', action.payload.data);
         return { ...state, isAllContactsPending: false, allContactsError: '', contacts: action.payload.data };
     default:
         return state;

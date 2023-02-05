@@ -50,21 +50,10 @@ const RelationContainer = styled.div`
 
 export default function RelationViewCard (props) {
     const { relationList, relationType, relatedEntityList, enableEdit, disableEdit, labelTerm } = props;
-    console.log('--------------------------------');
-    console.log('relationList', relationList);
-    console.log('relationType', relationType);
 
     const navigate = useNavigate();
 
     const filteredRelations = relationList.length ? relationList.filter(r => r[relationType + 'Id'] !== null) : [];
-
-    console.log('filteredRelations: ', filteredRelations);
-    // const entityPromises = [];
-    // filteredRelations.forEach(relation => {
-    //     getRelatedEntity(relation[relationType + 'Id']);
-    // });
-    // const relatedEntities = Promises.all(entityPromises);
-    console.log('relatedEntityList', relatedEntityList);
     const filteredEntities = filteredRelations.map(relation => relatedEntityList.find(entity => entity.id === relation[relationType + 'Id']));
 
     return (
@@ -77,9 +66,6 @@ export default function RelationViewCard (props) {
             >
                 {filteredEntities.length
                     ? filteredEntities.map((entity, index) => {
-                        console.log('filteredEntities: ', filteredEntities);
-                        console.log('entity: ', entity);
-                        console.log('labelTerm: ', labelTerm);
                         return (
                             <div className="relatedEntity" key={index} onClick={() => navigate(`/${relationType.toLowerCase()}s/${entity.id}`)}>
                                 <span className="relationTitle" title={entity[labelTerm]}>{entity[labelTerm]}</span>
