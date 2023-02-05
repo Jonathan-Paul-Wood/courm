@@ -471,127 +471,87 @@ app.get("/api/contacts", (req, res) => {
         relationships.notes = relatedNotes.split(',');
     }
 
-    const sqlPre =
-    `SELECT *
-    FROM relations
-    LEFT JOIN contacts
-    ON relations.contactId = contacts.id`;
+    if (Object.keys(relationships).length === 0) {
+        // if no relations, don't filter for them first
+        let sql = `SELECT * FROM contacts`;
+        getSubsetOfRecords(res, sql, order, direction, results, page, searchTerm, filters);
+    } else {
+        const sqlPre =
+        `SELECT *
+        FROM relations
+        LEFT JOIN contacts
+        ON relations.contactId = contacts.id`;
 
-    db.all(sqlPre, (err, rows) => {
-        if (err) {
-            console.log(err);
-            res.status = ERROR_CODE;
-            res.json(err);
-        } else if (!rows) {
-            res.status = NOT_FOUND_CODE;
-            res.json({message: 'NOT FOUND'});
-        } else {
-            const relatedRecordMap = new Map();
-
-            // create map where each record id has an object of their existing relationships
-            rows.forEach((row) => {
-                if (row.id) {
-                    if (!relatedRecordMap.get(row.id)) {
-                        relatedRecordMap.set(row.id, {
-                            contacts: [],
-                            events: [],
-                            notes: []
-                        });
-                    }
-                    const thisRecordEntry = relatedRecordMap.get(row.id);
-                    if (row.contactId && !thisRecordEntry.contacts.includes(row.contactId)) {
-                        relatedRecordMap.set(row.id, {
-                            ...thisRecordEntry,
-                            contacts: [...thisRecordEntry.contacts, row.contactId]
-                        });
-                    }
-                    if (row.eventId && !thisRecordEntry.events.includes(row.eventId)) {
-                        const possiblyUpdatedRecord = relatedRecordMap.get(row.id);
-                        relatedRecordMap.set(row.id, {
-                            ...possiblyUpdatedRecord,
-                            events: [...possiblyUpdatedRecord.events, row.eventId]
-                        });
-                    }
-                    if (row.noteId && !thisRecordEntry.notes.includes(row.noteId)) {
-                        const possiblyUpdatedRecord = relatedRecordMap.get(row.id);
-                        relatedRecordMap.set(row.id, {
-                            ...possiblyUpdatedRecord,
-                            notes: [...possiblyUpdatedRecord.notes, row.noteId]
-                        });
-                    }
-                }
-            });
-
-            // filter for just the record ids with the expected relations
-            const filteredIds = [];
-            const mapKeys = relatedRecordMap.keys();
-            let nextMapKey = mapKeys.next();
-            while (nextMapKey.done === false) {
-                const key = nextMapKey.value;
-                const recordRelations = relatedRecordMap.get(key);
-                const hasAllExpectedRelations = Object.keys(relationships).every((recordIdType) => {
-                    return relationships[recordIdType].every((id) => {
-                        return recordRelations[recordIdType].find(i => i === parseInt(id));
-                    });
-                });
-                if (hasAllExpectedRelations) {
-                    filteredIds.push(key);
-                }
-
-                nextMapKey = mapKeys.next();
-            }
-
-            let sql = `SELECT * FROM contacts`;
-
-            //apply search
-            if(searchTerm && filters) {
-                const searchFilters = filters.split(',');
-                sql = sql + ` WHERE ${searchFilters[0]} LIKE '%${searchTerm}%'`;
-                searchFilters.forEach((filter, index) => {
-                    if(index) {
-                        sql = sql + ` OR ${filter} LIKE '%${searchTerm}%'`;
-                    }
-                });
-                sql = sql+` AND id IN (${filteredIds})`;
+        db.all(sqlPre, (err, rows) => {
+            if (err) {
+                console.log(err);
+                res.status = ERROR_CODE;
+                res.json(err);
+            } else if (!rows) {
+                res.status = NOT_FOUND_CODE;
+                res.json({message: 'NOT FOUND'});
             } else {
-                sql = sql+` WHERE id IN (${filteredIds})`;
-            }
+                const relatedRecordMap = new Map();
 
-            const sql_metadata = sql;
-            //apply sort order and pagination
-            sql = sql+` ORDER BY ${order} ${direction} LIMIT ${results} OFFSET ((${page - 1})* ${results})`;
-            console.log(sql);
-            db.all(sql, (err, rows) => {
-                if (err) {
-                    res.status = ERROR_CODE;
-                    res.json(err);
-                } else if (!rows) {
-                    res.status = NOT_FOUND_CODE;
-                    res.json({message: 'NOT FOUND'});
-                } else {
-                    db.all(sql_metadata, (err, result) => {
-                        if (err) {
-                            res.status = ERROR_CODE;
-                            return console.error(err.message);
-                        } else if (!result) {
-                            res.status = NOT_FOUND_CODE;
-                            return;
-                        } else {
-                            totalResults = result.length;
-                            res.json({
-                                results: rows,
-                                resultCount: rows.length,
-                                pageSize: parseInt(results),
-                                totalCount: totalResults,
-                                pageCount: Math.ceil(totalResults / parseInt(results)),
-                                currentPage: parseInt(page),
+                // create map where each record id has an object of their existing relationships
+                rows.forEach((row) => {
+                    if (row.id) {
+                        if (!relatedRecordMap.get(row.id)) {
+                            relatedRecordMap.set(row.id, {
+                                contacts: [],
+                                events: [],
+                                notes: []
                             });
                         }
+                        const thisRecordEntry = relatedRecordMap.get(row.id);
+                        if (row.contactId && !thisRecordEntry.contacts.includes(row.contactId)) {
+                            relatedRecordMap.set(row.id, {
+                                ...thisRecordEntry,
+                                contacts: [...thisRecordEntry.contacts, row.contactId]
+                            });
+                        }
+                        if (row.eventId && !thisRecordEntry.events.includes(row.eventId)) {
+                            const possiblyUpdatedRecord = relatedRecordMap.get(row.id);
+                            relatedRecordMap.set(row.id, {
+                                ...possiblyUpdatedRecord,
+                                events: [...possiblyUpdatedRecord.events, row.eventId]
+                            });
+                        }
+                        if (row.noteId && !thisRecordEntry.notes.includes(row.noteId)) {
+                            const possiblyUpdatedRecord = relatedRecordMap.get(row.id);
+                            relatedRecordMap.set(row.id, {
+                                ...possiblyUpdatedRecord,
+                                notes: [...possiblyUpdatedRecord.notes, row.noteId]
+                            });
+                        }
+                    }
+                });
+
+                // filter for just the record ids with the expected relations
+                const filteredIds = [];
+                const mapKeys = relatedRecordMap.keys();
+                let nextMapKey = mapKeys.next();
+                while (nextMapKey.done === false) {
+                    const key = nextMapKey.value;
+                    const recordRelations = relatedRecordMap.get(key);
+                    const hasAllExpectedRelations = Object.keys(relationships).every((recordIdType) => {
+                        return relationships[recordIdType].every((id) => {
+                            return recordRelations[recordIdType].find(i => i === parseInt(id));
+                        });
                     });
+                    if (hasAllExpectedRelations) {
+                        filteredIds.push(key);
+                    }
+
+                    nextMapKey = mapKeys.next();
                 }
-            });
-        }
-    });
+
+                let sql = `SELECT * FROM contacts`;
+
+                getSubsetOfRecords(res, sql, order, direction, results, page, searchTerm, filters, filteredIds);
+            }
+        });
+    }
 });
 
 app.get("/api/contacts/:id", (req, res) => {
