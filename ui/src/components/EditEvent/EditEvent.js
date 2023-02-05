@@ -93,7 +93,7 @@ export default function EditEvent (props) {
 
     useEffect(() => {
         // update page when GET returns
-        const d = event.date ? event.date.split('T')[0] : '';
+        const d = event.date ? event.date : '';
         const newValues = { ...event, date: d };
         // TODO: handle 404, and Errors
         setPendingChanges(newValues);
@@ -139,13 +139,12 @@ export default function EditEvent (props) {
             setError({ ...error, ...{ title: 'Please enter title' } });
         }
         if (pendingChanges.date &&
-                (pendingChanges.date &&
-                    !pendingChanges.date.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}$/g)
-                )
+            !pendingChanges.date.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}$/g)
         ) {
             valid = false;
             setError({ ...error, ...{ date: 'Expected format: YYYY-MM-DD' } });
         }
+        // TODO: if you open editor and don't change date, it will not have a timestamp at the end and we need to add it back upon save
 
         if (valid) {
             let d = pendingChanges.date;
