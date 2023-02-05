@@ -38,8 +38,8 @@ export default function RelationCardManager (props) {
         disableEdit,
         onChange,
         contactList,
-        getContactList,
-        isContactListPending,
+        getAllContacts,
+        isAllContactsPending,
         eventList,
         getEventList,
         isEventListPending,
@@ -53,7 +53,7 @@ export default function RelationCardManager (props) {
 
     useEffect(() => {
         getRelationList(`${parentType}Id`, `${parentId}`);
-        getContactList(100000);
+        getAllContacts();
         getEventList(100000);
         getNoteList(100000);
     }, []);
@@ -90,7 +90,7 @@ export default function RelationCardManager (props) {
                 {`${relationType.toUpperCase()}S`}
             </div>
             <div className="relationList">
-                {(isRelationListPending || isContactListPending || isEventListPending || isNoteListPending)
+                {(isRelationListPending || isAllContactsPending || isEventListPending || isNoteListPending)
                     ? <LoadingSpinner />
                     : (editMode
                         ? <RelationEditCard
@@ -123,8 +123,8 @@ RelationCardManager.propTypes = {
     disableEdit: PropTypes.bool.isRequired,
     onChange: PropTypes.func.isRequired,
     contactList: PropTypes.object.isRequired,
-    getContactList: PropTypes.func.isRequired,
-    isContactListPending: PropTypes.bool.isRequired,
+    getAllContacts: PropTypes.func.isRequired,
+    isAllContactsPending: PropTypes.bool.isRequired,
     eventList: PropTypes.object.isRequired,
     getEventList: PropTypes.func.isRequired,
     isEventListPending: PropTypes.bool.isRequired,

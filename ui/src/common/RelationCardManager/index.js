@@ -2,14 +2,14 @@ import RelationCardManager from './RelationCardManager';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { getRelationList } from '../../store/RelationList/actions';
-import { getContactList } from '../../store/ContactList/actions';
+import { getAllContacts } from '../../store/ContactList/actions';
 import { getNoteList } from '../../store/NoteList/actions';
 import { getEventList } from '../../store/EventList/actions';
 
 function mapStateToProps (state) {
     return {
         contactList: state.contactList.contacts,
-        isContactListPending: state.contactList.isContactListPending,
+        isAllContactsPending: state.contactList.isAllContactsPending,
         eventList: state.eventList.events,
         isEventListPending: state.eventList.isEventListPending,
         noteList: state.noteList.notes,
@@ -25,7 +25,7 @@ function mapStateToProps (state) {
 const mapDispatchToProps = dispatch =>
     bindActionCreators(
         {
-            getContactList,
+            getAllContacts,
             getEventList,
             getNoteList,
             getRelationList
