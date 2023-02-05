@@ -2,8 +2,8 @@ import ContactsBrowse from './ContactsBrowse';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { getContactList } from '../../store/ContactList/actions';
-import { getEventList } from '../../store/EventList/actions';
-import { getNoteList } from '../../store/NoteList/actions';
+import { getAllEvents } from '../../store/EventList/actions';
+import { getAllNotes } from '../../store/NoteList/actions';
 
 function mapStateToProps (state) {
     return {
@@ -11,11 +11,11 @@ function mapStateToProps (state) {
         isContactListPending: state.contactList.isContactListPending,
         contactListError: state.contactList.contactListError,
         events: state.eventList.events,
-        isEventListPending: state.eventList.isEventListPending,
-        eventListError: state.eventList.eventListError,
+        isAllEventsPending: state.eventList.isAllEventsPending,
+        allEventsError: state.eventList.allEventsError,
         notes: state.noteList.notes,
-        isNoteListPending: state.noteList.isNoteListPending,
-        noteListError: state.noteList.noteListError
+        isAllNotesPending: state.noteList.isAllNotesPending,
+        allNotesError: state.noteList.allNotesError
     };
 }
 
@@ -23,8 +23,8 @@ const mapDispatchToProps = dispatch =>
     bindActionCreators(
         {
             getContactList,
-            getEventList,
-            getNoteList
+            getAllEvents,
+            getAllNotes
         },
         dispatch
     );

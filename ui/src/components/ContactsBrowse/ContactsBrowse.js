@@ -48,11 +48,11 @@ export default function ContactsBrowse (props) {
         isContactListPending,
         getContactList,
         events,
-        isEventListPending,
-        getEventList,
+        isAllEventsPending,
+        getAllEvents,
         notes,
-        isNoteListPending,
-        getNoteList
+        isAllNotesPending,
+        getAllNotes
     } = props;
     const [activeFilters, setActiveFilters] = useState([]);
     const [page, setPage] = useState(1);
@@ -128,8 +128,8 @@ export default function ContactsBrowse (props) {
 
     useEffect(() => {
         initiateSearch();
-        getEventList();
-        getNoteList();
+        getAllEvents();
+        getAllNotes();
     }, []);
 
     useEffect(() => {
@@ -184,7 +184,7 @@ export default function ContactsBrowse (props) {
                     currentDirection={direction}
                     handleDirectionUpdate={setDirection}
                 />
-                {isEventListPending || isNoteListPending
+                {isAllEventsPending || isAllNotesPending
                     ? <></>
                     : (
                         <RelationMatchContainer>
@@ -243,11 +243,11 @@ ContactsBrowse.propTypes = {
     contactListError: PropTypes.string.isRequired,
     getContactList: PropTypes.func.isRequired,
     events: PropTypes.object.isRequired,
-    isEventListPending: PropTypes.bool.isRequired,
-    eventListError: PropTypes.string.isRequired,
-    getEventList: PropTypes.func.isRequired,
+    isAllEventsPending: PropTypes.bool.isRequired,
+    allEventsError: PropTypes.string.isRequired,
+    getAllEvents: PropTypes.func.isRequired,
     notes: PropTypes.object.isRequired,
-    isNoteListPending: PropTypes.bool.isRequired,
-    noteListError: PropTypes.string.isRequired,
-    getNoteList: PropTypes.func.isRequired
+    isAllNotesPending: PropTypes.bool.isRequired,
+    allNotesError: PropTypes.string.isRequired,
+    getAllNotes: PropTypes.func.isRequired
 };
