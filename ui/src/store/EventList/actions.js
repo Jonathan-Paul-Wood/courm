@@ -23,11 +23,11 @@ function getEventListError (error) {
     };
 }
 
-export function getEventList (results, page, searchTerm, order, direction, filters) {
+export function getEventList (results, page, searchTerm, order, direction, filters, appliedContacts, appliedNotes) {
     return async dispatch => {
         dispatch(getEventListLoading());
         try {
-            const response = await EventListService.getEventList(results, page, searchTerm, order, direction, filters);
+            const response = await EventListService.getEventList(results, page, searchTerm, order, direction, filters, appliedContacts, appliedNotes);
             dispatch(getEventListSuccess(response));
         } catch (e) {
             dispatch(getEventListError(e));
