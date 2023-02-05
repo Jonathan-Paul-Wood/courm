@@ -95,7 +95,7 @@ export default function EditNote (props) {
 
     useEffect(() => {
         // update page when GET returns
-        const d = note.date ? note.date.split('T')[0] : '';
+        const d = note.date ? note.date : '';
         const newValues = { ...note, date: d };
         // TODO: handle 404, and Errors
         setPendingChanges(newValues);
@@ -140,11 +140,7 @@ export default function EditNote (props) {
             valid = false;
             setError({ ...error, ...{ title: 'Please enter title' } });
         }
-        if (pendingChanges.date &&
-                (pendingChanges.date &&
-                    !pendingChanges.date.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}$/g)
-                )
-        ) {
+        if (pendingChanges.date && !pendingChanges.date.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}/g)) {
             valid = false;
             setError({ ...error, ...{ date: 'Expected format: YYYY-MM-DD' } });
         }

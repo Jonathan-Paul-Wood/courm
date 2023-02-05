@@ -189,7 +189,7 @@ export default function EditContact (props) {
 
     useEffect(() => {
         // update page when GET returns
-        const dob = contact.dateOfBirth ? contact.dateOfBirth.split('T')[0] : '';
+        const dob = contact.dateOfBirth ? contact.dateOfBirth : '';
         const newValues = { ...contact, dateOfBirth: dob };
         // TODO: handle 404, and Errors
         setPendingChanges(newValues);
@@ -248,9 +248,8 @@ export default function EditContact (props) {
             updatedError.phoneNumber = 'Expected format: ###-###-####';
         }
         if (!entityIsOrganization &&
-            pendingChanges.dateOfBirth &&
             (pendingChanges.dateOfBirth &&
-                !pendingChanges.dateOfBirth.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}$/g)
+                !pendingChanges.dateOfBirth.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}/g)
             )
         ) {
             valid = false;
