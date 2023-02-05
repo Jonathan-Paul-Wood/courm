@@ -162,6 +162,28 @@ app.post('/api/notes/new', (req, res) => {
         );
 });
 
+app.get('/api/notes/all', (req, res) => {
+    const sql = `SELECT * FROM notes`;
+    db.all(sql, (err, rows) => {
+        if (err) {
+            res.status(ERROR_CODE).send({message: err.message});
+        } else if (!rows) {
+            res.status(NOT_FOUND_CODE).send({message: 'Failed to get all notes'});
+        } else {
+            res.status = SUCCESS_CODE;
+            const resultCount = rows.length;
+            res.json({
+                results: rows,
+                resultCount: resultCount,
+                pageSize: resultCount,
+                totalCount: resultCount,
+                pageCount: 1,
+                currentPage: 1,
+            });
+        }
+    });
+});
+
 //accepts requests of the form: /api/notes?order=id?results=3&page=1?direction=[ASC|DESC]?search=string
 app.get("/api/notes", (req, res) => {
     const { results, page, order, direction, searchTerm, filters } = req.query;
@@ -330,6 +352,28 @@ app.post('/api/contacts/new', (req, res) => {
                 }
             }
         );
+});
+
+app.get('/api/contacts/all', (req, res) => {
+    const sql = `SELECT * FROM contacts`;
+    db.all(sql, (err, rows) => {
+        if (err) {
+            res.status(ERROR_CODE).send({message: err.message});
+        } else if (!rows) {
+            res.status(NOT_FOUND_CODE).send({message: 'Failed to get all contacts'});
+        } else {
+            res.status = SUCCESS_CODE;
+            const resultCount = rows.length;
+            res.json({
+                results: rows,
+                resultCount: resultCount,
+                pageSize: resultCount,
+                totalCount: resultCount,
+                pageCount: 1,
+                currentPage: 1,
+            });
+        }
+    });
 });
 
 //accepts requests of the form: /api/contacts?order=id?results=3&page=1?direction=[ASC|DESC]?search=string
@@ -561,6 +605,28 @@ app.post('/api/events/new', (req, res) => {
             }
         );
     });
+
+app.get('/api/events/all', (req, res) => {
+    const sql = `SELECT * FROM events`;
+    db.all(sql, (err, rows) => {
+        if (err) {
+            res.status(ERROR_CODE).send({message: err.message});
+        } else if (!rows) {
+            res.status(NOT_FOUND_CODE).send({message: 'Failed to get all events'});
+        } else {
+            res.status = SUCCESS_CODE;
+            const resultCount = rows.length;
+            res.json({
+                results: rows,
+                resultCount: resultCount,
+                pageSize: resultCount,
+                totalCount: resultCount,
+                pageCount: 1,
+                currentPage: 1,
+            });
+        }
+    });
+});
 
 //accepts requests of the form: /api/events?order=id?results=3&page=1?direction=[ASC|DESC]?search=string
 app.get("/api/events", (req, res) => {
