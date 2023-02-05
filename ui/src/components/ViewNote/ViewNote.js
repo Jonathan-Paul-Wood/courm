@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import EntityTitleHeader from '../../common/EntityTitleHeader/EntityTitleHeader';
 import Button from '../../common/Button';
@@ -14,6 +14,12 @@ import ScrollContainer from '../../common/ScrollContainer';
 
 const ContentWrapper = styled.div`
     padding: 0 1em;
+
+    .link {
+        color: blue;
+        text-decoration-line: underline;
+        cursor: pointer;
+    }
 `;
 
 const GridWrapper = styled.div`
@@ -75,6 +81,8 @@ export default function ViewNote (props) {
     const [firstRelationCardEdit, setFirstRelationCardEdit] = useState(false);
     const [secondRelationCardEdit, setSecondRelationCardEdit] = useState(false);
 
+    const navigate = useNavigate();
+
     useEffect(() => {
         // initial GET of note
         if (noteId) {
@@ -91,7 +99,7 @@ export default function ViewNote (props) {
         <>
             {noteError
                 ? (<ContentWrapper>
-                    <p>No such note exists. (TODO, options to go back or create new, and address header...</p>
+                    <p>No such note exists. You can try <span className="link" onClick={() => navigate('/notes/new')}>creating one</span>, or return to the <span className="link" onClick={() => navigate('/notes')}>search existing notes</span></p>
                 </ContentWrapper>)
                 : (
                     <>
