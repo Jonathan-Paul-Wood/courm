@@ -2,6 +2,7 @@
 
 # data
 main.db
+release_steps.txt
 
 # dependencies
 node_modules
