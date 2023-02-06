@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory, useLocation, useParams } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import EntityTitleHeader from '../../common/EntityTitleHeader/EntityTitleHeader';
 import Button from '../../common/Button';
@@ -80,7 +80,7 @@ export default function EditNote (props) {
     };
     const [pendingChanges, setPendingChanges] = useState(defaultChanges);
     const [error, setError] = useState(defaultChanges);
-    const history = useHistory();
+    const navigate = useNavigate();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [pageLoaded, setPageLoaded] = useState(false);
 
@@ -95,7 +95,7 @@ export default function EditNote (props) {
 
     useEffect(() => {
         // update page when GET returns
-        const d = note.date ? note.date.split('T')[0] : '';
+        const d = note.date ? note.date : '';
         const newValues = { ...note, date: d };
         // TODO: handle 404, and Errors
         setPendingChanges(newValues);
@@ -112,12 +112,12 @@ export default function EditNote (props) {
     }, [isNotePostPending]);
     useEffect(() => {
         if (pageLoaded && !isNotePutPending) {
-            history.push(`/notes/${noteId}`);
+            navigate(`/notes/${noteId}`);
         }
     }, [isNotePutPending]);
     useEffect(() => {
         if (pageLoaded && !isNoteDeletePending) {
-            history.push('/notes');
+            navigate('/notes');
         }
     }, [isNoteDeletePending]);
 
@@ -140,11 +140,7 @@ export default function EditNote (props) {
             valid = false;
             setError({ ...error, ...{ title: 'Please enter title' } });
         }
-        if (pendingChanges.date &&
-                (pendingChanges.date &&
-                    !pendingChanges.date.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/g)
-                )
-        ) {
+        if (pendingChanges.date && !pendingChanges.date.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}/g)) {
             valid = false;
             setError({ ...error, ...{ date: 'Expected format: YYYY-MM-DD' } });
         }
@@ -210,7 +206,7 @@ export default function EditNote (props) {
                                 value={pendingChanges.date}
                                 label="Date"
                                 error={error.date}
-                                onChange={(event) => updateData('date', event.target.value)}
+                                onChange={(newDate) => updateData('date', newDate)}
                                 maxLength={11}
                             />
                         </div>

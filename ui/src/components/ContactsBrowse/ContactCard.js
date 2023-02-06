@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import icons from '../../assets/icons/bootstrapIcons';
 
 const CardWrapper = styled.div`
@@ -46,10 +46,10 @@ const CardWrapper = styled.div`
 
 export default function ContactCard (props) {
     const { contact } = props;
-    const history = useHistory();
+    const navigate = useNavigate();
 
     return (
-        <CardWrapper className="a-cursor-pointer" onClick={() => history.push(`/contacts/${contact.id}`)}>
+        <CardWrapper className="a-cursor-pointer" onClick={() => navigate(`/contacts/${contact.id}`)}>
             <div id="head-wrapper">
                 <div id="profile-picture">
                     {contact.profilePicture ? contact.profilePicture : icons.personCard}

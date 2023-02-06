@@ -1,0 +1,21 @@
+export const templateContact = {
+    firstName: '',
+    lastName: '',
+    profilePicture: '',
+    phoneNumber: '',
+    email: '',
+    address: '',
+    firm: '',
+    industry: '',
+    dateOfBirth: '',
+    bio: '',
+    tags: '',
+    interactions: '',
+    createdBy: '',
+    createdOn: '',
+    lastModifiedBy: '',
+    lastModifiedOn: '',
+    lastInteractionId: '',
+    lastInteractionOn: '',
+    entityType: 'person'
+};

@@ -7,6 +7,11 @@ This tool was born of a frustration with the default assumption of nearly every 
 
 CouRM is open source and built to be run 100% locally, so that you have full control over your use of the tool and the data you put in it. None of your information or metadata is shared outside of your machine by CouRM.
 
+## Downloading (Currently only supporting windows OS)
+For regular use, you can download the latest release at https://jonathanpaulwood.com/courm/. You will find a ".zip" file to extract, and from there can double click "LAUNCH APPLICATION" for the program to open in your default browser.
+
+Below are instructions for working directly with the code.
+
 ## Installation
 In both the `ui` and `backend` directories, install dependencies
 

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory, useLocation, useParams } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import EntityTitleHeader from '../../common/EntityTitleHeader/EntityTitleHeader';
 import Button from '../../common/Button';
@@ -78,7 +78,7 @@ export default function EditEvent (props) {
     };
     const [pendingChanges, setPendingChanges] = useState(defaultChanges);
     const [error, setError] = useState(defaultChanges);
-    const history = useHistory();
+    const navigate = useNavigate();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [pageLoaded, setPageLoaded] = useState(false);
 
@@ -93,7 +93,7 @@ export default function EditEvent (props) {
 
     useEffect(() => {
         // update page when GET returns
-        const d = event.date ? event.date.split('T')[0] : '';
+        const d = event.date ? event.date : '';
         const newValues = { ...event, date: d };
         // TODO: handle 404, and Errors
         setPendingChanges(newValues);
@@ -110,12 +110,12 @@ export default function EditEvent (props) {
     }, [isEventPostPending]);
     useEffect(() => {
         if (pageLoaded && !isEventPutPending) {
-            history.push(`/events/${eventId}`);
+            navigate(`/events/${eventId}`);
         }
     }, [isEventPutPending]);
     useEffect(() => {
         if (pageLoaded && !isEventDeletePending) {
-            history.push('/events');
+            navigate('/events');
         }
     }, [isEventDeletePending]);
 
@@ -139,9 +139,7 @@ export default function EditEvent (props) {
             setError({ ...error, ...{ title: 'Please enter title' } });
         }
         if (pendingChanges.date &&
-                (pendingChanges.date &&
-                    !pendingChanges.date.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/g)
-                )
+            !pendingChanges.date.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}/g)
         ) {
             valid = false;
             setError({ ...error, ...{ date: 'Expected format: YYYY-MM-DD' } });
@@ -208,7 +206,7 @@ export default function EditEvent (props) {
                                 value={pendingChanges.date}
                                 label="Date"
                                 error={error.date}
-                                onChange={(event) => { console.log('event date event: ', JSON.stringify(event)); updateData('date', event); } }
+                                onChange={(newDate) => { updateData('date', newDate); } }
                                 maxLength={11}
                             />
                         </div>

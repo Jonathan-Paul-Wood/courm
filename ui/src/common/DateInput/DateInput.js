@@ -159,7 +159,7 @@ export default function DateInput (props) {
 
     function handleDateChange (date) {
         if (date) {
-            onChange(date.toISOString().match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}/g)[0]);
+            onChange(`${date.getFullYear()}-${('0' + (date.getMonth() + 1)).slice(-2)}-${('0' + date.getDate()).slice(-2)}` + 'T00:00:00');
         } else {
             onChange('');
         }

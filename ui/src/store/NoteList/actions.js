@@ -23,14 +23,46 @@ function getNoteListError (error) {
     };
 }
 
-export function getNoteList (results, page, searchTerm, order, direction, filters) {
+export function getNoteList (results, page, searchTerm, order, direction, filters, appliedContacts, appliedEvents) {
     return async dispatch => {
         dispatch(getNoteListLoading());
         try {
-            const response = await NoteListService.getNoteList(results, page, searchTerm, order, direction, filters);
+            const response = await NoteListService.getNoteList(results, page, searchTerm, order, direction, filters, appliedContacts, appliedEvents);
             dispatch(getNoteListSuccess(response));
         } catch (e) {
             dispatch(getNoteListError(e));
+        }
+    };
+}
+
+function getAllNotesLoading () {
+    return {
+        type: types.GET_ALL_NOTES_PENDING
+    };
+}
+
+function getAllNotesSuccess (payload) {
+    return {
+        type: types.GET_ALL_NOTES_SUCCESS,
+        payload
+    };
+}
+
+function getAllNotesError (error) {
+    return {
+        type: types.GET_ALL_NOTES_ERROR,
+        error: new ServiceError('get notes list', error)
+    };
+}
+
+export function getAllNotes () {
+    return async dispatch => {
+        dispatch(getAllNotesLoading());
+        try {
+            const response = await NoteListService.getAllNotes();
+            dispatch(getAllNotesSuccess(response));
+        } catch (e) {
+            dispatch(getAllNotesError(e));
         }
     };
 }

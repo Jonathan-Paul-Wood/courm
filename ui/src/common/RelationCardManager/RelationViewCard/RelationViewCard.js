@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import { useHistory } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Button from '../../Button';
 import { GREY } from '../../../assets/colorsConstants';
 import ScrollContainer from '../../ScrollContainer';
@@ -51,7 +51,7 @@ const RelationContainer = styled.div`
 export default function RelationViewCard (props) {
     const { relationList, relationType, relatedEntityList, enableEdit, disableEdit, labelTerm } = props;
 
-    const history = useHistory();
+    const navigate = useNavigate();
 
     const filteredRelations = relationList.length ? relationList.filter(r => r[relationType + 'Id'] !== null) : [];
     const filteredEntities = filteredRelations.map(relation => relatedEntityList.find(entity => entity.id === relation[relationType + 'Id']));
@@ -67,7 +67,7 @@ export default function RelationViewCard (props) {
                 {filteredEntities.length
                     ? filteredEntities.map((entity, index) => {
                         return (
-                            <div className="relatedEntity" key={index} onClick={() => history.push(`/${relationType.toLowerCase()}s/${entity.id}`)}>
+                            <div className="relatedEntity" key={index} onClick={() => navigate(`/${relationType.toLowerCase()}s/${entity.id}`)}>
                                 <span className="relationTitle" title={entity[labelTerm]}>{entity[labelTerm]}</span>
                                 <span className="relationId">({entity.id})</span>
                             </div>

@@ -1,11 +1,11 @@
 import AppConfigure from './AppConfigure';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { getContactList } from '../../store/ContactList/actions';
+import { getAllContacts } from '../../store/ContactList/actions';
 import { postContact, deleteContact } from '../../store/Contact/actions';
-import { getEventList } from '../../store/EventList/actions';
+import { getAllEvents } from '../../store/EventList/actions';
 import { postEvent, deleteEvent } from '../../store/Event/actions';
-import { getNoteList } from '../../store/NoteList/actions';
+import { getAllNotes } from '../../store/NoteList/actions';
 import { postNote, deleteNote } from '../../store/Note/actions';
 import { getAllRelations } from '../../store/RelationList/actions';
 import { postRelation, deleteRelation } from '../../store/Relation/actions';
@@ -19,13 +19,13 @@ function mapStateToProps (state) {
         contactPostError: state.contact.contactPostError,
         isContactDeletePending: state.contact.isContactDeletePending,
         events: state.eventList.events,
-        isEventListPending: state.eventList.isEventListPending,
+        isAllEventsPending: state.eventList.isAllEventsPending,
         eventListError: state.eventList.eventListError,
         isEventPostPending: state.event.isEventPostPending,
         eventPostError: state.event.eventPostError,
         isEventDeletePending: state.event.isEventDeletePending,
         notes: state.noteList.notes,
-        isNoteListPending: state.noteList.isNoteListPending,
+        isAllNotesPending: state.noteList.isAllNotesPending,
         noteListError: state.noteList.noteListError,
         isNotePostPending: state.note.isNotePostPending,
         notePostError: state.note.notePostError,
@@ -39,13 +39,13 @@ function mapStateToProps (state) {
 const mapDispatchToProps = dispatch =>
     bindActionCreators(
         {
-            getContactList,
+            getAllContacts,
             postContact,
             deleteContact,
-            getEventList,
+            getAllEvents,
             postEvent,
             deleteEvent,
-            getNoteList,
+            getAllNotes,
             postNote,
             deleteNote,
             getAllRelations,

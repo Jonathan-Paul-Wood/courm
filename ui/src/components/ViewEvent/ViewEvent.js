@@ -1,5 +1,5 @@
-import React, { useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import EntityTitleHeader from '../../common/EntityTitleHeader/EntityTitleHeader';
 import Button from '../../common/Button';
@@ -8,11 +8,18 @@ import DateInput from '../../common/DateInput/DateInput';
 import TextArea from '../../common/TextArea/TextArea';
 import LoadingSpinner from '../../common/LoadingSpinner/LoadingSpinner';
 import { exportDataList } from '../../common/Utilities/utilities';
+import RelationCardManager from '../../common/RelationCardManager';
 import ScrollContainer from '../../common/ScrollContainer';
 import PropTypes from 'prop-types';
 
 const ContentWrapper = styled.div`
     padding: 0 1em;
+
+    .link {
+        color: blue;
+        text-decoration-line: underline;
+        cursor: pointer;
+    }
 `;
 
 const GridWrapper = styled.div`
@@ -30,7 +37,6 @@ const GridWrapper = styled.div`
     }
 
     .metadataRow {
-        height: 45vh;
 
         .inputRow {
             width: 100%;
@@ -49,6 +55,16 @@ const GridWrapper = styled.div`
         height: 20rem;
     }
 
+    .relationsRow {
+        display: flex;
+        justify-content: space-between;
+
+        .relationsList {
+            min-width: 50%;
+            margin: 1em;
+        }
+    }
+
     .dateInfo {
         font-style: italic;
         font-size: 0.8rem;
@@ -63,6 +79,10 @@ export default function ViewEvent (props) {
         eventError,
         getEvent
     } = props;
+    const [firstRelationCardEdit, setFirstRelationCardEdit] = useState(false);
+    const [secondRelationCardEdit, setSecondRelationCardEdit] = useState(false);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         // initial GET of event
@@ -80,12 +100,12 @@ export default function ViewEvent (props) {
         <>
             {eventError
                 ? (<ContentWrapper>
-                    <p>No such event exists. (TODO, options to go back or create new, and address header...</p>
+                    <p>No such event exists. You can try <span className="link" onClick={() => navigate('/events/new')}>creating one</span>, or return to the <span className="link" onClick={() => navigate('/events')}>search existing events</span> </p>
                 </ContentWrapper>)
                 : (
                     <>
                         <EntityTitleHeader
-                            title={`${event.title} ${event.date}`}
+                            title={`${event.title} ${event.date.split('T')[0]}`}
                             editMode={false}
                             type='Event'
                         />
@@ -133,6 +153,24 @@ export default function ViewEvent (props) {
                             cards go here, or none available message...
                         </div>
                     </div> */}
+                                                <div className="relationsRow">
+                                                    <RelationCardManager
+                                                        parentType={'event'}
+                                                        parentId={parseInt(eventId)}
+                                                        relationType='contact'
+                                                        editMode={firstRelationCardEdit}
+                                                        disableEdit={secondRelationCardEdit}
+                                                        onChange={setFirstRelationCardEdit}
+                                                    />
+                                                    <RelationCardManager
+                                                        parentType={'event'}
+                                                        parentId={parseInt(eventId)}
+                                                        relationType='note'
+                                                        editMode={secondRelationCardEdit}
+                                                        disableEdit={firstRelationCardEdit}
+                                                        onChange={setSecondRelationCardEdit}
+                                                    />
+                                                </div>
                                             </div>
                                             <div className="descriptionRow">
                                                 <TextArea

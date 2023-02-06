@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import EntityTitleHeader from '../../common/EntityTitleHeader/EntityTitleHeader';
 import Button from '../../common/Button';
@@ -15,6 +15,12 @@ import ScrollContainer from '../../common/ScrollContainer';
 
 const ContentWrapper = styled.div`
     padding: 0 1em;
+
+    .link {
+        color: blue;
+        text-decoration-line: underline;
+        cursor: pointer;
+    }
 `;
 
 const GridWrapper = styled.div`
@@ -81,6 +87,8 @@ export default function ViewContact (props) {
     const [firstRelationCardEdit, setFirstRelationCardEdit] = useState(false);
     const [secondRelationCardEdit, setSecondRelationCardEdit] = useState(false);
 
+    const navigate = useNavigate();
+
     useEffect(() => {
         // initial GET of contact
         if (contactId) {
@@ -102,7 +110,7 @@ export default function ViewContact (props) {
         <>
             {contactError
                 ? (<ContentWrapper>
-                    <p>No such contact exists. (TODO, options to go back or create new, and address header...</p>
+                    <p>No such contact exists. You can try <span className="link" onClick={() => navigate('/contacts/new')}>creating one</span>, or return to the <span className="link" onClick={() => navigate('/contacts')}>search existing contacts</span> </p>
                 </ContentWrapper>)
                 : (
                     <>

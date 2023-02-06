@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useHistory, useLocation, useParams } from 'react-router-dom';
+import { useNavigate, useLocation, useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import EntityTitleHeader from '../../common/EntityTitleHeader/EntityTitleHeader';
 import Button from '../../common/Button';
@@ -174,7 +174,7 @@ export default function EditContact (props) {
     const [entityIsOrganization, setEntityIsOrganization] = useState(false);
     const [pendingChanges, setPendingChanges] = useState(defaultChanges);
     const [error, setError] = useState(defaultChanges);
-    const history = useHistory();
+    const navigate = useNavigate();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [pageLoaded, setPageLoaded] = useState(false);
 
@@ -189,7 +189,7 @@ export default function EditContact (props) {
 
     useEffect(() => {
         // update page when GET returns
-        const dob = contact.dateOfBirth ? contact.dateOfBirth.split('T')[0] : '';
+        const dob = contact.dateOfBirth ? contact.dateOfBirth : '';
         const newValues = { ...contact, dateOfBirth: dob };
         // TODO: handle 404, and Errors
         setPendingChanges(newValues);
@@ -209,13 +209,13 @@ export default function EditContact (props) {
 
     useEffect(() => {
         if (pageLoaded && !isContactPutPending) {
-            history.push(`/contacts/${contactId}`);
+            navigate(`/contacts/${contactId}`);
         }
     }, [isContactPutPending]);
 
     useEffect(() => {
         if (pageLoaded && !isContactDeletePending) {
-            history.push('/contacts');
+            navigate('/contacts');
         }
     }, [isContactDeletePending]);
 
@@ -248,9 +248,8 @@ export default function EditContact (props) {
             updatedError.phoneNumber = 'Expected format: ###-###-####';
         }
         if (!entityIsOrganization &&
-            pendingChanges.dateOfBirth &&
             (pendingChanges.dateOfBirth &&
-                !pendingChanges.dateOfBirth.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}$/g)
+                !pendingChanges.dateOfBirth.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}/g)
             )
         ) {
             valid = false;
@@ -328,7 +327,7 @@ export default function EditContact (props) {
                                 </span>
                                 <label className={`switch ${isNewContact ? '' : 'hidden'}`}>
                                     <input
-                                        active={`${entityIsOrganization}`}
+                                        // active={`${entityIsOrganization}`} TODO: need to use flag in toggle
                                         type="checkbox"
                                         onClick={() => setEntityIsOrganization(!entityIsOrganization)}
                                         disabled={!isNewContact}
