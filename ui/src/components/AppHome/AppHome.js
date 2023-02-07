@@ -45,7 +45,13 @@ export default function AppHome (props) {
     return (
         <HomeWrapper>
             <h2>Welcome to CouRM <span style={{ color: 'red' }}>BETA</span></h2>
-            <h4>Use this personal CRM / Address Book to keep track of your contacts!</h4>
+            <h4><i>Track your network, not just your contacts</i></h4>
+            <h2>Three Point Overview</h2>
+            <ol>
+                <li>Create mupltiple types of records (Contacts, Events, and Notes) to log your interactions</li>
+                <li>Define Relationships to link records to each other</li>
+                <li>Use powerful search and filter tools and go beyond individual contacts to understand the shape of your network</li>
+            </ol>
             <h2>Common Actions</h2>
             <ul className="action-list">
                 <li onClick={() => handleActionSelection('create', 'contacts')}>Create Contact</li>
