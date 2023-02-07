@@ -247,7 +247,7 @@ export default function AppConfigure (props) {
                             <h4>Import LinkedIn Contacts</h4>
                             <p>Upload the 'Contacts.csv' file:</p>
                             <input type="file" name="linkedinContacts" id="linkedinContacts" onChange={e => captureLIUpload(e)} />
-                            <p>We will attempt to find contacts in the selected file and add them to your records</p>
+                            <p>We will attempt to find contacts in the selected file and add them to your records (<a target="_blank" rel="noreferrer" href="https://www.linkedin.com/help/linkedin/answer/a566336/exporting-connections-from-linkedin?lang=en">Learn how to export your LinkedIn contacts</a>)</p>
                             <Button isPending={isLinkedInFileUploading} icon="upload" label={'Extract & Upload'} type="secondary" onClick={() => handleParseLinkedInContacts()} />
                             <p className='error'>{linkedInUploadError}</p>
                             <p className='info'>{linkedInUploadInfo}</p>
