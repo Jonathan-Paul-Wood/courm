@@ -32,10 +32,13 @@ export default function FaqHome () {
                 </div>
                 <div className="answer">
                     <p>
-                        You can save backups of individual contacts (from their respective contact page), individual pages of search results, or all existing contacts (from the Configuration page). These saves are formatted as JSON files which you can store on your computer, on a USB, in the cloud, or whereever.
+                        You can save backups of individual contacts (from their respective contact page), individual pages of search results, or all existing contacts (from the Configure page). These saves are formatted as JSON files which you can store on your computer, on a USB, in the cloud, or whereever.
                     </p>
                     <p>
                         Backup files can be used to add back contacts you've removed, or to replace all of your existing contacts if you want to revert to a previous version of your address book.
+                    </p>
+                    <p>
+                        You can select a specific record type to export/import (eg, use a file that only has Notes), or group all your records in a single file.
                     </p>
                 </div>
             </div>
@@ -92,7 +95,7 @@ export default function FaqHome () {
                     </p>
                     <p>
                         You will then be able to download the latest version and start using it immediately. Your data can be ported over to the new version by using the Export and Import features
-                        in the 'Configuration' page.
+                        in the 'Configure' page.
                     </p>
                 </div>
             </div>
