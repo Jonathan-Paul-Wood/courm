@@ -88,7 +88,7 @@ export default function FaqHome () {
                 </div>
                 <div className="answer">
                     <p>
-                        CouRM does not connect to the internet, as such CouRM cannot check for updates. You will need to proactively check for updates, which you can find at <a target="_blank" rel="noreferrer" href="https://github.com/Jonathan-Paul-Wood/courm/archive/refs/heads/main.zip">this link</a>.
+                        CouRM does not connect to the internet, as such CouRM cannot check for updates. You will need to proactively check for updates, which you can find at <a target="_blank" rel="noreferrer" href="https://www.jonathanpaulwood.com/courm/">this link</a>.
                     </p>
                     <p>
                         You will then be able to download the latest version and start using it immediately. Your data can be ported over to the new version by using the Export and Import features
