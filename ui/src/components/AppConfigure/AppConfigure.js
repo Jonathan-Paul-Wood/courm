@@ -133,7 +133,7 @@ export default function AppConfigure (props) {
         }
     }
 
-    function handleRestore () {
+    function handleReset () {
         const type = fileTypeOptions[selectedTypeIndex].value;
         if (type === 'all') {
             contacts.results.forEach(contact => deleteContact(contact.id));
@@ -236,8 +236,8 @@ export default function AppConfigure (props) {
                             <h4>Import</h4>
                             <p>Adding data will create new records. This does not check for duplicates of existing data.</p>
                             <Button icon="upload" label={`Add ${fileTypeOptions[selectedTypeIndex].label}`} type="secondary" onClick={() => handleAddData()} />
-                            <p>Restoring data will remove all existing data and replace them with those in the uploaded file.</p>
-                            <Button icon="upload" label={`Restore ${fileTypeOptions[selectedTypeIndex].label}`} type="secondary" onClick={() => handleRestore()} />
+                            <p>Resetting data will remove all existing data and replace them with those in the uploaded file.</p>
+                            <Button icon="upload" label={`Reset ${fileTypeOptions[selectedTypeIndex].label}`} type="secondary" onClick={() => handleReset()} />
                         </div>
                     </div>
                     <hr />
