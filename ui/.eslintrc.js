@@ -19,6 +19,11 @@ module.exports = {
     'react',
     "jest"
   ],
+  settings: {
+    react: {
+      version: 'detect'
+    }
+  },
   rules: {
     "indent": ["error", 4],
     "semi": ["error", "always"],

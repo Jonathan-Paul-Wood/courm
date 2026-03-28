@@ -1,5 +1,5 @@
 import React from 'react';
-import { ToastContainer, toast, Slide } from 'react-toastify';
+import { ToastContainer, Slide } from 'react-toastify';
 import styled from 'styled-components';
 import { SUCCESS, ERROR, WARNING, LIGHT_GREY } from '../../../assets/colorsConstants';
 
@@ -49,7 +49,7 @@ export default function ToastWrapper () {
     return (
         <ToastWrapperContainer
             hideProgressBar={true}
-            position={toast.POSITION.TOP_RIGHT}
+            position="top-right"
             transition={Slide}
             autoClose={0}
         />

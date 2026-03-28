@@ -1,5 +1,5 @@
 import axios from 'axios';
-import Cookies from 'js-cookies';
+import Cookies from 'js-cookie';
 // import { isJson } from '../Utilities'; //try catch returns bool on test JSON.parse(str)
 
 export const axiosInstance = axios.create({ responseType: 'json' });

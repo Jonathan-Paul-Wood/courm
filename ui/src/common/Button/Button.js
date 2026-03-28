@@ -112,8 +112,16 @@ const StyleContainer = styled.div`
       }
 `;
 
-export default function Button (props) {
-    const { type, size, block, icon, label, onClick, disabled, isPending } = props;
+export default function Button ({
+    type = 'primary',
+    size = 'md',
+    block = false,
+    icon = '',
+    label,
+    onClick,
+    disabled = false,
+    isPending = false
+}) {
     return (
         <StyleContainer>
             <button
@@ -138,15 +146,6 @@ export default function Button (props) {
         </StyleContainer>
     );
 }
-
-Button.defaultProps = {
-    type: 'primary',
-    size: 'md',
-    block: false,
-    icon: '',
-    disabled: false,
-    isPending: false
-};
 
 Button.propTypes = {
     type: PropTypes.string,

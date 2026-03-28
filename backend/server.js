@@ -1,8 +1,5 @@
 const express = require("express");
-const bodyParser = require("body-parser");
 const cors = require("cors");
-var path = require('path');
-const open = require('open');
 var sqlite3 = require('sqlite3').verbose();
 var db = new sqlite3.Database('main.db', (err) => {
     if(err) {
@@ -22,13 +19,13 @@ var corsOptions = {
 app.use(cors(corsOptions));
 
 // parse requests of content-type - application/json
-app.use(bodyParser.json());
+app.use(express.json());
 
 // parse requests of content-type - application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.urlencoded({ extended: true }));
 
 // parse requests of content-type - text/
-//app.use(bodyParser.text());
+// app.use(express.text());
 
 
 // If running in production mode enter here
@@ -1151,7 +1148,4 @@ app.get("/api/title-list/recordType/:recordType", async (req, res) => {
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}/`);
-
-    // if in production mode: opens the url in the default browser 
-    // open(`http://localhost:${PORT}/`);
 });
