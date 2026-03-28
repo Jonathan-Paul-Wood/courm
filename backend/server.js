@@ -1,6 +1,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const cors = require("cors");
+const crypto = require("crypto");
+const fs = require("fs");
 var path = require('path');
 const open = require('open');
 var sqlite3 = require('sqlite3').verbose();
@@ -14,6 +16,9 @@ const app = express();
 const ERROR_CODE = 500;
 const SUCCESS_CODE = 200;
 const NOT_FOUND_CODE = 404;
+const APP_STORAGE_DIRECTORY = path.resolve(process.cwd(), 'storage');
+const NOTE_IMAGE_DIRECTORY = path.join(APP_STORAGE_DIRECTORY, 'note-images');
+const MAX_NOTE_IMAGE_BYTES = 10 * 1024 * 1024;
 
 var corsOptions = {
     origin: "http://localhost:3000",
@@ -22,10 +27,14 @@ var corsOptions = {
 app.use(cors(corsOptions));
 
 // parse requests of content-type - application/json
-app.use(bodyParser.json());
+app.use(bodyParser.json({ limit: '15mb' }));
 
 // parse requests of content-type - application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '15mb' }));
+
+ensureDirectoryExists(APP_STORAGE_DIRECTORY);
+ensureDirectoryExists(NOTE_IMAGE_DIRECTORY);
+app.use('/api/files', express.static(APP_STORAGE_DIRECTORY));
 
 // parse requests of content-type - text/
 //app.use(bodyParser.text());
@@ -71,10 +80,12 @@ function initializeDB() {
             address TEXT,
             contacts TEXT,
             tags TEXT,
+            imagePath TEXT,
             createdOn datetime default current_timestamp,
             lastModifiedOn datetime default current_timestamp
             );
         `);
+        addColumnIfMissing('notes', 'imagePath TEXT');
         db.run(`
         CREATE TABLE IF NOT EXISTS relations (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -115,6 +126,164 @@ function confirmInt(value) {
     return Number.isSafeInteger(value) ? value : null;
 }
 
+function ensureDirectoryExists(directoryPath) {
+    if (!fs.existsSync(directoryPath)) {
+        fs.mkdirSync(directoryPath, { recursive: true });
+    }
+}
+
+function addColumnIfMissing(tableName, columnDefinition) {
+    db.run(`ALTER TABLE ${tableName} ADD COLUMN ${columnDefinition}`, (err) => {
+        if (err && !err.message.includes('duplicate column name')) {
+            console.error(err.message);
+        }
+    });
+}
+
+function runStatement(sql, params = []) {
+    return new Promise((resolve, reject) => {
+        db.run(sql, params, function(err) {
+            if (err) {
+                reject(err);
+            } else {
+                resolve({
+                    lastID: this.lastID,
+                    changes: this.changes
+                });
+            }
+        });
+    });
+}
+
+function getRow(sql, params = []) {
+    return new Promise((resolve, reject) => {
+        db.get(sql, params, (err, row) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(row);
+            }
+        });
+    });
+}
+
+function getNoteImageExtension(fileName, mimeType) {
+    const possibleExtension = path.extname(fileName || '').toLowerCase();
+
+    if (possibleExtension) {
+        return possibleExtension;
+    }
+
+    switch (mimeType) {
+    case 'image/jpeg':
+        return '.jpg';
+    case 'image/png':
+        return '.png';
+    case 'image/gif':
+        return '.gif';
+    case 'image/webp':
+        return '.webp';
+    case 'image/bmp':
+        return '.bmp';
+    default:
+        return '';
+    }
+}
+
+function resolveStoredFilePath(relativeFilePath) {
+    if (!relativeFilePath) {
+        return null;
+    }
+
+    const normalizedRelativePath = relativeFilePath.replace(/[\\/]+/g, path.sep);
+    const resolvedPath = path.resolve(APP_STORAGE_DIRECTORY, normalizedRelativePath);
+    const expectedPrefix = `${APP_STORAGE_DIRECTORY}${path.sep}`;
+
+    if (resolvedPath !== APP_STORAGE_DIRECTORY && !resolvedPath.startsWith(expectedPrefix)) {
+        throw new Error('Invalid stored file path');
+    }
+
+    return resolvedPath;
+}
+
+function deleteStoredFile(relativeFilePath) {
+    if (!relativeFilePath) {
+        return;
+    }
+
+    try {
+        const storedFilePath = resolveStoredFilePath(relativeFilePath);
+        if (storedFilePath && fs.existsSync(storedFilePath)) {
+            fs.unlinkSync(storedFilePath);
+        }
+    } catch (err) {
+        console.error(`Failed to delete stored file ${relativeFilePath}: ${err.message}`);
+    }
+}
+
+function saveNoteImage(imageUpload) {
+    if (!imageUpload || !imageUpload.dataUrl) {
+        return '';
+    }
+
+    const dataUrlMatch = imageUpload.dataUrl.match(/^data:(.+);base64,(.+)$/);
+
+    if (!dataUrlMatch) {
+        throw new Error('Invalid image upload payload');
+    }
+
+    const mimeType = dataUrlMatch[1];
+    if (!mimeType.startsWith('image/')) {
+        throw new Error('Only image uploads are supported');
+    }
+
+    const imageBuffer = Buffer.from(dataUrlMatch[2], 'base64');
+    if (imageBuffer.length > MAX_NOTE_IMAGE_BYTES) {
+        throw new Error('Image exceeds the 10MB limit');
+    }
+
+    const fileExtension = getNoteImageExtension(imageUpload.fileName, mimeType);
+    const generatedFileName = `${Date.now()}-${crypto.randomBytes(6).toString('hex')}${fileExtension}`;
+    const relativeFilePath = path.posix.join('note-images', generatedFileName);
+    const storedFilePath = resolveStoredFilePath(relativeFilePath);
+
+    ensureDirectoryExists(NOTE_IMAGE_DIRECTORY);
+    fs.writeFileSync(storedFilePath, imageBuffer);
+
+    return relativeFilePath;
+}
+
+function buildNoteValues(body, existingNote) {
+    const existingImagePath = existingNote && existingNote.imagePath ? existingNote.imagePath : '';
+    const removeImage = body.removeImage === true || body.removeImage === 'true';
+    let createdImagePath = '';
+    let nextImagePath = typeof body.imagePath === 'string' ? body.imagePath : existingImagePath;
+
+    if (body.imageUpload && body.imageUpload.dataUrl) {
+        createdImagePath = saveNoteImage(body.imageUpload);
+        nextImagePath = createdImagePath;
+    } else if (removeImage) {
+        nextImagePath = '';
+    } else if (!nextImagePath && existingImagePath) {
+        nextImagePath = existingImagePath;
+    }
+
+    return {
+        noteValues: {
+            date: body.date || '',
+            title: body.title || '',
+            record: body.record || '',
+            address: body.address || '',
+            contacts: body.contacts || '',
+            tags: body.tags || '',
+            imagePath: nextImagePath,
+            lastModifiedOn: body.lastModifiedOn || null
+        },
+        createdImagePath,
+        replacedImagePath: existingImagePath && existingImagePath !== nextImagePath ? existingImagePath : ''
+    };
+}
+
 app.post("/api/initialize", (req, res) => {
     initializeDB();
     res.json({message: 'done'});
@@ -127,39 +296,43 @@ app.delete("/api/disconnect", (req, res) => {
 
 // NOTES APIS
 
-app.post('/api/notes/new', (req, res) => {
-    db.run(
-        `INSERT INTO notes(
-            date,
-            title,
-            record,
-            address,
-            contacts,
-            tags) 
-        VALUES(
-            '${req.body.date}',
-            '${cleanseString(req.body.title)}',
-            '${cleanseString(req.body.record)}',
-            '${cleanseString(req.body.address)}',
-            '${req.body.contacts}',
-            '${req.body.tags}'
-            )`, (err, rows) => {
-                console.log('error: ', err);
-                if (err) {
-                    res.status = ERROR_CODE;
-                    res.json(err);
-                } else {
-                    res.status = SUCCESS_CODE;
-                    db.run(`SELECT id FROM notes WHERE createdOn=${req.body.createdOn}`, (err, id) => {
-                        if (err) {
-                            res.json({'message': 'could not get new Id'});
-                        } else {
-                            res.json({'newId': id});
-                        }
-                    });
-                }
-            }
+app.post('/api/notes/new', async (req, res) => {
+    let createdImagePath = '';
+
+    try {
+        const { noteValues, createdImagePath: nextCreatedImagePath } = buildNoteValues(req.body);
+        createdImagePath = nextCreatedImagePath;
+
+        const insertResult = await runStatement(
+            `INSERT INTO notes(
+                date,
+                title,
+                record,
+                address,
+                contacts,
+                tags,
+                imagePath
+            )
+            VALUES(?, ?, ?, ?, ?, ?, ?)`,
+            [
+                noteValues.date,
+                noteValues.title,
+                noteValues.record,
+                noteValues.address,
+                noteValues.contacts,
+                noteValues.tags,
+                noteValues.imagePath
+            ]
         );
+
+        const newNote = await getRow(`SELECT * FROM notes WHERE id = ?`, [insertResult.lastID]);
+        res.status(SUCCESS_CODE).json(newNote);
+    } catch (err) {
+        if (createdImagePath) {
+            deleteStoredFile(createdImagePath);
+        }
+        res.status(ERROR_CODE).json({ message: err.message });
+    }
 });
 
 app.get('/api/notes/all', (req, res) => {
@@ -316,8 +489,7 @@ app.get("/api/notes", (req, res) => {
 });
 
 app.get("/api/notes/:id", (req, res) => {
-    const sql = `SELECT * FROM notes WHERE id = ${req.params.id}`;
-    db.get(sql, (err, row) => {
+    db.get(`SELECT * FROM notes WHERE id = ?`, [req.params.id], (err, row) => {
         if (err) {
             res.status(ERROR_CODE).send({message: err.message});
         } else if (!row) {
@@ -326,55 +498,101 @@ app.get("/api/notes/:id", (req, res) => {
             res.status = SUCCESS_CODE;
             res.json(row);
         }
-    })
-});
-
-app.put("/api/notes/:id", (req, res) => {
-    const b = req.body;
-    let sql = `UPDATE notes SET`;
-    Object.keys(b).map(key => {
-        if(key !== 'id' && key !== 'date') {
-            sql = sql+`, ${key}='${cleanseString(b[key])}'`
-        } else if (key === 'date') {
-            sql = sql+` ${key}='${b[key]}'`
-        }
-    });
-    sql = sql+` WHERE id=${req.params.id}`;
-    db.run(sql, (err, row) => {
-        if (err) {
-            res.status = ERROR_CODE;
-            res.json(err);
-        } else if (!row) {
-            res.status = NOT_FOUND_CODE;
-            res.json({'response': 'NOT FOUND'});
-        } else {
-            res.status = SUCCESS_CODE;
-            res.json({'response': row});
-        }
     });
 });
 
-app.delete("/api/notes/:id", (req, res) => {
-    const wasErrorRemovingRelations = cleanUpRelations('note', req.params.id);
-    if (wasErrorRemovingRelations) {
-        res.status = ERROR_CODE;
-        res.json(wasErrorRemovingRelations);
-        return;
+app.put("/api/notes/:id", async (req, res) => {
+    let createdImagePath = '';
+
+    try {
+        const existingNote = await getRow(`SELECT * FROM notes WHERE id = ?`, [req.params.id]);
+        if (!existingNote) {
+            res.status(NOT_FOUND_CODE).json({ response: 'NOT FOUND' });
+            return;
+        }
+
+        const {
+            noteValues,
+            createdImagePath: nextCreatedImagePath,
+            replacedImagePath
+        } = buildNoteValues(req.body, existingNote);
+        createdImagePath = nextCreatedImagePath;
+
+        const updateResult = await runStatement(
+            `UPDATE notes
+            SET date = ?,
+                title = ?,
+                record = ?,
+                address = ?,
+                contacts = ?,
+                tags = ?,
+                imagePath = ?,
+                lastModifiedOn = COALESCE(?, lastModifiedOn)
+            WHERE id = ?`,
+            [
+                noteValues.date,
+                noteValues.title,
+                noteValues.record,
+                noteValues.address,
+                noteValues.contacts,
+                noteValues.tags,
+                noteValues.imagePath,
+                noteValues.lastModifiedOn,
+                req.params.id
+            ]
+        );
+
+        if (!updateResult.changes) {
+            if (createdImagePath) {
+                deleteStoredFile(createdImagePath);
+            }
+            res.status(NOT_FOUND_CODE).json({ response: 'NOT FOUND' });
+            return;
+        }
+
+        if (replacedImagePath) {
+            deleteStoredFile(replacedImagePath);
+        }
+
+        const updatedNote = await getRow(`SELECT * FROM notes WHERE id = ?`, [req.params.id]);
+        res.status(SUCCESS_CODE).json(updatedNote);
+    } catch (err) {
+        if (createdImagePath) {
+            deleteStoredFile(createdImagePath);
+        }
+        res.status(ERROR_CODE).json({ message: err.message });
     }
+});
 
-    const sql = `DELETE FROM notes WHERE id = ${req.params.id}`;
-    db.run(sql, (err, row) => {
-        if (err) {
-            res.status = ERROR_CODE;
-            res.json(err);
-        } else if (!row) {
-            res.status = NOT_FOUND_CODE;
-            res.json({'response': 'NOT FOUND'});
-        } else {
-            res.status = SUCCESS_CODE;
-            res.json({'response': row});
+app.delete("/api/notes/:id", async (req, res) => {
+    try {
+        const existingNote = await getRow(`SELECT * FROM notes WHERE id = ?`, [req.params.id]);
+        if (!existingNote) {
+            res.status(NOT_FOUND_CODE).json({ response: 'NOT FOUND' });
+            return;
         }
-    });
+
+        const wasErrorRemovingRelations = cleanUpRelations('note', req.params.id);
+        if (wasErrorRemovingRelations) {
+            res.status = ERROR_CODE;
+            res.json(wasErrorRemovingRelations);
+            return;
+        }
+
+        const deleteResult = await runStatement(`DELETE FROM notes WHERE id = ?`, [req.params.id]);
+        if (!deleteResult.changes) {
+            res.status(NOT_FOUND_CODE).json({ response: 'NOT FOUND' });
+            return;
+        }
+
+        if (existingNote.imagePath) {
+            deleteStoredFile(existingNote.imagePath);
+        }
+
+        res.status(SUCCESS_CODE).json({ response: deleteResult });
+    } catch (err) {
+        res.status(ERROR_CODE).json({ message: err.message });
+    }
 });
 // END NOTES APIS
 

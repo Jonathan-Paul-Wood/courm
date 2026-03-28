@@ -28,3 +28,11 @@ export function exportJSON (json, name) {
     const content = JSON.stringify(data);
     downloadContent(content, `${name}_${time.toISOString().replace(/:/g, '-')}.json`, 'text/json');
 }
+
+export function buildStoredFileUrl (relativePath) {
+    if (!relativePath) {
+        return '';
+    }
+
+    return `http://localhost:8080/api/files/${relativePath.replace(/\\/g, '/').replace(/^\/+/, '')}`;
+}
