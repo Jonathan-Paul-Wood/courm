@@ -5,16 +5,13 @@
   "main": "server.js",
   "bin": "server.js",
   "dependencies": {
-    "body-parser": "^1.19.0",
     "cors": "^2.8.5",
-    "express": "^4.17.1",
-    "open": "^8.0.2",
-    "sequelize": "^6.3.5",
-    "sqlite3": "^5.0.0"
+    "express": "^5.2.1",
+    "sqlite3": "^6.0.1"
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "node --test",
     "start": "node server.js",
     "db-init-win": "fsutil file createnew main.db 0",
     "db-init-lin": "touch main.db"

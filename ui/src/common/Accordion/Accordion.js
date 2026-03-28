@@ -1,121 +1,60 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import Input from '../../common/Input/Input';
-import Button from '../../common/Button';
-import SortOrderControls from './SortOrderControls';
-import FilterControls from './FilterControls';
 
-const ControlContainer = styled.div`
+const AccordionContainer = styled.div`
     display: flex;
-    align-content: center;
-    margin-bottom: 0.5em;
-    .input-field {
-        padding: 0 3em;
-    }
+    flex-direction: column;
+    gap: 0.5rem;
 `;
 
-export default function Accordion (props) {
-    const {
-        sections
-    } = props;
-    const navigate = useNavigate();
-    const [selectedSearchFields, setSelectedSearchFields] = useState(searchFields);
-    const [filtersApplied, setFiltersApplied] = useState(false);
+const Section = styled.div`
+    border: 1px solid #d9d9d9;
+    border-radius: 0.25rem;
+    overflow: hidden;
+`;
 
-    function exportList () {
-        let list, name;
-        if (type === 'Contact') {
-            list = contactList.results;
-            name = 'contactList';
-        } else if (type === 'Note') {
-            list = noteList.results;
-            name = 'noteList';
-        }
-        exportDataList([type.toLowerCase()], [list], name);
-    }
+const HeaderButton = styled.button`
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 0;
+    background: #f7f7f7;
+    font-weight: 600;
+    text-align: left;
+`;
 
-    function handleSelectionChange (index) {
-        const newSelections = selectedSearchFields;
-        newSelections[index].selected = !newSelections[index].selected;
-        setSelectedSearchFields(newSelections);
+const Body = styled.div`
+    padding: 1rem;
+    background: #ffffff;
+`;
 
-        setFiltersApplied(newSelections.filter(f => f.selected).length);
-
-        const selectedFields = [];
-        newSelections.forEach(filter => {
-            if (filter.selected) {
-                selectedFields.push(filter.value);
-            }
-        });
-        updateActiveFilters(selectedFields);
-    }
+export default function Accordion ({ sections }) {
+    const [openSection, setOpenSection] = useState(null);
 
     return (
-        <>
-            <ControlContainer>
-                <Button
-                    icon="plusCircle"
-                    label={`Add ${type}`}
-                    onClick={() => navigate(`/${type.toLowerCase()}s/new`)}
-                />
-                <Button
-                    icon="download"
-                    label={'Export Page Results'}
-                    onClick={exportList}
-                />
-            </ControlContainer>
-            <ControlContainer>
-                <Tooltip
-                    content={
-                        <FilterControls
-                            updateActiveFilters={handleSelectionChange}
-                            activeFilters={selectedSearchFields}
-                        />
-                    }
-                    style={{
-                        margin: 'auto 0'
-                    }}
-                >
-                    <Button
-                        icon={filtersApplied ? 'filterCircleFill' : 'filterCircle'}
-                        label="Filters"
-                        type="secondary"
-                        onClick={() => { }}
-                    />
-                </Tooltip>
-                <Input
-                    placeholder="Search (3 character minimum)"
-                    label="Search"
-                    value={searchTerm}
-                    onChange={event => updateSearchTerm(event.target.value)}
-                />
-                <Tooltip
-                    content={
-                        <SortOrderControls
-                            currentOrder={currentOrder}
-                            handleOrderUpdate={handleOrderUpdate}
-                            currentDirection={currentDirection}
-                            handleDirectionUpdate={handleDirectionUpdate}
-                            sortOptions={sortOptions}
-                        />
-                    }
-                    style={{
-                        margin: 'auto 0'
-                    }}
-                >
-                    <Button
-                        label={'Sort'}
-                        type="secondary"
-                        onClick={() => { }}
-                    />
-                </Tooltip>
-            </ControlContainer>
-        </>
+        <AccordionContainer>
+            {sections.map((section, index) => {
+                const isOpen = openSection === index;
+
+                return (
+                    <Section key={section.title || index}>
+                        <HeaderButton
+                            type="button"
+                            onClick={() => setOpenSection(isOpen ? null : index)}
+                        >
+                            {section.title || `Section ${index + 1}`}
+                        </HeaderButton>
+                        {isOpen && <Body>{section.content}</Body>}
+                    </Section>
+                );
+            })}
+        </AccordionContainer>
     );
 }
 
 Accordion.propTypes = {
-    sections: PropTypes.array.isRequired
+    sections: PropTypes.arrayOf(PropTypes.shape({
+        title: PropTypes.string,
+        content: PropTypes.node
+    })).isRequired
 };

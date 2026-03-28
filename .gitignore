@@ -20,7 +20,7 @@ require.js
 pb-backend-*
 
 #logs
-*.logs*
+*.log*
 
 # misc
 .DS_Store
