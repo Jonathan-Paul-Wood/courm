@@ -12,7 +12,7 @@ const LeftSideBarWrapper = styled.div`
     color: white;
     display: grid;
     grid-template-columns: 8em;
-    grid-template-rows: 5rem 5rem 5rem 5rem 5rem 5rem;
+    grid-auto-rows: 5rem;
 `;
 
 const ActiveTab = styled.div`
@@ -43,6 +43,11 @@ export default function LeftSidebar () {
             icon: 'notes',
             title: 'Notes',
             path: '/notes'
+        },
+        {
+            icon: 'calendar',
+            title: 'Calendar',
+            path: '/calendar'
         },
         {
             icon: 'tools',

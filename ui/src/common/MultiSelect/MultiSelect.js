@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Select from '../../common/Select';
@@ -8,6 +8,10 @@ import ScrollContainer from '../ScrollContainer';
 
 const RelationContainer = styled.div`
     width: calc(50% - 1em);
+
+    @media (max-width: 960px) {
+        width: 100%;
+    }
 
     .relationSelectRow {
         display: flex;
@@ -81,19 +85,30 @@ export default function MultiSelect (props) {
     const [pendingChanges, setPendingChanges] = useState([]);
     const [pendingSelection, setPendingSelection] = useState(0);
 
+    useEffect(() => {
+        const selectedIds = new Set(pendingChanges.map(change => change.id));
+        const nextRemainingOptions = options.filter(option => !selectedIds.has(option.id));
+        setRemainingOptions(nextRemainingOptions);
+
+        if (!nextRemainingOptions.length || pendingSelection >= nextRemainingOptions.length) {
+            setPendingSelection(0);
+        }
+    }, [options, pendingChanges, pendingSelection]);
+
     function handleRemovePendingRelation (index) {
-        setRemainingOptions([...remainingOptions, pendingChanges[index]]);
         const newPending = pendingChanges.filter((_, i) => i !== index);
         setPendingChanges(newPending);
         onChange(newPending);
     }
 
     function handleAddPendingRelation () {
+        if (!remainingOptions.length) {
+            return;
+        }
+
         const newPending = [...pendingChanges, remainingOptions[pendingSelection]];
         setPendingChanges(newPending);
         onChange(newPending);
-        const newRemainingOptions = remainingOptions.filter((_, i) => i !== pendingSelection);
-        setRemainingOptions(newRemainingOptions);
         setPendingSelection(0);
     }
 
