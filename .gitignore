@@ -22,6 +22,9 @@ pb-backend-*
 #logs
 *.log*
 
+# temporary LLM context
+tickets/
+
 # misc
 .DS_Store
 .env.local
