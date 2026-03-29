@@ -33,6 +33,8 @@ const MAX_NOTE_MEDIA_BYTES = {
     video: 50 * 1024 * 1024
 };
 const SUPPORTED_NOTE_MEDIA_TYPES = ['audio', 'image', 'video'];
+const CONTACT_IMAGE_DIRECTORY = path.join(APP_STORAGE_DIRECTORY, 'contact-images');
+const MAX_CONTACT_IMAGE_BYTES = 10 * 1024 * 1024;
 
 var corsOptions = {
     origin: "http://localhost:3000",
@@ -48,6 +50,7 @@ app.use(bodyParser.urlencoded({ extended: true, limit: '100mb' }));
 
 ensureDirectoryExists(APP_STORAGE_DIRECTORY);
 ensureDirectoryExists(NOTE_STORAGE_DIRECTORY);
+ensureDirectoryExists(CONTACT_IMAGE_DIRECTORY);
 Object.values(NOTE_MEDIA_DIRECTORIES).forEach(ensureDirectoryExists);
 app.use('/api/files', express.static(APP_STORAGE_DIRECTORY));
 
@@ -623,6 +626,80 @@ function buildNoteValues(body, existingNote) {
     };
 }
 
+function saveContactImage(imageUpload) {
+    if (!imageUpload || !imageUpload.dataUrl) {
+        return '';
+    }
+
+    const dataUrlMatch = imageUpload.dataUrl.match(/^data:(.+);base64,(.+)$/);
+
+    if (!dataUrlMatch) {
+        throw new Error('Invalid image upload payload');
+    }
+
+    const mimeType = dataUrlMatch[1];
+    if (!mimeType.startsWith('image/')) {
+        throw new Error('Only image uploads are supported');
+    }
+
+    const imageBuffer = Buffer.from(dataUrlMatch[2], 'base64');
+    if (imageBuffer.length > MAX_CONTACT_IMAGE_BYTES) {
+        throw new Error('Image exceeds the 10MB limit');
+    }
+
+    const fileExtension = getStoredFileExtension(imageUpload.fileName, mimeType);
+    const generatedFileName = `${Date.now()}-${crypto.randomBytes(6).toString('hex')}${fileExtension}`;
+    const relativeFilePath = path.posix.join('contact-images', generatedFileName);
+    const storedFilePath = resolveStoredFilePath(relativeFilePath);
+
+    ensureDirectoryExists(CONTACT_IMAGE_DIRECTORY);
+    fs.writeFileSync(storedFilePath, imageBuffer);
+
+    return relativeFilePath;
+}
+
+function buildContactValues(body, existingContact) {
+    const existingProfilePicture = existingContact && existingContact.profilePicture ? existingContact.profilePicture : '';
+    const removeImage = body.removeImage === true || body.removeImage === 'true';
+    let createdImagePath = '';
+    let nextProfilePicture = typeof body.profilePicture === 'string' ? body.profilePicture : existingProfilePicture;
+
+    if (body.imageUpload && body.imageUpload.dataUrl) {
+        createdImagePath = saveContactImage(body.imageUpload);
+        nextProfilePicture = createdImagePath;
+    } else if (removeImage) {
+        nextProfilePicture = '';
+    } else if (!nextProfilePicture && existingProfilePicture) {
+        nextProfilePicture = existingProfilePicture;
+    }
+
+    return {
+        contactValues: {
+            firstName: body.firstName || '',
+            lastName: body.lastName || '',
+            profilePicture: nextProfilePicture,
+            phoneNumber: body.phoneNumber || '',
+            email: body.email || '',
+            address: body.address || '',
+            firm: body.firm || '',
+            industry: body.industry || '',
+            dateOfBirth: body.dateOfBirth || '',
+            tags: body.tags || '',
+            interactions: body.interactions || '',
+            bio: body.bio || '',
+            createdBy: body.createdBy || '',
+            createdOn: body.createdOn || '',
+            lastModifiedBy: body.lastModifiedBy || '',
+            lastModifiedOn: body.lastModifiedOn || '',
+            lastInteractionId: body.lastInteractionId || body.lastInteraction || '',
+            lastInteractionOn: body.lastInteractionOn || body.lastInteraction || '',
+            entityType: body.entityType || 'person'
+        },
+        createdImagePath,
+        replacedImagePath: existingProfilePicture && existingProfilePicture !== nextProfilePicture ? existingProfilePicture : ''
+    };
+}
+
 app.post("/api/initialize", async (req, res) => {
     try {
         await initializeDB();
@@ -938,65 +1015,66 @@ app.delete("/api/notes/:id", async (req, res) => {
 // END NOTES APIS
 
 // CONTACTS APIS
-app.post('/api/contacts/new', (req, res) => {
-    const createdOn = req.body.createdOn;
-    db.run(
-        `INSERT INTO contacts(
-            firstName,
-            lastName,
-            profilePicture,
-            phoneNumber,
-            email,
-            address,
-            firm,
-            industry,
-            dateOfBirth,
-            tags,
-            interactions,
-            bio,
-            createdBy,
-            createdOn,
-            lastModifiedBy,
-            lastModifiedOn,
-            lastInteractionId,
-            lastInteractionOn,
-            entityType) 
-        VALUES(
-            '${cleanseString(req.body.firstName)}',
-            '${cleanseString(req.body.lastName)}',
-            '${req.body.profilePicture}',
-            '${req.body.phoneNumber}',
-            '${req.body.email}',
-            '${cleanseString(req.body.address)}',
-            '${cleanseString(req.body.firm)}',
-            '${cleanseString(req.body.industry)}',
-            '${req.body.dateOfBirth}',
-            '${req.body.tags}',
-            '${req.body.interactions}',
-            '${cleanseString(req.body.bio)}',
-            '${req.body.createdBy}',
-            '${req.body.createdOn}',
-            '${req.body.lastModifiedBy}',
-            '${req.body.lastModifiedOn}',
-            '${req.body.lastInteraction}',
-            '${req.body.lastInteraction}',
-            '${req.body.entityType}'
-            )`, (err, rows) => {
-                if (err) {
-                    res.status(ERROR_CODE);
-                    res.json(err);
-                } else {
-                    res.status(SUCCESS_CODE);
-                    db.run(`SELECT id FROM contacts WHERE createdOn=${createdOn}`, (err, id) => {
-                        if (err) {
-                            res.json({'message': 'could not get new Id'});
-                        } else {
-                            res.json({'newId': id});
-                        }
-                    });
-                }
-            }
+app.post('/api/contacts/new', async (req, res) => {
+    let createdImagePath = '';
+
+    try {
+        const { contactValues, createdImagePath: nextCreatedImagePath } = buildContactValues(req.body);
+        createdImagePath = nextCreatedImagePath;
+
+        const insertResult = await runStatement(
+            `INSERT INTO contacts(
+                firstName,
+                lastName,
+                profilePicture,
+                phoneNumber,
+                email,
+                address,
+                firm,
+                industry,
+                dateOfBirth,
+                tags,
+                interactions,
+                bio,
+                createdBy,
+                createdOn,
+                lastModifiedBy,
+                lastModifiedOn,
+                lastInteractionId,
+                lastInteractionOn,
+                entityType
+            ) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+                contactValues.firstName,
+                contactValues.lastName,
+                contactValues.profilePicture,
+                contactValues.phoneNumber,
+                contactValues.email,
+                contactValues.address,
+                contactValues.firm,
+                contactValues.industry,
+                contactValues.dateOfBirth,
+                contactValues.tags,
+                contactValues.interactions,
+                contactValues.bio,
+                contactValues.createdBy,
+                contactValues.createdOn,
+                contactValues.lastModifiedBy,
+                contactValues.lastModifiedOn,
+                contactValues.lastInteractionId,
+                contactValues.lastInteractionOn,
+                contactValues.entityType
+            ]
         );
+
+        const newContact = await getRow(`SELECT * FROM contacts WHERE id = ?`, [insertResult.lastID]);
+        res.status(SUCCESS_CODE).json(newContact);
+    } catch (err) {
+        if (createdImagePath) {
+            deleteStoredFile(createdImagePath);
+        }
+        res.status(ERROR_CODE).json({ message: err.message });
+    }
 });
 
 app.get('/api/contacts/all', (req, res) => {
@@ -1134,52 +1212,120 @@ app.get("/api/contacts/:id", (req, res) => {
     })
 });
 
-app.put("/api/contacts/:id", (req, res) => {
-    const b = req.body;
-    let sql = `UPDATE contacts SET`;
-    Object.keys(b).map(key => {
-        if(key !== 'id' && key !== 'firstName') {
-            sql = sql+`, ${key}='${cleanseString(b[key])}'`
-        } else if (key === 'firstName') {
-            sql = sql+` ${key}='${cleanseString(b[key])}'`
+app.put("/api/contacts/:id", async (req, res) => {
+    let createdImagePath = '';
+
+    try {
+        const existingContact = await getRow(`SELECT * FROM contacts WHERE id = ?`, [req.params.id]);
+        if (!existingContact) {
+            res.status(NOT_FOUND_CODE).json({ response: 'NOT FOUND' });
+            return;
         }
-    });
-    sql = sql+` WHERE id=${req.params.id}`;
-    db.run(sql, (err, row) => {
-        if (err) {
-            res.status(ERROR_CODE);
-            res.json(err);
-        } else if (!row) {
-            res.status(NOT_FOUND_CODE);
-            res.json({'response': 'NOT FOUND'});
-        } else {
-            res.status(SUCCESS_CODE);
-            res.json({'response': row});
+
+        const {
+            contactValues,
+            createdImagePath: nextCreatedImagePath,
+            replacedImagePath
+        } = buildContactValues(req.body, existingContact);
+        createdImagePath = nextCreatedImagePath;
+
+        const updateResult = await runStatement(
+            `UPDATE contacts
+            SET firstName = ?,
+                lastName = ?,
+                profilePicture = ?,
+                phoneNumber = ?,
+                email = ?,
+                address = ?,
+                firm = ?,
+                industry = ?,
+                dateOfBirth = ?,
+                tags = ?,
+                interactions = ?,
+                bio = ?,
+                createdBy = ?,
+                createdOn = ?,
+                lastModifiedBy = ?,
+                lastModifiedOn = ?,
+                lastInteractionId = ?,
+                lastInteractionOn = ?,
+                entityType = ?
+            WHERE id = ?`,
+            [
+                contactValues.firstName,
+                contactValues.lastName,
+                contactValues.profilePicture,
+                contactValues.phoneNumber,
+                contactValues.email,
+                contactValues.address,
+                contactValues.firm,
+                contactValues.industry,
+                contactValues.dateOfBirth,
+                contactValues.tags,
+                contactValues.interactions,
+                contactValues.bio,
+                contactValues.createdBy,
+                contactValues.createdOn,
+                contactValues.lastModifiedBy,
+                contactValues.lastModifiedOn,
+                contactValues.lastInteractionId,
+                contactValues.lastInteractionOn,
+                contactValues.entityType,
+                req.params.id
+            ]
+        );
+
+        if (!updateResult.changes) {
+            if (createdImagePath) {
+                deleteStoredFile(createdImagePath);
+            }
+            res.status(NOT_FOUND_CODE).json({ response: 'NOT FOUND' });
+            return;
         }
-    });
+
+        if (replacedImagePath) {
+            deleteStoredFile(replacedImagePath);
+        }
+
+        const updatedContact = await getRow(`SELECT * FROM contacts WHERE id = ?`, [req.params.id]);
+        res.status(SUCCESS_CODE).json(updatedContact);
+    } catch (err) {
+        if (createdImagePath) {
+            deleteStoredFile(createdImagePath);
+        }
+        res.status(ERROR_CODE).json({ message: err.message });
+    }
 });
 
-app.delete("/api/contacts/:id", (req, res) => {
-    const wasErrorRemovingRelations = cleanUpRelations('contact', req.params.id);
-    if (wasErrorRemovingRelations) {
-        res.status(ERROR_CODE);
-        res.json(wasErrorRemovingRelations);
-        return;
-    }
-
-    const sql = `DELETE FROM contacts WHERE id = ${req.params.id}`;
-    db.run(sql, (err, row) => {
-        if (err) {
-            res.status(ERROR_CODE);
-            res.json(err);
-        } else if (!row) {
-            res.status(NOT_FOUND_CODE);
-            res.json({'response': 'NOT FOUND'});
-        } else {
-            res.status(SUCCESS_CODE);
-            res.json({'response': row});
+app.delete("/api/contacts/:id", async (req, res) => {
+    try {
+        const existingContact = await getRow(`SELECT * FROM contacts WHERE id = ?`, [req.params.id]);
+        if (!existingContact) {
+            res.status(NOT_FOUND_CODE).json({ response: 'NOT FOUND' });
+            return;
         }
-    });
+
+        const wasErrorRemovingRelations = cleanUpRelations('contact', req.params.id);
+        if (wasErrorRemovingRelations) {
+            res.status(ERROR_CODE);
+            res.json(wasErrorRemovingRelations);
+            return;
+        }
+
+        const deleteResult = await runStatement(`DELETE FROM contacts WHERE id = ?`, [req.params.id]);
+        if (!deleteResult.changes) {
+            res.status(NOT_FOUND_CODE).json({ response: 'NOT FOUND' });
+            return;
+        }
+
+        if (existingContact.profilePicture) {
+            deleteStoredFile(existingContact.profilePicture);
+        }
+
+        res.status(SUCCESS_CODE).json({ response: deleteResult });
+    } catch (err) {
+        res.status(ERROR_CODE).json({ message: err.message });
+    }
 });
 // END CONTACTS APIS
 
