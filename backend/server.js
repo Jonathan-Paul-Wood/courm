@@ -342,7 +342,7 @@ app.get('/api/notes/all', (req, res) => {
         } else if (!rows) {
             res.status(NOT_FOUND_CODE).send({message: 'Failed to get all notes'});
         } else {
-            res.status = SUCCESS_CODE;
+            res.status(SUCCESS_CODE);
             const resultCount = rows.length;
             res.json({
                 results: rows,
@@ -372,10 +372,10 @@ app.get("/api/notes", (req, res) => {
     db.all(sqlPre, (err, rows) => {
         if (err) {
             console.log(err);
-            res.status = ERROR_CODE;
+            res.status(ERROR_CODE);
             res.json(err);
         } else if (!rows) {
-            res.status = NOT_FOUND_CODE;
+            res.status(NOT_FOUND_CODE);
             res.json({message: 'NOT FOUND'});
         } else {
             const relatedRecordMap = new Map();
@@ -456,18 +456,18 @@ app.get("/api/notes", (req, res) => {
             db.all(sql, (err, rows) => {
                 if (err) {
                     console.log(err);
-                    res.status = ERROR_CODE;
+                    res.status(ERROR_CODE);
                     res.json(err);
                 } else if (!rows) {
-                    res.status = NOT_FOUND_CODE;
+                    res.status(NOT_FOUND_CODE);
                     res.json({message: 'NOT FOUND'});
                 } else {
                     db.all(sql_metadata, (err, result) => {
                         if (err) {
-                            res.status = ERROR_CODE;
+                            res.status(ERROR_CODE);
                             return console.error(err.message);
                         } else if (!result) {
-                            res.status = NOT_FOUND_CODE;
+                            res.status(NOT_FOUND_CODE);
                             return;
                         } else {
                             totalResults = result.length;
@@ -494,7 +494,7 @@ app.get("/api/notes/:id", (req, res) => {
         } else if (!row) {
             res.status(NOT_FOUND_CODE).send({message: 'No such note'});
         } else {
-            res.status = SUCCESS_CODE;
+            res.status(SUCCESS_CODE);
             res.json(row);
         }
     });
@@ -573,7 +573,7 @@ app.delete("/api/notes/:id", async (req, res) => {
 
         const wasErrorRemovingRelations = cleanUpRelations('note', req.params.id);
         if (wasErrorRemovingRelations) {
-            res.status = ERROR_CODE;
+            res.status(ERROR_CODE);
             res.json(wasErrorRemovingRelations);
             return;
         }
@@ -641,10 +641,10 @@ app.post('/api/contacts/new', (req, res) => {
             '${req.body.entityType}'
             )`, (err, rows) => {
                 if (err) {
-                    res.status = ERROR_CODE;
+                    res.status(ERROR_CODE);
                     res.json(err);
                 } else {
-                    res.status = SUCCESS_CODE;
+                    res.status(SUCCESS_CODE);
                     db.run(`SELECT id FROM contacts WHERE createdOn=${createdOn}`, (err, id) => {
                         if (err) {
                             res.json({'message': 'could not get new Id'});
@@ -665,7 +665,7 @@ app.get('/api/contacts/all', (req, res) => {
         } else if (!rows) {
             res.status(NOT_FOUND_CODE).send({message: 'Failed to get all contacts'});
         } else {
-            res.status = SUCCESS_CODE;
+            res.status(SUCCESS_CODE);
             const resultCount = rows.length;
             res.json({
                 results: rows,
@@ -709,10 +709,10 @@ app.get("/api/contacts", (req, res) => {
         db.all(sqlPre, (err, rows) => {
             if (err) {
                 console.log(err);
-                res.status = ERROR_CODE;
+                res.status(ERROR_CODE);
                 res.json(err);
             } else if (!rows) {
-                res.status = NOT_FOUND_CODE;
+                res.status(NOT_FOUND_CODE);
                 res.json({message: 'NOT FOUND'});
             } else {
                 const relatedRecordMap = new Map();
@@ -786,7 +786,7 @@ app.get("/api/contacts/:id", (req, res) => {
         } else if (!row) {
             res.status(NOT_FOUND_CODE).send({message: 'No such contact'});
         } else {
-            res.status = SUCCESS_CODE;
+            res.status(SUCCESS_CODE);
             res.json(row);
         }
     })
@@ -805,13 +805,13 @@ app.put("/api/contacts/:id", (req, res) => {
     sql = sql+` WHERE id=${req.params.id}`;
     db.run(sql, (err, row) => {
         if (err) {
-            res.status = ERROR_CODE;
+            res.status(ERROR_CODE);
             res.json(err);
         } else if (!row) {
-            res.status = NOT_FOUND_CODE;
+            res.status(NOT_FOUND_CODE);
             res.json({'response': 'NOT FOUND'});
         } else {
-            res.status = SUCCESS_CODE;
+            res.status(SUCCESS_CODE);
             res.json({'response': row});
         }
     });
@@ -820,7 +820,7 @@ app.put("/api/contacts/:id", (req, res) => {
 app.delete("/api/contacts/:id", (req, res) => {
     const wasErrorRemovingRelations = cleanUpRelations('contact', req.params.id);
     if (wasErrorRemovingRelations) {
-        res.status = ERROR_CODE;
+        res.status(ERROR_CODE);
         res.json(wasErrorRemovingRelations);
         return;
     }
@@ -828,13 +828,13 @@ app.delete("/api/contacts/:id", (req, res) => {
     const sql = `DELETE FROM contacts WHERE id = ${req.params.id}`;
     db.run(sql, (err, row) => {
         if (err) {
-            res.status = ERROR_CODE;
+            res.status(ERROR_CODE);
             res.json(err);
         } else if (!row) {
-            res.status = NOT_FOUND_CODE;
+            res.status(NOT_FOUND_CODE);
             res.json({'response': 'NOT FOUND'});
         } else {
-            res.status = SUCCESS_CODE;
+            res.status(SUCCESS_CODE);
             res.json({'response': row});
         }
     });
@@ -858,10 +858,10 @@ app.post('/api/events/new', (req, res) => {
             )`, (err, rows) => {
                 console.log('error: ', err);
                 if (err) {
-                    res.status = ERROR_CODE;
+                    res.status(ERROR_CODE);
                     res.json(err);
                 } else {
-                    res.status = SUCCESS_CODE;
+                    res.status(SUCCESS_CODE);
                     db.run(`SELECT id FROM events WHERE createdOn=${req.body.createdOn}`, (err, id) => {
                         if (err) {
                             res.json({'message': 'could not get new Id'});
@@ -882,7 +882,7 @@ app.get('/api/events/all', (req, res) => {
         } else if (!rows) {
             res.status(NOT_FOUND_CODE).send({message: 'Failed to get all events'});
         } else {
-            res.status = SUCCESS_CODE;
+            res.status(SUCCESS_CODE);
             const resultCount = rows.length;
             res.json({
                 results: rows,
@@ -917,10 +917,10 @@ app.get("/api/events", (req, res) => {
         db.all(sqlPre, (err, rows) => {
             if (err) {
                 console.log(err);
-                res.status = ERROR_CODE;
+                res.status(ERROR_CODE);
                 res.json(err);
             } else if (!rows) {
-                res.status = NOT_FOUND_CODE;
+                res.status(NOT_FOUND_CODE);
                 res.json({message: 'NOT FOUND'});
             } else {
                 const relatedRecordMap = new Map();
@@ -1008,18 +1008,18 @@ function getSubsetOfRecords(res, sql, order, direction, results, page, searchTer
     db.all(sql, (err, rows) => {
         if (err) {
             console.log(err);
-            res.status = ERROR_CODE;
+            res.status(ERROR_CODE);
             res.json(err);
         } else if (!rows) {
-            res.status = NOT_FOUND_CODE;
+            res.status(NOT_FOUND_CODE);
             res.json({message: 'NOT FOUND'});
         } else {
             db.all(sql_metadata, (err, result) => {
                 if (err) {
-                    res.status = ERROR_CODE;
+                    res.status(ERROR_CODE);
                     return console.error(err.message);
                 } else if (!result) {
-                    res.status = NOT_FOUND_CODE;
+                    res.status(NOT_FOUND_CODE);
                     return;
                 } else {
                     totalResults = result.length;
@@ -1045,7 +1045,7 @@ app.get("/api/events/:id", (req, res) => {
         } else if (!row) {
             res.status(NOT_FOUND_CODE).send({message: 'No such event'});
         } else {
-            res.status = SUCCESS_CODE;
+            res.status(SUCCESS_CODE);
             res.json(row);
         }
     })
@@ -1064,13 +1064,13 @@ app.put("/api/events/:id", (req, res) => {
     sql = sql+` WHERE id=${req.params.id}`;
     db.run(sql, (err, row) => {
         if (err) {
-            res.status = ERROR_CODE;
+            res.status(ERROR_CODE);
             res.json(err);
         } else if (!row) {
-            res.status = NOT_FOUND_CODE;
+            res.status(NOT_FOUND_CODE);
             res.json({'response': 'NOT FOUND'});
         } else {
-            res.status = SUCCESS_CODE;
+            res.status(SUCCESS_CODE);
             res.json({'response': row});
         }
     });
@@ -1079,7 +1079,7 @@ app.put("/api/events/:id", (req, res) => {
 app.delete("/api/events/:id", (req, res) => {
     const wasErrorRemovingRelations = cleanUpRelations('event', req.params.id);
     if (wasErrorRemovingRelations) {
-        res.status = ERROR_CODE;
+        res.status(ERROR_CODE);
         res.json(wasErrorRemovingRelations);
         return;
     }
@@ -1087,13 +1087,13 @@ app.delete("/api/events/:id", (req, res) => {
     const sql = `DELETE FROM events WHERE id = ${req.params.id}`;
     db.run(sql, (err, row) => {
         if (err) {
-            res.status = ERROR_CODE;
+            res.status(ERROR_CODE);
             res.json(err);
         } else if (!row) {
-            res.status = NOT_FOUND_CODE;
+            res.status(NOT_FOUND_CODE);
             res.json({'response': 'NOT FOUND'});
         } else {
-            res.status = SUCCESS_CODE;
+            res.status(SUCCESS_CODE);
             res.json({'response': row});
         }
     });
@@ -1115,10 +1115,10 @@ app.post('/api/relations/new', (req, res) => {
             )`, (err, rows) => {
                 console.log('error: ', err);
                 if (err) {
-                    res.status = ERROR_CODE;
+                    res.status(ERROR_CODE);
                     res.json(err);
                 } else {
-                    res.status = SUCCESS_CODE;
+                    res.status(SUCCESS_CODE);
                     db.run(`SELECT id FROM relations WHERE createdOn=${req.body.createdOn}`, (err, id) => {
                         if (err) {
                             res.json({'message': 'could not get new Id'});
@@ -1137,10 +1137,10 @@ app.get('/api/relations/all', (req, res) => {
     db.all(sql, (err, rows) => {
         if (err) {
             console.log(err);
-            res.status = ERROR_CODE;
+            res.status(ERROR_CODE);
             res.json(err);
         } else if (!rows) {
-            res.status = NOT_FOUND_CODE;
+            res.status(NOT_FOUND_CODE);
             res.json({message: 'NOT FOUND'});
         } else {
             res.json(rows);
@@ -1154,10 +1154,10 @@ app.get('/api/relations/:id', (req, res) => {
     db.all(sql, (err, rows) => {
         if (err) {
             console.log(err);
-            res.status = ERROR_CODE;
+            res.status(ERROR_CODE);
             res.json(err);
         } else if (!rows) {
-            res.status = NOT_FOUND_CODE;
+            res.status(NOT_FOUND_CODE);
             res.json({message: 'NOT FOUND'});
         } else {
             res.json(rows);
@@ -1173,10 +1173,10 @@ app.get("/api/relations", (req, res) => {
     db.all(sql, (err, rows) => {
         if (err) {
             console.log(err);
-            res.status = ERROR_CODE;
+            res.status(ERROR_CODE);
             res.json(err);
         } else if (!rows) {
-            res.status = NOT_FOUND_CODE;
+            res.status(NOT_FOUND_CODE);
             res.json({message: 'NOT FOUND'});
         } else {
             res.json(rows);
@@ -1197,13 +1197,13 @@ app.put("/api/relations/:id", (req, res) => {
     sql = sql+` WHERE id=${req.params.id}`;
     db.run(sql, (err, row) => {
         if (err) {
-            res.status = ERROR_CODE;
+            res.status(ERROR_CODE);
             res.json(err);
         } else if (!row) {
-            res.status = NOT_FOUND_CODE;
+            res.status(NOT_FOUND_CODE);
             res.json({'response': 'NOT FOUND'});
         } else {
-            res.status = SUCCESS_CODE;
+            res.status(SUCCESS_CODE);
             res.json({'response': row});
         }
     });
@@ -1213,13 +1213,13 @@ app.delete("/api/relations/:id", (req, res) => {
     const sql = `DELETE FROM relations WHERE id = ${req.params.id}`;
     db.run(sql, (err, row) => {
         if (err) {
-            res.status = ERROR_CODE;
+            res.status(ERROR_CODE);
             res.json(err);
         } else if (!row) {
-            res.status = NOT_FOUND_CODE;
+            res.status(NOT_FOUND_CODE);
             res.json({'response': 'NOT FOUND'});
         } else {
-            res.status = SUCCESS_CODE;
+            res.status(SUCCESS_CODE);
             res.json({'response': row});
         }
     });
@@ -1263,10 +1263,10 @@ app.get("/api/records-by-relation/recordType/:recordType", async (req, res) => {
     db.all(sql, (err, rows) => {
         if (err) {
             console.log(err);
-            res.status = ERROR_CODE;
+            res.status(ERROR_CODE);
             res.json(err);
         } else if (!rows) {
-            res.status = NOT_FOUND_CODE;
+            res.status(NOT_FOUND_CODE);
             res.json({message: 'NOT FOUND'});
         } else {
             const relatedRecordMap = new Map();
@@ -1327,13 +1327,13 @@ app.get("/api/records-by-relation/recordType/:recordType", async (req, res) => {
             const sql2 = `SELECT * FROM ${recordType}s WHERE id IN (${filteredIds})`;
             db.all(sql2, (err2, rows2) => {
                 if (err2) {
-                    res.status = ERROR_CODE;
+                    res.status(ERROR_CODE);
                     res.json(err2);
                 } else if (!rows2) {
-                    res.status = NOT_FOUND_CODE;
+                    res.status(NOT_FOUND_CODE);
                     res.json({'response': 'NOT FOUND'});
                 } else {
-                    res.status = SUCCESS_CODE;
+                    res.status(SUCCESS_CODE);
                     res.json(rows2);
                 }
             });
@@ -1352,13 +1352,13 @@ app.get("/api/title-list/recordType/:recordType", async (req, res) => {
 
     db.all(sql, (err, rows) => {
         if (err) {
-            res.status = ERROR_CODE;
+            res.status(ERROR_CODE);
             res.json(err);
         } else if (!rows) {
-            res.status = NOT_FOUND_CODE;
+            res.status(NOT_FOUND_CODE);
             res.json({message: 'NOT FOUND'});
         } else {
-            res.status = SUCCESS_CODE;
+            res.status(SUCCESS_CODE);
             res.json({ results: rows });
         }
     });
