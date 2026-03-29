@@ -2,6 +2,7 @@
 
 # data
 main.db
+storage/
 
 # dependencies
 node_modules

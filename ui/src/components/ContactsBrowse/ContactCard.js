@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import icons from '../../assets/icons/bootstrapIcons';
+import { buildStoredFileUrl } from '../../common/Utilities/utilities';
 
 const CardWrapper = styled.div`
     height: 15vh;
@@ -24,6 +25,22 @@ const CardWrapper = styled.div`
         display: flex;
         justify-content: space-between;
         margin: 0.5em;
+    }
+
+    #profile-picture {
+        width: 3rem;
+        height: 3rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        border-radius: 4px;
+    }
+
+    #profile-picture img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
 
     .card-content {
@@ -52,7 +69,9 @@ export default function ContactCard (props) {
         <CardWrapper className="a-cursor-pointer" onClick={() => navigate(`/contacts/${contact.id}`)}>
             <div id="head-wrapper">
                 <div id="profile-picture">
-                    {contact.profilePicture ? contact.profilePicture : icons.personCard}
+                    {contact.profilePicture
+                        ? <img src={buildStoredFileUrl(contact.profilePicture)} alt={`${contact.firstName} ${contact.lastName}`} />
+                        : icons.personCard}
                 </div>
                 <div id="contact-name" className="limit-content" title={contact.firstName + ' ' + contact.lastName}>
                     <b>{contact.firstName}</b> {contact.lastName}
