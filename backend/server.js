@@ -4,9 +4,7 @@ const cors = require("cors");
 const crypto = require("crypto");
 const fs = require("fs");
 var path = require('path');
-const open = require('open');
 var sqlite3 = require('sqlite3').verbose();
-const cors = require("cors");
 var db = new sqlite3.Database('main.db', (err) => {
     if(err) {
         console.error(err.message);
