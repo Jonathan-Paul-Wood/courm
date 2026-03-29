@@ -6,7 +6,7 @@ export const initialState = {
         date: '',
         record: '',
         address: '',
-        imagePath: '',
+        mediaFiles: [],
         contacts: '',
         createdOn: '',
         lastModifiedOn: ''

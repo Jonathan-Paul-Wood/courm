@@ -81,9 +81,31 @@ CREATE TABLE IF NOT EXISTS notes (
     address TEXT,
     contacts TEXT,
     tags TEXT,
+    mediaFiles JSONB,
     createdOn datetime default current_timestamp,
     lastModifiedOn datetime default current_timestamp
     );
+```
+
+### Note Media Files
+
+`mediaFiles` stores a JSON array of note attachments. Each item uses the following structure:
+
+```
+{
+    "id": "UUID",
+    "path": "String",
+    "type": "audio" | "image" | "video",
+    "name": "String"
+}
+```
+
+Note media is stored locally under:
+
+```
+storage/note/images
+storage/note/audio
+storage/note/video
 ```
 
 ## Relations

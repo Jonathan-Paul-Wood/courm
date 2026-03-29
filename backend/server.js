@@ -16,8 +16,23 @@ const ERROR_CODE = 500;
 const SUCCESS_CODE = 200;
 const NOT_FOUND_CODE = 404;
 const APP_STORAGE_DIRECTORY = path.resolve(process.cwd(), 'storage');
-const NOTE_IMAGE_DIRECTORY = path.join(APP_STORAGE_DIRECTORY, 'note-images');
-const MAX_NOTE_IMAGE_BYTES = 10 * 1024 * 1024;
+const NOTE_STORAGE_DIRECTORY = path.join(APP_STORAGE_DIRECTORY, 'note');
+const NOTE_MEDIA_DIRECTORIES = {
+    image: path.join(NOTE_STORAGE_DIRECTORY, 'images'),
+    audio: path.join(NOTE_STORAGE_DIRECTORY, 'audio'),
+    video: path.join(NOTE_STORAGE_DIRECTORY, 'video')
+};
+const NOTE_MEDIA_DIRECTORY_NAMES = {
+    image: 'images',
+    audio: 'audio',
+    video: 'video'
+};
+const MAX_NOTE_MEDIA_BYTES = {
+    image: 10 * 1024 * 1024,
+    audio: 25 * 1024 * 1024,
+    video: 50 * 1024 * 1024
+};
+const SUPPORTED_NOTE_MEDIA_TYPES = ['audio', 'image', 'video'];
 
 var corsOptions = {
     origin: "http://localhost:3000",
@@ -26,13 +41,14 @@ var corsOptions = {
 app.use(cors(corsOptions));
 
 // parse requests of content-type - application/json
-app.use(bodyParser.json({ limit: '15mb' }));
+app.use(bodyParser.json({ limit: '100mb' }));
 
 // parse requests of content-type - application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: true, limit: '15mb' }));
+app.use(bodyParser.urlencoded({ extended: true, limit: '100mb' }));
 
 ensureDirectoryExists(APP_STORAGE_DIRECTORY);
-ensureDirectoryExists(NOTE_IMAGE_DIRECTORY);
+ensureDirectoryExists(NOTE_STORAGE_DIRECTORY);
+Object.values(NOTE_MEDIA_DIRECTORIES).forEach(ensureDirectoryExists);
 app.use('/api/files', express.static(APP_STORAGE_DIRECTORY));
 
 // parse requests of content-type - text/
@@ -46,67 +62,69 @@ app.use('/api/files', express.static(APP_STORAGE_DIRECTORY));
 //     res.sendFile(path.join(breadcrumbtrail, 'index.html'));
 // });
 
-function initializeDB() {
-    db.serialize(function() {
-        db.run(`CREATE TABLE IF NOT EXISTS contacts (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            firstName TEXT NOT NULL,
-            lastName TEXT,
-            profilePicture TEXT,
-            phoneNumber TEXT,
-            email TEXT,
-            address TEXT,
-            firm TEXT,
-            industry TEXT,
-            dateOfBirth TEXT,
-            tags TEXT,
-            interactions TEXT,
-            bio TEXT,
-            createdBy TEXT,
-            createdOn TEXT NOT NULL,
-            lastModifiedBy TEXT,
-            lastModifiedOn TEXT,
-            lastInteractionId TEXT,
-            lastInteractionOn TEXT NOT NULL,
-            entityType TEXT NOT NULL
-            );`);
-        db.run(`
-        CREATE TABLE IF NOT EXISTS notes (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            date datetime NOT NULL,
-            title TEXT,
-            record TEXT,
-            address TEXT,
-            contacts TEXT,
-            tags TEXT,
-            imagePath TEXT,
-            createdOn datetime default current_timestamp,
-            lastModifiedOn datetime default current_timestamp
-            );
-        `);
-        addColumnIfMissing('notes', 'imagePath TEXT');
-        db.run(`
-        CREATE TABLE IF NOT EXISTS relations (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            contactId INTEGER DEFAULT NULL,
-            noteId INTEGER DEFAULT NULL,
-            eventId INTEGER DEFAULT NULL,
-            createdOn datetime default current_timestamp,
-            lastModifiedOn datetime default current_timestamp
-            );
-        `);
-        db.run(`
-        CREATE TABLE IF NOT EXISTS events (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            date datetime NOT NULL,
-            title TEXT,
-            description TEXT,
-            address TEXT,
-            createdOn datetime default current_timestamp,
-            lastModifiedOn datetime default current_timestamp
-            );
-        `);
-      });      
+async function initializeDB() {
+    await runStatement(`CREATE TABLE IF NOT EXISTS contacts (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        firstName TEXT NOT NULL,
+        lastName TEXT,
+        profilePicture TEXT,
+        phoneNumber TEXT,
+        email TEXT,
+        address TEXT,
+        firm TEXT,
+        industry TEXT,
+        dateOfBirth TEXT,
+        tags TEXT,
+        interactions TEXT,
+        bio TEXT,
+        createdBy TEXT,
+        createdOn TEXT NOT NULL,
+        lastModifiedBy TEXT,
+        lastModifiedOn TEXT,
+        lastInteractionId TEXT,
+        lastInteractionOn TEXT NOT NULL,
+        entityType TEXT NOT NULL
+        );`);
+
+    await runStatement(`
+    CREATE TABLE IF NOT EXISTS notes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        date datetime NOT NULL,
+        title TEXT,
+        record TEXT,
+        address TEXT,
+        contacts TEXT,
+        tags TEXT,
+        mediaFiles JSONB,
+        createdOn datetime default current_timestamp,
+        lastModifiedOn datetime default current_timestamp
+        );
+    `);
+
+    await migrateNotesTableSchema();
+
+    await runStatement(`
+    CREATE TABLE IF NOT EXISTS relations (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        contactId INTEGER DEFAULT NULL,
+        noteId INTEGER DEFAULT NULL,
+        eventId INTEGER DEFAULT NULL,
+        createdOn datetime default current_timestamp,
+        lastModifiedOn datetime default current_timestamp
+        );
+    `);
+
+    await runStatement(`
+    CREATE TABLE IF NOT EXISTS events (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        date datetime NOT NULL,
+        title TEXT,
+        description TEXT,
+        address TEXT,
+        createdOn datetime default current_timestamp,
+        lastModifiedOn datetime default current_timestamp
+        );
+    `);
 } //TODO: delete interactions from contacts, delete contacts from notes, delete tags from all (maybe tags in new table like relations)
 
 function closeDB() { 
@@ -166,7 +184,58 @@ function getRow(sql, params = []) {
     });
 }
 
-function getNoteImageExtension(fileName, mimeType) {
+function getAllRows(sql, params = []) {
+    return new Promise((resolve, reject) => {
+        db.all(sql, params, (err, rows) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(rows);
+            }
+        });
+    });
+}
+
+function normalizeStoredRelativePath(relativeFilePath) {
+    return String(relativeFilePath || '').replace(/\\/g, '/').replace(/^\/+/, '');
+}
+
+function isSupportedNoteMediaType(mediaType) {
+    return SUPPORTED_NOTE_MEDIA_TYPES.includes(mediaType);
+}
+
+function normalizeNoteMediaType(mediaType, mimeType = '', relativeFilePath = '') {
+    if (isSupportedNoteMediaType(mediaType)) {
+        return mediaType;
+    }
+
+    if (mimeType.startsWith('image/')) {
+        return 'image';
+    }
+
+    if (mimeType.startsWith('audio/')) {
+        return 'audio';
+    }
+
+    if (mimeType.startsWith('video/')) {
+        return 'video';
+    }
+
+    const normalizedRelativePath = normalizeStoredRelativePath(relativeFilePath).toLowerCase();
+    if (normalizedRelativePath.startsWith('note/images/') || normalizedRelativePath.startsWith('note-images/')) {
+        return 'image';
+    }
+    if (normalizedRelativePath.startsWith('note/audio/')) {
+        return 'audio';
+    }
+    if (normalizedRelativePath.startsWith('note/video/')) {
+        return 'video';
+    }
+
+    return '';
+}
+
+function getStoredFileExtension(fileName, mimeType) {
     const possibleExtension = path.extname(fileName || '').toLowerCase();
 
     if (possibleExtension) {
@@ -184,9 +253,158 @@ function getNoteImageExtension(fileName, mimeType) {
         return '.webp';
     case 'image/bmp':
         return '.bmp';
+    case 'audio/mpeg':
+        return '.mp3';
+    case 'audio/mp4':
+    case 'audio/x-m4a':
+        return '.m4a';
+    case 'audio/wav':
+    case 'audio/x-wav':
+        return '.wav';
+    case 'audio/ogg':
+        return '.ogg';
+    case 'audio/webm':
+        return '.webm';
+    case 'video/mp4':
+        return '.mp4';
+    case 'video/quicktime':
+        return '.mov';
+    case 'video/webm':
+        return '.webm';
+    case 'video/ogg':
+        return '.ogv';
     default:
         return '';
     }
+}
+
+function sanitizeMediaName(name, fallbackValue = '') {
+    const trimmedName = typeof name === 'string' ? name.trim() : '';
+    if (trimmedName) {
+        return trimmedName;
+    }
+
+    const fallbackName = path.posix.basename(normalizeStoredRelativePath(fallbackValue));
+    return fallbackName || 'Untitled file';
+}
+
+function isUuid(value) {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+}
+
+function createMediaFile(mediaFile) {
+    if (!mediaFile) {
+        return null;
+    }
+
+    const normalizedPath = normalizeStoredRelativePath(mediaFile.path);
+    const mediaType = normalizeNoteMediaType(mediaFile.type, '', normalizedPath);
+
+    if (!normalizedPath || !mediaType) {
+        return null;
+    }
+
+    return {
+        path: normalizedPath,
+        type: mediaType,
+        name: sanitizeMediaName(mediaFile.name, normalizedPath),
+        id: isUuid(mediaFile.id) ? mediaFile.id : crypto.randomUUID()
+    };
+}
+
+function parseNoteMediaFiles(value) {
+    if (!value) {
+        return [];
+    }
+
+    let parsedValue = value;
+    if (typeof parsedValue === 'string') {
+        if (!parsedValue.trim()) {
+            return [];
+        }
+
+        try {
+            parsedValue = JSON.parse(parsedValue);
+        } catch (err) {
+            return [];
+        }
+    }
+
+    if (parsedValue && !Array.isArray(parsedValue) && Array.isArray(parsedValue.files)) {
+        parsedValue = parsedValue.files;
+    }
+
+    if (!Array.isArray(parsedValue)) {
+        return [];
+    }
+
+    return parsedValue
+        .map(createMediaFile)
+        .filter(Boolean);
+}
+
+function dedupeNoteMediaFiles(mediaFiles) {
+    const mediaFileMap = new Map();
+
+    mediaFiles.forEach((mediaFile) => {
+        const normalizedMediaFile = createMediaFile(mediaFile);
+        if (!normalizedMediaFile) {
+            return;
+        }
+
+        const mapKey = normalizedMediaFile.id || normalizedMediaFile.path;
+        mediaFileMap.set(mapKey, normalizedMediaFile);
+    });
+
+    return Array.from(mediaFileMap.values());
+}
+
+function serializeNoteMediaFiles(mediaFiles) {
+    return JSON.stringify(dedupeNoteMediaFiles(mediaFiles));
+}
+
+function migrateLegacyNoteMediaPath(relativeFilePath) {
+    const normalizedRelativePath = normalizeStoredRelativePath(relativeFilePath);
+
+    if (!normalizedRelativePath.toLowerCase().startsWith('note-images/')) {
+        return normalizedRelativePath;
+    }
+
+    const migratedRelativePath = path.posix.join('note', 'images', path.posix.basename(normalizedRelativePath));
+
+    try {
+        const legacyStoredFilePath = resolveStoredFilePath(normalizedRelativePath);
+        const migratedStoredFilePath = resolveStoredFilePath(migratedRelativePath);
+
+        ensureDirectoryExists(path.dirname(migratedStoredFilePath));
+        if (
+            legacyStoredFilePath &&
+            migratedStoredFilePath &&
+            fs.existsSync(legacyStoredFilePath) &&
+            !fs.existsSync(migratedStoredFilePath)
+        ) {
+            fs.renameSync(legacyStoredFilePath, migratedStoredFilePath);
+        }
+    } catch (err) {
+        console.error(`Failed to migrate legacy note media ${relativeFilePath}: ${err.message}`);
+    }
+
+    return migratedRelativePath;
+}
+
+function buildLegacyNoteMediaFiles(imagePath) {
+    if (!imagePath) {
+        return [];
+    }
+
+    const migratedRelativePath = migrateLegacyNoteMediaPath(imagePath);
+    const mediaFile = createMediaFile({
+        path: migratedRelativePath,
+        type: 'image',
+        name: path.posix.basename(migratedRelativePath)
+    });
+
+    return mediaFile ? [mediaFile] : [];
 }
 
 function resolveStoredFilePath(relativeFilePath) {
@@ -194,7 +412,7 @@ function resolveStoredFilePath(relativeFilePath) {
         return null;
     }
 
-    const normalizedRelativePath = relativeFilePath.replace(/[\\/]+/g, path.sep);
+    const normalizedRelativePath = normalizeStoredRelativePath(relativeFilePath).replace(/[\\/]+/g, path.sep);
     const resolvedPath = path.resolve(APP_STORAGE_DIRECTORY, normalizedRelativePath);
     const expectedPrefix = `${APP_STORAGE_DIRECTORY}${path.sep}`;
 
@@ -220,52 +438,174 @@ function deleteStoredFile(relativeFilePath) {
     }
 }
 
-function saveNoteImage(imageUpload) {
-    if (!imageUpload || !imageUpload.dataUrl) {
-        return '';
+function deleteStoredFiles(relativeFilePaths = []) {
+    relativeFilePaths.forEach(deleteStoredFile);
+}
+
+function saveNoteMediaFile(mediaUpload) {
+    if (!mediaUpload || !mediaUpload.dataUrl) {
+        return null;
     }
 
-    const dataUrlMatch = imageUpload.dataUrl.match(/^data:(.+);base64,(.+)$/);
+    const dataUrlMatch = mediaUpload.dataUrl.match(/^data:(.+);base64,(.+)$/);
 
     if (!dataUrlMatch) {
-        throw new Error('Invalid image upload payload');
+        throw new Error('Invalid media upload payload');
     }
 
     const mimeType = dataUrlMatch[1];
-    if (!mimeType.startsWith('image/')) {
-        throw new Error('Only image uploads are supported');
+    const mediaType = normalizeNoteMediaType(mediaUpload.type, mimeType);
+
+    if (!mediaType) {
+        throw new Error('Only image, audio, and video uploads are supported');
     }
 
-    const imageBuffer = Buffer.from(dataUrlMatch[2], 'base64');
-    if (imageBuffer.length > MAX_NOTE_IMAGE_BYTES) {
-        throw new Error('Image exceeds the 10MB limit');
+    const mediaBuffer = Buffer.from(dataUrlMatch[2], 'base64');
+    const maxMediaBytes = MAX_NOTE_MEDIA_BYTES[mediaType];
+    if (mediaBuffer.length > maxMediaBytes) {
+        throw new Error(`${mediaType} files must be ${Math.floor(maxMediaBytes / (1024 * 1024))}MB or smaller`);
     }
 
-    const fileExtension = getNoteImageExtension(imageUpload.fileName, mimeType);
+    const originalFileName = mediaUpload.fileName || mediaUpload.name || '';
+    const fileExtension = getStoredFileExtension(originalFileName, mimeType);
     const generatedFileName = `${Date.now()}-${crypto.randomBytes(6).toString('hex')}${fileExtension}`;
-    const relativeFilePath = path.posix.join('note-images', generatedFileName);
+    const relativeFilePath = path.posix.join('note', NOTE_MEDIA_DIRECTORY_NAMES[mediaType], generatedFileName);
     const storedFilePath = resolveStoredFilePath(relativeFilePath);
 
-    ensureDirectoryExists(NOTE_IMAGE_DIRECTORY);
-    fs.writeFileSync(storedFilePath, imageBuffer);
+    ensureDirectoryExists(NOTE_MEDIA_DIRECTORIES[mediaType]);
+    fs.writeFileSync(storedFilePath, mediaBuffer);
 
-    return relativeFilePath;
+    return createMediaFile({
+        id: mediaUpload.id,
+        path: relativeFilePath,
+        type: mediaType,
+        name: sanitizeMediaName(mediaUpload.name, originalFileName || generatedFileName)
+    });
+}
+
+function normalizeNoteRecord(note) {
+    if (!note) {
+        return note;
+    }
+
+    const normalizedNote = { ...note };
+    const parsedMediaFiles = parseNoteMediaFiles(normalizedNote.mediaFiles);
+
+    normalizedNote.mediaFiles = parsedMediaFiles.length
+        ? parsedMediaFiles
+        : buildLegacyNoteMediaFiles(normalizedNote.imagePath);
+
+    delete normalizedNote.imagePath;
+
+    return normalizedNote;
+}
+
+async function migrateNotesTableSchema() {
+    const noteTableColumns = await getAllRows(`PRAGMA table_info(notes)`);
+    const hasImagePath = noteTableColumns.some((column) => column.name === 'imagePath');
+    const hasMediaFiles = noteTableColumns.some((column) => column.name === 'mediaFiles');
+
+    if (!hasMediaFiles && !hasImagePath) {
+        await runStatement(`ALTER TABLE notes ADD COLUMN mediaFiles JSONB`);
+        await runStatement(`UPDATE notes SET mediaFiles = ? WHERE mediaFiles IS NULL`, [serializeNoteMediaFiles([])]);
+        return;
+    }
+
+    if (hasMediaFiles && !hasImagePath) {
+        const notes = await getAllRows(`SELECT id, mediaFiles FROM notes`);
+        for (const note of notes) {
+            await runStatement(`UPDATE notes SET mediaFiles = ? WHERE id = ?`, [
+                serializeNoteMediaFiles(parseNoteMediaFiles(note.mediaFiles)),
+                note.id
+            ]);
+        }
+        return;
+    }
+
+    await runStatement(`ALTER TABLE notes RENAME TO notes_legacy_migration`);
+    await runStatement(`
+    CREATE TABLE notes (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        date datetime NOT NULL,
+        title TEXT,
+        record TEXT,
+        address TEXT,
+        contacts TEXT,
+        tags TEXT,
+        mediaFiles JSONB,
+        createdOn datetime default current_timestamp,
+        lastModifiedOn datetime default current_timestamp
+        );
+    `);
+
+    const legacyNotes = await getAllRows(`SELECT * FROM notes_legacy_migration`);
+    for (const legacyNote of legacyNotes) {
+        const migratedMediaFiles = parseNoteMediaFiles(legacyNote.mediaFiles).length
+            ? parseNoteMediaFiles(legacyNote.mediaFiles)
+            : buildLegacyNoteMediaFiles(legacyNote.imagePath);
+
+        await runStatement(
+            `INSERT INTO notes(
+                id,
+                date,
+                title,
+                record,
+                address,
+                contacts,
+                tags,
+                mediaFiles,
+                createdOn,
+                lastModifiedOn
+            )
+            VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+            [
+                legacyNote.id,
+                legacyNote.date,
+                legacyNote.title,
+                legacyNote.record,
+                legacyNote.address,
+                legacyNote.contacts,
+                legacyNote.tags,
+                serializeNoteMediaFiles(migratedMediaFiles),
+                legacyNote.createdOn,
+                legacyNote.lastModifiedOn
+            ]
+        );
+    }
+
+    await runStatement(`DROP TABLE notes_legacy_migration`);
 }
 
 function buildNoteValues(body, existingNote) {
-    const existingImagePath = existingNote && existingNote.imagePath ? existingNote.imagePath : '';
-    const removeImage = body.removeImage === true || body.removeImage === 'true';
-    let createdImagePath = '';
-    let nextImagePath = typeof body.imagePath === 'string' ? body.imagePath : existingImagePath;
+    const normalizedExistingNote = normalizeNoteRecord(existingNote);
+    const existingMediaFiles = normalizedExistingNote ? normalizedExistingNote.mediaFiles : [];
+    const hasExplicitMediaFiles = Object.prototype.hasOwnProperty.call(body, 'mediaFiles');
+    const removeLegacyImage = body.removeImage === true || body.removeImage === 'true';
+    let requestedMediaFiles = existingMediaFiles;
 
-    if (body.imageUpload && body.imageUpload.dataUrl) {
-        createdImagePath = saveNoteImage(body.imageUpload);
-        nextImagePath = createdImagePath;
-    } else if (removeImage) {
-        nextImagePath = '';
-    } else if (!nextImagePath && existingImagePath) {
-        nextImagePath = existingImagePath;
+    if (hasExplicitMediaFiles) {
+        requestedMediaFiles = parseNoteMediaFiles(body.mediaFiles);
+    } else if (typeof body.imagePath === 'string') {
+        requestedMediaFiles = buildLegacyNoteMediaFiles(body.imagePath);
+    } else if (removeLegacyImage) {
+        requestedMediaFiles = [];
     }
+
+    const uploadPayloads = Array.isArray(body.mediaUploads)
+        ? body.mediaUploads
+        : (body.imageUpload ? [{ ...body.imageUpload, type: 'image' }] : []);
+    const createdMediaFiles = uploadPayloads
+        .map(saveNoteMediaFile)
+        .filter(Boolean);
+    const finalMediaFiles = dedupeNoteMediaFiles([...requestedMediaFiles, ...createdMediaFiles]);
+    const deletedMediaPaths = existingMediaFiles
+        .filter((existingMediaFile) => {
+            return !finalMediaFiles.some((mediaFile) => {
+                return mediaFile.id === existingMediaFile.id || mediaFile.path === existingMediaFile.path;
+            });
+        })
+        .map((mediaFile) => mediaFile.path)
+        .filter(Boolean);
 
     return {
         noteValues: {
@@ -275,17 +615,21 @@ function buildNoteValues(body, existingNote) {
             address: body.address || '',
             contacts: body.contacts || '',
             tags: body.tags || '',
-            imagePath: nextImagePath,
+            mediaFiles: serializeNoteMediaFiles(finalMediaFiles),
             lastModifiedOn: body.lastModifiedOn || null
         },
-        createdImagePath,
-        replacedImagePath: existingImagePath && existingImagePath !== nextImagePath ? existingImagePath : ''
+        createdMediaPaths: createdMediaFiles.map((mediaFile) => mediaFile.path),
+        deletedMediaPaths
     };
 }
 
-app.post("/api/initialize", (req, res) => {
-    initializeDB();
-    res.json({message: 'done'});
+app.post("/api/initialize", async (req, res) => {
+    try {
+        await initializeDB();
+        res.json({message: 'done'});
+    } catch (err) {
+        res.status(ERROR_CODE).json({ message: err.message });
+    }
 });
 
 app.delete("/api/disconnect", (req, res) => {
@@ -296,11 +640,11 @@ app.delete("/api/disconnect", (req, res) => {
 // NOTES APIS
 
 app.post('/api/notes/new', async (req, res) => {
-    let createdImagePath = '';
+    let createdMediaPaths = [];
 
     try {
-        const { noteValues, createdImagePath: nextCreatedImagePath } = buildNoteValues(req.body);
-        createdImagePath = nextCreatedImagePath;
+        const { noteValues, createdMediaPaths: nextCreatedMediaPaths } = buildNoteValues(req.body);
+        createdMediaPaths = nextCreatedMediaPaths;
 
         const insertResult = await runStatement(
             `INSERT INTO notes(
@@ -310,7 +654,7 @@ app.post('/api/notes/new', async (req, res) => {
                 address,
                 contacts,
                 tags,
-                imagePath
+                mediaFiles
             )
             VALUES(?, ?, ?, ?, ?, ?, ?)`,
             [
@@ -320,15 +664,15 @@ app.post('/api/notes/new', async (req, res) => {
                 noteValues.address,
                 noteValues.contacts,
                 noteValues.tags,
-                noteValues.imagePath
+                noteValues.mediaFiles
             ]
         );
 
         const newNote = await getRow(`SELECT * FROM notes WHERE id = ?`, [insertResult.lastID]);
-        res.status(SUCCESS_CODE).json(newNote);
+        res.status(SUCCESS_CODE).json(normalizeNoteRecord(newNote));
     } catch (err) {
-        if (createdImagePath) {
-            deleteStoredFile(createdImagePath);
+        if (createdMediaPaths.length) {
+            deleteStoredFiles(createdMediaPaths);
         }
         res.status(ERROR_CODE).json({ message: err.message });
     }
@@ -345,7 +689,7 @@ app.get('/api/notes/all', (req, res) => {
             res.status(SUCCESS_CODE);
             const resultCount = rows.length;
             res.json({
-                results: rows,
+                results: rows.map(normalizeNoteRecord),
                 resultCount: resultCount,
                 pageSize: resultCount,
                 totalCount: resultCount,
@@ -472,7 +816,7 @@ app.get("/api/notes", (req, res) => {
                         } else {
                             totalResults = result.length;
                             res.json({
-                                results: rows,
+                                results: rows.map(normalizeNoteRecord),
                                 resultCount: rows.length,
                                 pageSize: parseInt(results),
                                 totalCount: totalResults,
@@ -495,13 +839,13 @@ app.get("/api/notes/:id", (req, res) => {
             res.status(NOT_FOUND_CODE).send({message: 'No such note'});
         } else {
             res.status(SUCCESS_CODE);
-            res.json(row);
+            res.json(normalizeNoteRecord(row));
         }
     });
 });
 
 app.put("/api/notes/:id", async (req, res) => {
-    let createdImagePath = '';
+    let createdMediaPaths = [];
 
     try {
         const existingNote = await getRow(`SELECT * FROM notes WHERE id = ?`, [req.params.id]);
@@ -512,10 +856,10 @@ app.put("/api/notes/:id", async (req, res) => {
 
         const {
             noteValues,
-            createdImagePath: nextCreatedImagePath,
-            replacedImagePath
+            createdMediaPaths: nextCreatedMediaPaths,
+            deletedMediaPaths
         } = buildNoteValues(req.body, existingNote);
-        createdImagePath = nextCreatedImagePath;
+        createdMediaPaths = nextCreatedMediaPaths;
 
         const updateResult = await runStatement(
             `UPDATE notes
@@ -525,7 +869,7 @@ app.put("/api/notes/:id", async (req, res) => {
                 address = ?,
                 contacts = ?,
                 tags = ?,
-                imagePath = ?,
+                mediaFiles = ?,
                 lastModifiedOn = COALESCE(?, lastModifiedOn)
             WHERE id = ?`,
             [
@@ -535,29 +879,29 @@ app.put("/api/notes/:id", async (req, res) => {
                 noteValues.address,
                 noteValues.contacts,
                 noteValues.tags,
-                noteValues.imagePath,
+                noteValues.mediaFiles,
                 noteValues.lastModifiedOn,
                 req.params.id
             ]
         );
 
         if (!updateResult.changes) {
-            if (createdImagePath) {
-                deleteStoredFile(createdImagePath);
+            if (createdMediaPaths.length) {
+                deleteStoredFiles(createdMediaPaths);
             }
             res.status(NOT_FOUND_CODE).json({ response: 'NOT FOUND' });
             return;
         }
 
-        if (replacedImagePath) {
-            deleteStoredFile(replacedImagePath);
+        if (deletedMediaPaths.length) {
+            deleteStoredFiles(deletedMediaPaths);
         }
 
         const updatedNote = await getRow(`SELECT * FROM notes WHERE id = ?`, [req.params.id]);
-        res.status(SUCCESS_CODE).json(updatedNote);
+        res.status(SUCCESS_CODE).json(normalizeNoteRecord(updatedNote));
     } catch (err) {
-        if (createdImagePath) {
-            deleteStoredFile(createdImagePath);
+        if (createdMediaPaths.length) {
+            deleteStoredFiles(createdMediaPaths);
         }
         res.status(ERROR_CODE).json({ message: err.message });
     }
@@ -584,9 +928,7 @@ app.delete("/api/notes/:id", async (req, res) => {
             return;
         }
 
-        if (existingNote.imagePath) {
-            deleteStoredFile(existingNote.imagePath);
-        }
+        deleteStoredFiles(normalizeNoteRecord(existingNote).mediaFiles.map((mediaFile) => mediaFile.path));
 
         res.status(SUCCESS_CODE).json({ response: deleteResult });
     } catch (err) {
