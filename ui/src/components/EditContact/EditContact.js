@@ -10,25 +10,59 @@ import LoadingSpinner from '../../common/LoadingSpinner/LoadingSpinner';
 import PropTypes from 'prop-types';
 import { deepCopy } from '../../utilities/utilities';
 import ScrollContainer from '../../common/ScrollContainer';
+import { buildStoredFileUrl } from '../../common/Utilities/utilities';
+
+const MAX_CONTACT_IMAGE_BYTES = 10 * 1024 * 1024;
 
 const GridWrapper = styled.div`
     .imageRow {
-        height: 15vh;
         display: flex;
         justify-content: space-between;
-        
-        #profile-picture {
-            margin: auto 0;
-            max-height: 13vh;
-            width: auto;
-        }
+        gap: 2rem;
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
 
-        #picture-upload {
-        }
+    .imagePreview {
+        width: 18rem;
+        max-width: 100%;
+        min-height: 12rem;
+        border: 1px dashed #bfbfbf;
+        border-radius: 4px;
+        background: #fafafa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem;
+        color: #666666;
+    }
 
-        img {
-            cursor: pointer;
-        }
+    .imagePreview img {
+        width: 100%;
+        max-height: 16rem;
+        object-fit: contain;
+    }
+
+    .imageControls {
+        min-width: 16rem;
+        flex: 1 1 16rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .imageControls label {
+        font-weight: 600;
+    }
+
+    .imageControls .supportText {
+        color: #666666;
+        font-size: 0.9rem;
+    }
+
+    .imageControls .errorText {
+        color: #c62828;
+        font-size: 0.9rem;
     }
 
     .rowMargin {
@@ -174,6 +208,9 @@ export default function EditContact (props) {
     const [entityIsOrganization, setEntityIsOrganization] = useState(false);
     const [pendingChanges, setPendingChanges] = useState(defaultChanges);
     const [error, setError] = useState(defaultChanges);
+    const [pendingImageUpload, setPendingImageUpload] = useState(null);
+    const [pendingImagePreview, setPendingImagePreview] = useState('');
+    const [removeCurrentImage, setRemoveCurrentImage] = useState(false);
     const navigate = useNavigate();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [pageLoaded, setPageLoaded] = useState(false);
@@ -190,10 +227,13 @@ export default function EditContact (props) {
     useEffect(() => {
         // update page when GET returns
         const dob = contact.dateOfBirth ? contact.dateOfBirth : '';
-        const newValues = { ...contact, dateOfBirth: dob };
+        const newValues = { ...defaultChanges, ...contact, dateOfBirth: dob };
         // TODO: handle 404, and Errors
         setPendingChanges(newValues);
         setEntityIsOrganization(contact.entityType === 'organization');
+        setPendingImageUpload(null);
+        setPendingImagePreview(contact.profilePicture ? buildStoredFileUrl(contact.profilePicture) : '');
+        setRemoveCurrentImage(false);
     }, [contact]);
 
     // only after the page is first loaded, a post/put/delete changing from pending to success requires a redirect
@@ -205,6 +245,9 @@ export default function EditContact (props) {
 
     useEffect(() => {
         setPendingChanges(defaultChanges);
+        setPendingImageUpload(null);
+        setPendingImagePreview('');
+        setRemoveCurrentImage(false);
     }, [isContactPostPending]);
 
     useEffect(() => {
@@ -262,13 +305,15 @@ export default function EditContact (props) {
             if (!entityIsOrganization && dob) {
                 dob = new Date(pendingChanges.dateOfBirth).toISOString();
             }
-            const entity = pendingChanges.entityIsOrganization ? 'organization' : 'person';
+            const entity = entityIsOrganization ? 'organization' : 'person';
 
             const submitChanges = {
                 ...pendingChanges,
                 lastModifiedOn: new Date().toISOString(),
                 dateOfBirth: dob,
-                entityType: entity
+                entityType: entity,
+                imageUpload: pendingImageUpload,
+                removeImage: removeCurrentImage
             };
 
             // submit changes
@@ -286,11 +331,70 @@ export default function EditContact (props) {
     }
 
     function handlePictureUpload (e) {
-        console.log(e.target.files[0]);
-        console.log(e);
+        const selectedFile = e.target.files && e.target.files[0];
+        if (!selectedFile) {
+            return;
+        }
+
+        if (!selectedFile.type || !selectedFile.type.startsWith('image/')) {
+            setError({ ...error, profilePicture: 'Please select an image file' });
+            e.target.value = '';
+            return;
+        }
+
+        if (selectedFile.size > MAX_CONTACT_IMAGE_BYTES) {
+            setError({ ...error, profilePicture: 'Images must be 10MB or smaller' });
+            e.target.value = '';
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            const dataUrl = typeof reader.result === 'string' ? reader.result : '';
+            setError({ ...error, profilePicture: '' });
+            setPendingImageUpload({
+                fileName: selectedFile.name,
+                mimeType: selectedFile.type,
+                dataUrl
+            });
+            setPendingImagePreview(dataUrl);
+            setRemoveCurrentImage(false);
+        };
+        reader.readAsDataURL(selectedFile);
+        e.target.value = '';
+    }
+
+    function handleRemoveImage () {
+        setError({ ...error, profilePicture: '' });
+        if (pendingImageUpload) {
+            setPendingImageUpload(null);
+            setPendingImagePreview(pendingChanges.profilePicture ? buildStoredFileUrl(pendingChanges.profilePicture) : '');
+            setRemoveCurrentImage(false);
+            return;
+        }
+
+        setPendingImageUpload(null);
+        setPendingImagePreview('');
+        setRemoveCurrentImage(true);
+        updateData('profilePicture', '');
+    }
+
+    function getDisplayedImagePreview () {
+        if (pendingImagePreview) {
+            return pendingImagePreview;
+        }
+
+        if (!removeCurrentImage && pendingChanges.profilePicture) {
+            return buildStoredFileUrl(pendingChanges.profilePicture);
+        }
+
+        return '';
     }
 
     // TODO: handle loading state, 404s and errors
+    const displayedImagePreview = getDisplayedImagePreview();
+    const hasImagePreview = !!displayedImagePreview;
+
     return (
         <>
             <EntityTitleHeader
@@ -314,10 +418,32 @@ export default function EditContact (props) {
                     ? <LoadingSpinner />
                     : <GridWrapper>
                         <div className="imageRow">
-                            <div id="profile-picture">
-                                <img src={contact.profilePicture ? `../../assets/images/contact-${contactId}-picture/` : '../../assets/images/default-profile.png'} alt="profile picture" />
-                                <br />
-                                <input id="picture-upload" type="file" accept="image/*" onChange={(event) => handlePictureUpload(event)} capture />
+                            <div className="imagePreview">
+                                {hasImagePreview
+                                    ? <img src={displayedImagePreview} alt="Selected contact profile" />
+                                    : <span>No profile image uploaded</span>}
+                            </div>
+                            <div className="imageControls">
+                                <label htmlFor="contact-image-upload">Profile Image</label>
+                                <input
+                                    id="contact-image-upload"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(event) => handlePictureUpload(event)}
+                                />
+                                <Button
+                                    label="Remove Image"
+                                    type="secondary"
+                                    icon="trashCan"
+                                    onClick={handleRemoveImage}
+                                    disabled={!hasImagePreview && !pendingChanges.profilePicture}
+                                />
+                                {pendingImageUpload && <div className="supportText">This image will be saved when you save the contact.</div>}
+                                {!pendingImageUpload && pendingChanges.profilePicture && !removeCurrentImage && (
+                                    <div className="supportText">Saved path: {pendingChanges.profilePicture}</div>
+                                )}
+                                <div className="supportText">Uploaded contact images are stored locally in the application folder.</div>
+                                {error.profilePicture && <div className="errorText">{error.profilePicture}</div>}
                             </div>
                             <ToggleSwitch>
                                 <span>
