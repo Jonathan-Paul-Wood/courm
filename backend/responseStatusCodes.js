@@ -1,3 +1,11 @@
-const ERROR_CODE = 500;
-const SUCCESS_CODE = 200;
-const NOT_FOUND_CODE = 404;
+const {
+    ERROR_CODE,
+    SUCCESS_CODE,
+    NOT_FOUND_CODE
+} = require("./src/config/constants");
+
+module.exports = {
+    ERROR_CODE,
+    SUCCESS_CODE,
+    NOT_FOUND_CODE
+};

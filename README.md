@@ -34,6 +34,22 @@ Currently, CouRM runs by using a backend and frontend process. From a terminal o
 
 The UI will start on localhost:3000 (and open in your default browser), and the backend will start on localhost:8080
 
+## Backend Structure
+The backend uses a modular source tree under `backend/src/`:
+
+- `app.js` builds the Express app
+- `routes/` defines API endpoints
+- `services/` owns resource-specific shaping logic
+- `lib/` owns shared helpers
+- `db/` owns sqlite access and schema setup
+- `config/` owns constants and derived paths
+
+Additional backend guidance lives in:
+
+- [`backend/documentation.md`](backend/documentation.md)
+- [`backend/src/documentation.md`](backend/src/documentation.md)
+- [`Documentation/Data_Structures.md`](Documentation/Data_Structures.md)
+
 ## Future Development Overview
 - Port code to an integrated desktop application, so command line is not needed to run the project
 - Support GPS coordinates and addresses displayed on a map for Contacts
