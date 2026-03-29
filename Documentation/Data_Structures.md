@@ -1,6 +1,13 @@
 # Data Structures
 
-This file contains documentation of the formatting of data used within CouRM
+This file contains documentation of the data used within CouRM and the backend modules that own that data.
+
+Backend ownership reference:
+
+- `backend/src/db/schema.js` owns table creation and note schema migration.
+- `backend/src/services/notes.service.js` owns note media normalization and legacy note-media migration.
+- `backend/src/services/contacts.service.js` owns contact image path handling.
+- `backend/src/services/events.service.js` owns event payload normalization.
 
 # DATABASE TABLES
 
@@ -31,6 +38,7 @@ CREATE TABLE IF NOT EXISTS contacts (
     lastInteractionId TEXT,
     lastInteractionOn TEXT NOT NULL,
     entityType TEXT NOT NULL     
+);
 ```
 
 ### Backups
@@ -119,7 +127,8 @@ CREATE TABLE IF NOT EXISTS relations (
     eventId INTEGER DEFAULT NULL,
     createdOn datetime default current_timestamp,
     lastModifiedOn datetime default current_timestamp
-    );
+);
+```
 
 ## Events
 
