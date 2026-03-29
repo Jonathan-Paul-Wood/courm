@@ -6,6 +6,7 @@ const fs = require("fs");
 var path = require('path');
 const open = require('open');
 var sqlite3 = require('sqlite3').verbose();
+const cors = require("cors");
 var db = new sqlite3.Database('main.db', (err) => {
     if(err) {
         console.error(err.message);
@@ -1369,7 +1370,4 @@ app.get("/api/title-list/recordType/:recordType", async (req, res) => {
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
     console.log(`Server is running at http://localhost:${PORT}/`);
-
-    // if in production mode: opens the url in the default browser 
-    // open(`http://localhost:${PORT}/`);
 });
