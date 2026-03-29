@@ -5,6 +5,15 @@ const crypto = require("crypto");
 const fs = require("fs");
 var path = require('path');
 var sqlite3 = require('sqlite3').verbose();
+const {
+    DEFAULT_PAGE,
+    DEFAULT_PAGE_SIZE,
+    buildNotesListQuery,
+    getValidatedNoteOrder,
+    getValidatedPositiveInteger,
+    getValidatedSortDirection,
+    normalizeCsvList
+} = require('./noteSearch');
 var db = new sqlite3.Database('main.db', (err) => {
     if(err) {
         console.error(err.message);
@@ -781,11 +790,22 @@ app.get('/api/notes/all', (req, res) => {
 app.get("/api/notes", (req, res) => {
     const { results, page, order, direction, searchTerm, filters, relatedContacts, relatedEvents } = req.query;
     const relationships = {};
-    if (relatedContacts) {
-        relationships.contacts = relatedContacts.split(',');
+    const normalizedRelatedContacts = normalizeCsvList(relatedContacts)
+        .map((id) => parseInt(id, 10))
+        .filter(Number.isSafeInteger);
+    const normalizedRelatedEvents = normalizeCsvList(relatedEvents)
+        .map((id) => parseInt(id, 10))
+        .filter(Number.isSafeInteger);
+    const pageSize = getValidatedPositiveInteger(results, DEFAULT_PAGE_SIZE);
+    const currentPage = getValidatedPositiveInteger(page, DEFAULT_PAGE);
+    const sortOrder = getValidatedNoteOrder(order);
+    const sortDirection = getValidatedSortDirection(direction);
+
+    if (normalizedRelatedContacts.length) {
+        relationships.contacts = normalizedRelatedContacts;
     }
-    if (relatedEvents) {
-        relationships.events = relatedEvents.split(',');
+    if (normalizedRelatedEvents.length) {
+        relationships.events = normalizedRelatedEvents;
     }
 
     let sqlPre = `SELECT * FROM relations LEFT JOIN notes ON relations.noteId = notes.id`;
@@ -836,45 +856,44 @@ app.get("/api/notes", (req, res) => {
             });
 
             // filter for just the record ids with the expected relations
-            const filteredIds = [];
-            const mapKeys = relatedRecordMap.keys();
-            let nextMapKey = mapKeys.next();
-            while (nextMapKey.done === false) {
-                const key = nextMapKey.value;
-                const recordRelations = relatedRecordMap.get(key);
-                const hasAllExpectedRelations = Object.keys(relationships).every((recordIdType) => {
-                    return relationships[recordIdType].every((id) => {
-                        return recordRelations[recordIdType].find(i => i === parseInt(id));
+            let filteredIds = null;
+            if (Object.keys(relationships).length) {
+                filteredIds = [];
+                const mapKeys = relatedRecordMap.keys();
+                let nextMapKey = mapKeys.next();
+                while (nextMapKey.done === false) {
+                    const key = nextMapKey.value;
+                    const recordRelations = relatedRecordMap.get(key);
+                    const hasAllExpectedRelations = Object.keys(relationships).every((recordIdType) => {
+                        return relationships[recordIdType].every((id) => {
+                            return recordRelations[recordIdType].find(i => i === id);
+                        });
                     });
-                });
-                if (hasAllExpectedRelations) {
-                    filteredIds.push(key);
-                }
-
-                nextMapKey = mapKeys.next();
-            }
-
-            let sql = `SELECT * FROM notes`;
-
-            //apply search
-            if(searchTerm && filters) {
-                const searchFilters = filters.split(',');
-                sql = sql + ` WHERE ${searchFilters[0]} LIKE '%${searchTerm}%'`;
-                searchFilters.forEach((filter, index) => {
-                    if(index) {
-                        sql = sql + ` OR ${filter} LIKE '%${searchTerm}%'`;
+                    if (hasAllExpectedRelations) {
+                        filteredIds.push(key);
                     }
-                });
-                sql = sql+` AND id IN (${filteredIds})`;
-            } else {
-                sql = sql+` WHERE id IN (${filteredIds})`;
+
+                    nextMapKey = mapKeys.next();
+                }
             }
 
-            const sql_metadata = sql;
+            const {
+                sql: sql_metadata,
+                params: metadataParams
+            } = buildNotesListQuery({
+                searchTerm,
+                filters,
+                filteredIds
+            });
             //apply sort order and pagination
-            sql = sql+` ORDER BY ${order} ${direction} LIMIT ${results} OFFSET ((${page - 1})* ${results})`;
+            const sql = `${sql_metadata} ORDER BY ${sortOrder} ${sortDirection} LIMIT ? OFFSET ?`;
+            const queryParams = [
+                ...metadataParams,
+                pageSize,
+                (currentPage - 1) * pageSize
+            ];
 
-            db.all(sql, (err, rows) => {
+            db.all(sql, queryParams, (err, rows) => {
                 if (err) {
                     console.log(err);
                     res.status(ERROR_CODE);
@@ -883,7 +902,7 @@ app.get("/api/notes", (req, res) => {
                     res.status(NOT_FOUND_CODE);
                     res.json({message: 'NOT FOUND'});
                 } else {
-                    db.all(sql_metadata, (err, result) => {
+                    db.all(sql_metadata, metadataParams, (err, result) => {
                         if (err) {
                             res.status(ERROR_CODE);
                             return console.error(err.message);
@@ -895,10 +914,10 @@ app.get("/api/notes", (req, res) => {
                             res.json({
                                 results: rows.map(normalizeNoteRecord),
                                 resultCount: rows.length,
-                                pageSize: parseInt(results),
+                                pageSize,
                                 totalCount: totalResults,
-                                pageCount: Math.ceil(totalResults / parseInt(results)),
-                                currentPage: parseInt(page)
+                                pageCount: Math.ceil(totalResults / pageSize),
+                                currentPage
                             });
                         }
                     });
