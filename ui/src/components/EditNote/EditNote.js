@@ -9,8 +9,60 @@ import TextArea from '../../common/TextArea/TextArea';
 import CommonModal from '../../common/CommonModal/CommonModal';
 import PropTypes from 'prop-types';
 import ScrollContainer from '../../common/ScrollContainer';
+import { buildStoredFileUrl } from '../../common/Utilities/utilities';
+
+const MAX_NOTE_IMAGE_BYTES = 10 * 1024 * 1024;
 
 const GridWrapper = styled.div`
+    .imageRow {
+        display: flex;
+        gap: 2rem;
+        align-items: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .imagePreview {
+        width: 18rem;
+        max-width: 100%;
+        min-height: 12rem;
+        border: 1px dashed #bfbfbf;
+        border-radius: 4px;
+        background: #fafafa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem;
+        color: #666666;
+    }
+
+    .imagePreview img {
+        width: 100%;
+        max-height: 16rem;
+        object-fit: contain;
+    }
+
+    .imageControls {
+        min-width: 16rem;
+        flex: 1 1 16rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .imageControls label {
+        font-weight: 600;
+    }
+
+    .imageControls .supportText {
+        color: #666666;
+        font-size: 0.9rem;
+    }
+
+    .imageControls .errorText {
+        color: #c62828;
+        font-size: 0.9rem;
+    }
+
     .rowMargin {
         margin: 1rem 0;
         .input-field {
@@ -76,10 +128,14 @@ export default function EditNote (props) {
         address: '',
         contacts: '',
         tags: '',
-        record: ''
+        record: '',
+        imagePath: ''
     };
     const [pendingChanges, setPendingChanges] = useState(defaultChanges);
     const [error, setError] = useState(defaultChanges);
+    const [pendingImageUpload, setPendingImageUpload] = useState(null);
+    const [pendingImagePreview, setPendingImagePreview] = useState('');
+    const [removeCurrentImage, setRemoveCurrentImage] = useState(false);
     const navigate = useNavigate();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [pageLoaded, setPageLoaded] = useState(false);
@@ -87,19 +143,28 @@ export default function EditNote (props) {
     useEffect(() => {
         // initial GET of note
         if (noteId) {
-            setPendingChanges(getNote(noteId));
+            getNote(noteId);
         } else {
             setPendingChanges(defaultChanges);
         }
-    }, []);
+    }, [noteId]);
 
     useEffect(() => {
-        // update page when GET returns
+        if (!noteId) {
+            setPendingChanges(defaultChanges);
+            setPendingImageUpload(null);
+            setPendingImagePreview('');
+            setRemoveCurrentImage(false);
+            return;
+        }
+
         const d = note.date ? note.date : '';
-        const newValues = { ...note, date: d };
-        // TODO: handle 404, and Errors
+        const newValues = { ...defaultChanges, ...note, date: d };
         setPendingChanges(newValues);
-    }, [note]);
+        setPendingImageUpload(null);
+        setPendingImagePreview(note.imagePath ? buildStoredFileUrl(note.imagePath) : '');
+        setRemoveCurrentImage(false);
+    }, [noteId, note]);
 
     // only after the page is first loaded, a post/put/delete changing from pending to success requires a redirect
     useEffect(() => {
@@ -109,6 +174,9 @@ export default function EditNote (props) {
     }, [isNotePending]);
     useEffect(() => {
         setPendingChanges(defaultChanges);
+        setPendingImageUpload(null);
+        setPendingImagePreview('');
+        setRemoveCurrentImage(false);
     }, [isNotePostPending]);
     useEffect(() => {
         if (pageLoaded && !isNotePutPending) {
@@ -133,17 +201,81 @@ export default function EditNote (props) {
         setPendingChanges({ ...pendingChanges, ...updatedValue });
     }
 
+    function handleImageSelection (event) {
+        const selectedFile = event.target.files && event.target.files[0];
+        if (!selectedFile) {
+            return;
+        }
+
+        if (!selectedFile.type || !selectedFile.type.startsWith('image/')) {
+            setError({ ...error, imagePath: 'Please select an image file' });
+            event.target.value = '';
+            return;
+        }
+
+        if (selectedFile.size > MAX_NOTE_IMAGE_BYTES) {
+            setError({ ...error, imagePath: 'Images must be 10MB or smaller' });
+            event.target.value = '';
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            const dataUrl = typeof reader.result === 'string' ? reader.result : '';
+            setError({ ...error, imagePath: '' });
+            setPendingImageUpload({
+                fileName: selectedFile.name,
+                mimeType: selectedFile.type,
+                dataUrl
+            });
+            setPendingImagePreview(dataUrl);
+            setRemoveCurrentImage(false);
+        };
+        reader.readAsDataURL(selectedFile);
+        event.target.value = '';
+    }
+
+    function handleRemoveImage () {
+        setError({ ...error, imagePath: '' });
+        if (pendingImageUpload) {
+            setPendingImageUpload(null);
+            setPendingImagePreview(pendingChanges.imagePath ? buildStoredFileUrl(pendingChanges.imagePath) : '');
+            setRemoveCurrentImage(false);
+            return;
+        }
+
+        setPendingImageUpload(null);
+        setPendingImagePreview('');
+        setRemoveCurrentImage(true);
+        updateData('imagePath', '');
+    }
+
+    function getDisplayedImagePreview () {
+        if (pendingImagePreview) {
+            return pendingImagePreview;
+        }
+
+        if (!removeCurrentImage && pendingChanges.imagePath) {
+            return buildStoredFileUrl(pendingChanges.imagePath);
+        }
+
+        return '';
+    }
+
     function handleSaveNote () {
         // validate inputs, prompt user with actionable errors
         let valid = true;
+        const nextErrorState = { ...error };
+
         if (!pendingChanges.title) {
             valid = false;
-            setError({ ...error, ...{ title: 'Please enter title' } });
+            nextErrorState.title = 'Please enter title';
         }
         if (pendingChanges.date && !pendingChanges.date.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}/g)) {
             valid = false;
-            setError({ ...error, ...{ date: 'Expected format: YYYY-MM-DD' } });
+            nextErrorState.date = 'Expected format: YYYY-MM-DD';
         }
+        setError(nextErrorState);
 
         if (valid) {
             let d = pendingChanges.date;
@@ -154,7 +286,9 @@ export default function EditNote (props) {
             const submitChanges = {
                 ...pendingChanges,
                 lastModifiedOn: new Date().toISOString(),
-                date: d
+                date: d,
+                imageUpload: pendingImageUpload,
+                removeImage: removeCurrentImage
             };
 
             // submit changes
@@ -172,6 +306,9 @@ export default function EditNote (props) {
     }
 
     // TODO: handle loading state, 404s and errors
+    const displayedImagePreview = getDisplayedImagePreview();
+    const hasImagePreview = !!displayedImagePreview;
+
     return (
         <>
             <EntityTitleHeader
@@ -192,6 +329,35 @@ export default function EditNote (props) {
                 }}
             >
                 <GridWrapper>
+                    <div className="imageRow rowMargin">
+                        <div className="imagePreview">
+                            {hasImagePreview
+                                ? <img src={displayedImagePreview} alt="Selected note attachment" />
+                                : <span>No image uploaded</span>}
+                        </div>
+                        <div className="imageControls">
+                            <label htmlFor="note-image-upload">Image</label>
+                            <input
+                                id="note-image-upload"
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageSelection}
+                            />
+                            <Button
+                                label="Remove Image"
+                                type="secondary"
+                                icon="trashCan"
+                                onClick={handleRemoveImage}
+                                disabled={!hasImagePreview && !pendingChanges.imagePath}
+                            />
+                            {pendingImageUpload && <div className="supportText">This image will be saved when you save the note.</div>}
+                            {!pendingImageUpload && pendingChanges.imagePath && !removeCurrentImage && (
+                                <div className="supportText">Saved path: {pendingChanges.imagePath}</div>
+                            )}
+                            <div className="supportText">Uploaded note images are stored locally in the application folder.</div>
+                            {error.imagePath && <div className="errorText">{error.imagePath}</div>}
+                        </div>
+                    </div>
                     <div className="metadataRow">
                         <div id="titleData" className="inputRow rowMargin">
                             <Input
@@ -218,13 +384,6 @@ export default function EditNote (props) {
                                 error={error.address}
                                 onChange={(event) => updateData('address', event.target.value)}
                             />
-                            {/* <Input
-                                placeholder="upload files"
-                                value={pendingChanges.files}
-                                label="Files"
-                                error={error.files}
-                                onChange={(event) => updateData('files', event.target.value)}
-                            /> */}
                         </div>
                     </div>
                     <div className="recordRow">

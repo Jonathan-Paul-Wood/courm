@@ -7,7 +7,7 @@ import Input from '../../common/Input/Input';
 import DateInput from '../../common/DateInput/DateInput';
 import TextArea from '../../common/TextArea/TextArea';
 import LoadingSpinner from '../../common/LoadingSpinner/LoadingSpinner';
-import { exportDataList } from '../../common/Utilities/utilities';
+import { buildStoredFileUrl, exportDataList } from '../../common/Utilities/utilities';
 import PropTypes from 'prop-types';
 import RelationCardManager from '../../common/RelationCardManager';
 import ScrollContainer from '../../common/ScrollContainer';
@@ -23,6 +23,35 @@ const ContentWrapper = styled.div`
 `;
 
 const GridWrapper = styled.div`
+    .imageRow {
+        margin-bottom: 1.5rem;
+    }
+
+    .imagePreview {
+        width: 100%;
+        min-height: 14rem;
+        border: 1px solid #d9d9d9;
+        border-radius: 4px;
+        background: #fafafa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        padding: 0.75rem;
+    }
+
+    .imagePreview img {
+        width: 100%;
+        max-height: 22rem;
+        object-fit: contain;
+    }
+
+    .imagePath {
+        margin-top: 0.5rem;
+        color: #666666;
+        font-size: 0.9rem;
+    }
+
     .configureRow {
         height: 15vh;
         display: flex;
@@ -94,6 +123,8 @@ export default function ViewNote (props) {
         exportDataList(['notes'], [[note]], `note-${noteId}`);
     }
 
+    const noteDate = note.date ? note.date.split('T')[0] : '';
+
     // TODO: handle loading state, 404s and errors
     return (
         <>
@@ -104,7 +135,7 @@ export default function ViewNote (props) {
                 : (
                     <>
                         <EntityTitleHeader
-                            title={`${note.title} ${note.date.split('T')[0]}`}
+                            title={`${note.title} ${noteDate}`.trim()}
                             editMode={false}
                             type='Note'
                         />
@@ -116,6 +147,14 @@ export default function ViewNote (props) {
                                         style={{ margin: '2em 2em 0 2em' }}
                                     >
                                         <GridWrapper>
+                                            {note.imagePath && (
+                                                <div className="imageRow">
+                                                    <div className="imagePreview">
+                                                        <img src={buildStoredFileUrl(note.imagePath)} alt={`${note.title} attachment`} />
+                                                    </div>
+                                                    <div className="imagePath">Saved path: {note.imagePath}</div>
+                                                </div>
+                                            )}
                                             <div className="metadataRow">
                                                 <div id="titleData" className="inputRow rowMargin">
                                                     <Input
@@ -135,13 +174,6 @@ export default function ViewNote (props) {
                                                         label="Address"
                                                         locked={true}
                                                     />
-                                                    {/* <Input
-                                placeholder="upload files"
-                                value={note.files}
-                                label="Files"
-                                error={error.files}
-                                onChange={(event) => updateData('files', event.target.value)}
-                            /> */}
                                                 </div>
                                                 {/* <div className="tagsRow">
 
