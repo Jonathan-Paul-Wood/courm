@@ -11,19 +11,109 @@ import PropTypes from 'prop-types';
 import ScrollContainer from '../../common/ScrollContainer';
 import { buildStoredFileUrl } from '../../common/Utilities/utilities';
 
-const MAX_NOTE_IMAGE_BYTES = 10 * 1024 * 1024;
+const NOTE_MEDIA_SIZE_LIMITS = {
+    image: 10 * 1024 * 1024,
+    audio: 25 * 1024 * 1024,
+    video: 50 * 1024 * 1024
+};
+
+const NOTE_MEDIA_TYPE_LABELS = {
+    image: 'Image',
+    audio: 'Audio',
+    video: 'Video'
+};
 
 const GridWrapper = styled.div`
-    .imageRow {
+    .mediaRow {
         display: flex;
-        gap: 2rem;
-        align-items: flex-start;
-        flex-wrap: wrap;
+        flex-direction: column;
+        gap: 1rem;
     }
 
-    .imagePreview {
-        width: 18rem;
-        max-width: 100%;
+    .mediaControls {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .mediaControls label {
+        font-weight: 600;
+    }
+
+    .supportText {
+        color: #666666;
+        font-size: 0.9rem;
+    }
+
+    .errorText {
+        color: #c62828;
+        font-size: 0.9rem;
+    }
+
+    .mediaGrid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+        gap: 1rem;
+    }
+
+    .mediaCard {
+        border: 1px solid #d9d9d9;
+        border-radius: 6px;
+        background: #fafafa;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .mediaPreview {
+        min-height: 12rem;
+        border: 1px dashed #bfbfbf;
+        border-radius: 4px;
+        background: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem;
+        color: #666666;
+        overflow: hidden;
+    }
+
+    .mediaPreview img,
+    .mediaPreview video {
+        width: 100%;
+        max-height: 16rem;
+        object-fit: contain;
+    }
+
+    .mediaPreview audio {
+        width: 100%;
+    }
+
+    .mediaMeta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.75rem;
+        color: #666666;
+        font-size: 0.9rem;
+    }
+
+    .mediaNameInput {
+        width: 100%;
+        padding: 0.625rem 0.75rem;
+        border: 1px solid #bfbfbf;
+        border-radius: 4px;
+        font-size: 1rem;
+    }
+
+    .mediaPath {
+        word-break: break-word;
+        color: #666666;
+        font-size: 0.9rem;
+    }
+
+    .emptyMediaState {
         min-height: 12rem;
         border: 1px dashed #bfbfbf;
         border-radius: 4px;
@@ -31,40 +121,13 @@ const GridWrapper = styled.div`
         display: flex;
         align-items: center;
         justify-content: center;
-        padding: 0.75rem;
         color: #666666;
-    }
-
-    .imagePreview img {
-        width: 100%;
-        max-height: 16rem;
-        object-fit: contain;
-    }
-
-    .imageControls {
-        min-width: 16rem;
-        flex: 1 1 16rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.75rem;
-    }
-
-    .imageControls label {
-        font-weight: 600;
-    }
-
-    .imageControls .supportText {
-        color: #666666;
-        font-size: 0.9rem;
-    }
-
-    .imageControls .errorText {
-        color: #c62828;
-        font-size: 0.9rem;
+        padding: 1rem;
     }
 
     .rowMargin {
         margin: 1rem 0;
+
         .input-field {
             padding: 0 3em;
         }
@@ -107,6 +170,74 @@ const GridWrapper = styled.div`
     }
 `;
 
+function createClientUuid () {
+    if (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function') {
+        return globalThis.crypto.randomUUID();
+    }
+
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (character) => {
+        const randomValue = Math.random() * 16 | 0;
+        const nextValue = character === 'x' ? randomValue : ((randomValue & 0x3) | 0x8);
+        return nextValue.toString(16);
+    });
+}
+
+function getNoteMediaType (file) {
+    if (!file || !file.type) {
+        return '';
+    }
+
+    if (file.type.startsWith('image/')) {
+        return 'image';
+    }
+
+    if (file.type.startsWith('audio/')) {
+        return 'audio';
+    }
+
+    if (file.type.startsWith('video/')) {
+        return 'video';
+    }
+
+    return '';
+}
+
+function readFileAsDataUrl (file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(typeof reader.result === 'string' ? reader.result : '');
+        reader.onerror = () => reject(new Error(`Failed to read ${file.name}`));
+        reader.readAsDataURL(file);
+    });
+}
+
+function getMediaSource (mediaFile) {
+    if (mediaFile.previewUrl) {
+        return mediaFile.previewUrl;
+    }
+
+    if (mediaFile.path) {
+        return buildStoredFileUrl(mediaFile.path);
+    }
+
+    return '';
+}
+
+function mapNoteMediaFiles (mediaFiles = []) {
+    return mediaFiles.map((mediaFile) => ({
+        id: mediaFile.id,
+        path: mediaFile.path,
+        type: mediaFile.type,
+        name: mediaFile.name,
+        previewUrl: '',
+        upload: null
+    }));
+}
+
+function getSizeLimitLabel (mediaType) {
+    return `${Math.floor(NOTE_MEDIA_SIZE_LIMITS[mediaType] / (1024 * 1024))}MB`;
+}
+
 export default function EditNote (props) {
     const location = useLocation();
     const isNewNote = !!location.pathname.match('/new');
@@ -129,60 +260,57 @@ export default function EditNote (props) {
         contacts: '',
         tags: '',
         record: '',
-        imagePath: ''
+        mediaFiles: []
     };
     const [pendingChanges, setPendingChanges] = useState(defaultChanges);
-    const [error, setError] = useState(defaultChanges);
-    const [pendingImageUpload, setPendingImageUpload] = useState(null);
-    const [pendingImagePreview, setPendingImagePreview] = useState('');
-    const [removeCurrentImage, setRemoveCurrentImage] = useState(false);
+    const [error, setError] = useState({
+        ...defaultChanges,
+        mediaFiles: ''
+    });
+    const [pendingMediaFiles, setPendingMediaFiles] = useState([]);
     const navigate = useNavigate();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [pageLoaded, setPageLoaded] = useState(false);
 
     useEffect(() => {
-        // initial GET of note
         if (noteId) {
             getNote(noteId);
         } else {
             setPendingChanges(defaultChanges);
+            setPendingMediaFiles([]);
         }
     }, [noteId]);
 
     useEffect(() => {
         if (!noteId) {
             setPendingChanges(defaultChanges);
-            setPendingImageUpload(null);
-            setPendingImagePreview('');
-            setRemoveCurrentImage(false);
+            setPendingMediaFiles([]);
             return;
         }
 
         const d = note.date ? note.date : '';
         const newValues = { ...defaultChanges, ...note, date: d };
         setPendingChanges(newValues);
-        setPendingImageUpload(null);
-        setPendingImagePreview(note.imagePath ? buildStoredFileUrl(note.imagePath) : '');
-        setRemoveCurrentImage(false);
+        setPendingMediaFiles(mapNoteMediaFiles(note.mediaFiles));
     }, [noteId, note]);
 
-    // only after the page is first loaded, a post/put/delete changing from pending to success requires a redirect
     useEffect(() => {
         if (!isNotePending && note) {
             setPageLoaded(true);
         }
     }, [isNotePending]);
+
     useEffect(() => {
         setPendingChanges(defaultChanges);
-        setPendingImageUpload(null);
-        setPendingImagePreview('');
-        setRemoveCurrentImage(false);
+        setPendingMediaFiles([]);
     }, [isNotePostPending]);
+
     useEffect(() => {
         if (pageLoaded && !isNotePutPending) {
             navigate(`/notes/${noteId}`);
         }
     }, [isNotePutPending]);
+
     useEffect(() => {
         if (pageLoaded && !isNoteDeletePending) {
             navigate('/notes');
@@ -190,82 +318,129 @@ export default function EditNote (props) {
     }, [isNoteDeletePending]);
 
     function updateData (field, value) {
-        // clear any errors
-        const updateError = {};
-        updateError[field] = '';
-        setError({ ...error, ...updateError });
+        setError((currentError) => ({
+            ...currentError,
+            [field]: ''
+        }));
 
-        // update the value
-        const updatedValue = {};
-        updatedValue[field] = value;
-        setPendingChanges({ ...pendingChanges, ...updatedValue });
+        setPendingChanges((currentChanges) => ({
+            ...currentChanges,
+            [field]: value
+        }));
     }
 
-    function handleImageSelection (event) {
-        const selectedFile = event.target.files && event.target.files[0];
-        if (!selectedFile) {
+    async function handleMediaSelection (event) {
+        const selectedFiles = Array.from(event.target.files || []);
+        if (!selectedFiles.length) {
             return;
         }
 
-        if (!selectedFile.type || !selectedFile.type.startsWith('image/')) {
-            setError({ ...error, imagePath: 'Please select an image file' });
-            event.target.value = '';
-            return;
+        const nextMediaFiles = [];
+        const selectionErrors = [];
+
+        for (const selectedFile of selectedFiles) {
+            const mediaType = getNoteMediaType(selectedFile);
+            if (!mediaType) {
+                selectionErrors.push('Only image, audio, and video files are supported.');
+                continue;
+            }
+
+            if (selectedFile.size > NOTE_MEDIA_SIZE_LIMITS[mediaType]) {
+                selectionErrors.push(`${NOTE_MEDIA_TYPE_LABELS[mediaType]} files must be ${getSizeLimitLabel(mediaType)} or smaller.`);
+                continue;
+            }
+
+            try {
+                const previewUrl = await readFileAsDataUrl(selectedFile);
+                const mediaId = createClientUuid();
+                nextMediaFiles.push({
+                    id: mediaId,
+                    path: '',
+                    type: mediaType,
+                    name: selectedFile.name,
+                    previewUrl,
+                    upload: {
+                        id: mediaId,
+                        type: mediaType,
+                        name: selectedFile.name,
+                        fileName: selectedFile.name,
+                        mimeType: selectedFile.type,
+                        dataUrl: previewUrl
+                    }
+                });
+            } catch (selectionError) {
+                selectionErrors.push(selectionError.message);
+            }
         }
 
-        if (selectedFile.size > MAX_NOTE_IMAGE_BYTES) {
-            setError({ ...error, imagePath: 'Images must be 10MB or smaller' });
-            event.target.value = '';
-            return;
+        if (nextMediaFiles.length) {
+            setPendingMediaFiles((currentMediaFiles) => [...currentMediaFiles, ...nextMediaFiles]);
         }
 
-        const reader = new FileReader();
-        reader.onload = () => {
-            const dataUrl = typeof reader.result === 'string' ? reader.result : '';
-            setError({ ...error, imagePath: '' });
-            setPendingImageUpload({
-                fileName: selectedFile.name,
-                mimeType: selectedFile.type,
-                dataUrl
-            });
-            setPendingImagePreview(dataUrl);
-            setRemoveCurrentImage(false);
-        };
-        reader.readAsDataURL(selectedFile);
+        setError((currentError) => ({
+            ...currentError,
+            mediaFiles: selectionErrors.join(' ')
+        }));
+
         event.target.value = '';
     }
 
-    function handleRemoveImage () {
-        setError({ ...error, imagePath: '' });
-        if (pendingImageUpload) {
-            setPendingImageUpload(null);
-            setPendingImagePreview(pendingChanges.imagePath ? buildStoredFileUrl(pendingChanges.imagePath) : '');
-            setRemoveCurrentImage(false);
-            return;
-        }
-
-        setPendingImageUpload(null);
-        setPendingImagePreview('');
-        setRemoveCurrentImage(true);
-        updateData('imagePath', '');
+    function handleRemoveMedia (mediaId) {
+        setPendingMediaFiles((currentMediaFiles) => currentMediaFiles.filter((mediaFile) => mediaFile.id !== mediaId));
+        setError((currentError) => ({
+            ...currentError,
+            mediaFiles: ''
+        }));
     }
 
-    function getDisplayedImagePreview () {
-        if (pendingImagePreview) {
-            return pendingImagePreview;
-        }
+    function handleMediaNameChange (mediaId, value) {
+        setPendingMediaFiles((currentMediaFiles) => {
+            return currentMediaFiles.map((mediaFile) => {
+                if (mediaFile.id !== mediaId) {
+                    return mediaFile;
+                }
 
-        if (!removeCurrentImage && pendingChanges.imagePath) {
-            return buildStoredFileUrl(pendingChanges.imagePath);
-        }
+                const nextUpload = mediaFile.upload
+                    ? {
+                        ...mediaFile.upload,
+                        name: value
+                    }
+                    : null;
 
-        return '';
+                return {
+                    ...mediaFile,
+                    name: value,
+                    upload: nextUpload
+                };
+            });
+        });
+    }
+
+    function buildSubmitMediaFiles () {
+        return pendingMediaFiles
+            .filter((mediaFile) => !mediaFile.upload)
+            .map((mediaFile) => ({
+                id: mediaFile.id,
+                path: mediaFile.path,
+                type: mediaFile.type,
+                name: mediaFile.name
+            }));
+    }
+
+    function buildSubmitMediaUploads () {
+        return pendingMediaFiles
+            .filter((mediaFile) => mediaFile.upload)
+            .map((mediaFile) => ({
+                ...mediaFile.upload,
+                id: mediaFile.id,
+                type: mediaFile.type,
+                name: mediaFile.name
+            }));
     }
 
     function handleSaveNote () {
-        // validate inputs, prompt user with actionable errors
         let valid = true;
-        const nextErrorState = { ...error };
+        const nextErrorState = { ...error, mediaFiles: '' };
 
         if (!pendingChanges.title) {
             valid = false;
@@ -287,11 +462,10 @@ export default function EditNote (props) {
                 ...pendingChanges,
                 lastModifiedOn: new Date().toISOString(),
                 date: d,
-                imageUpload: pendingImageUpload,
-                removeImage: removeCurrentImage
+                mediaFiles: buildSubmitMediaFiles(),
+                mediaUploads: buildSubmitMediaUploads()
             };
 
-            // submit changes
             if (isNewNote) {
                 postNote(submitChanges);
             } else {
@@ -305,9 +479,27 @@ export default function EditNote (props) {
         deleteNote(noteId);
     }
 
-    // TODO: handle loading state, 404s and errors
-    const displayedImagePreview = getDisplayedImagePreview();
-    const hasImagePreview = !!displayedImagePreview;
+    function renderMediaPreview (mediaFile) {
+        const mediaSource = getMediaSource(mediaFile);
+
+        if (!mediaSource) {
+            return <span>No preview available</span>;
+        }
+
+        if (mediaFile.type === 'image') {
+            return <img src={mediaSource} alt={mediaFile.name || 'Note attachment'} />;
+        }
+
+        if (mediaFile.type === 'audio') {
+            return <audio controls src={mediaSource} />;
+        }
+
+        if (mediaFile.type === 'video') {
+            return <video controls src={mediaSource} />;
+        }
+
+        return <span>No preview available</span>;
+    }
 
     return (
         <>
@@ -329,34 +521,51 @@ export default function EditNote (props) {
                 }}
             >
                 <GridWrapper>
-                    <div className="imageRow rowMargin">
-                        <div className="imagePreview">
-                            {hasImagePreview
-                                ? <img src={displayedImagePreview} alt="Selected note attachment" />
-                                : <span>No image uploaded</span>}
-                        </div>
-                        <div className="imageControls">
-                            <label htmlFor="note-image-upload">Image</label>
+                    <div className="mediaRow rowMargin">
+                        <div className="mediaControls">
+                            <label htmlFor="note-media-upload">Attachments</label>
                             <input
-                                id="note-image-upload"
+                                id="note-media-upload"
                                 type="file"
-                                accept="image/*"
-                                onChange={handleImageSelection}
+                                accept="image/*,audio/*,video/*"
+                                multiple
+                                onChange={handleMediaSelection}
                             />
-                            <Button
-                                label="Remove Image"
-                                type="secondary"
-                                icon="trashCan"
-                                onClick={handleRemoveImage}
-                                disabled={!hasImagePreview && !pendingChanges.imagePath}
-                            />
-                            {pendingImageUpload && <div className="supportText">This image will be saved when you save the note.</div>}
-                            {!pendingImageUpload && pendingChanges.imagePath && !removeCurrentImage && (
-                                <div className="supportText">Saved path: {pendingChanges.imagePath}</div>
-                            )}
-                            <div className="supportText">Uploaded note images are stored locally in the application folder.</div>
-                            {error.imagePath && <div className="errorText">{error.imagePath}</div>}
+                            <div className="supportText">Attach multiple images, audio files, or videos to this note.</div>
+                            <div className="supportText">Uploaded note media is stored locally under `storage/note/images`, `storage/note/audio`, and `storage/note/video`.</div>
+                            {error.mediaFiles && <div className="errorText">{error.mediaFiles}</div>}
                         </div>
+                        {pendingMediaFiles.length
+                            ? (
+                                <div className="mediaGrid">
+                                    {pendingMediaFiles.map((mediaFile) => (
+                                        <div key={mediaFile.id} className="mediaCard">
+                                            <div className="mediaPreview">
+                                                {renderMediaPreview(mediaFile)}
+                                            </div>
+                                            <div className="mediaMeta">
+                                                <span>{NOTE_MEDIA_TYPE_LABELS[mediaFile.type]}</span>
+                                                <Button
+                                                    label="Remove"
+                                                    type="secondary"
+                                                    icon="trashCan"
+                                                    onClick={() => handleRemoveMedia(mediaFile.id)}
+                                                />
+                                            </div>
+                                            <input
+                                                className="mediaNameInput"
+                                                value={mediaFile.name}
+                                                onChange={(event) => handleMediaNameChange(mediaFile.id, event.target.value)}
+                                                placeholder="Attachment name"
+                                            />
+                                            {mediaFile.path && (
+                                                <div className="mediaPath">Saved path: {mediaFile.path}</div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )
+                            : <div className="emptyMediaState">No media uploaded</div>}
                     </div>
                     <div className="metadataRow">
                         <div id="titleData" className="inputRow rowMargin">
