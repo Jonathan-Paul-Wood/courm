@@ -15,6 +15,12 @@ import { buildStoredFileUrl } from '../../common/Utilities/utilities';
 const MAX_CONTACT_IMAGE_BYTES = 10 * 1024 * 1024;
 
 const GridWrapper = styled.div`
+    .submitError {
+        margin-bottom: 1rem;
+        color: #c62828;
+        font-weight: 600;
+    }
+
     .imageRow {
         display: flex;
         justify-content: space-between;
@@ -188,10 +194,13 @@ export default function EditContact (props) {
         getContact,
         postContact,
         isContactPostPending,
+        contactPostError,
         putContact,
         isContactPutPending,
+        contactPutError,
         deleteContact,
-        isContactDeletePending
+        isContactDeletePending,
+        contactDeleteError
     } = props;
     const defaultChanges = {
         firstName: '',
@@ -213,16 +222,18 @@ export default function EditContact (props) {
     const [removeCurrentImage, setRemoveCurrentImage] = useState(false);
     const navigate = useNavigate();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [pageLoaded, setPageLoaded] = useState(false);
+    const [hasSubmittedPut, setHasSubmittedPut] = useState(false);
+    const [hasRequestedDelete, setHasRequestedDelete] = useState(false);
+    const submitErrorMessage = contactPutError?.message || contactPostError?.message || '';
 
     useEffect(() => {
         // initial GET of contact
         if (contactId) {
-            setPendingChanges(getContact(contactId));
+            getContact(contactId);
         } else {
             setPendingChanges(defaultChanges);
         }
-    }, []);
+    }, [contactId, getContact]);
 
     useEffect(() => {
         // update page when GET returns
@@ -236,31 +247,38 @@ export default function EditContact (props) {
         setRemoveCurrentImage(false);
     }, [contact]);
 
-    // only after the page is first loaded, a post/put/delete changing from pending to success requires a redirect
     useEffect(() => {
-        if (!isContactPending && contact) {
-            setPageLoaded(true);
+        if (!isContactPostPending && !contactPostError) {
+            setPendingChanges(defaultChanges);
+            setPendingImageUpload(null);
+            setPendingImagePreview('');
+            setRemoveCurrentImage(false);
         }
-    }, [isContactPending]);
+    }, [isContactPostPending, contactPostError]);
 
     useEffect(() => {
-        setPendingChanges(defaultChanges);
-        setPendingImageUpload(null);
-        setPendingImagePreview('');
-        setRemoveCurrentImage(false);
-    }, [isContactPostPending]);
-
-    useEffect(() => {
-        if (pageLoaded && !isContactPutPending) {
+        if (hasSubmittedPut && !isContactPutPending && !contactPutError) {
             navigate(`/contacts/${contactId}`);
         }
-    }, [isContactPutPending]);
+    }, [hasSubmittedPut, isContactPutPending, contactPutError, contactId, navigate]);
 
     useEffect(() => {
-        if (pageLoaded && !isContactDeletePending) {
+        if (hasSubmittedPut && !isContactPutPending && contactPutError) {
+            setHasSubmittedPut(false);
+        }
+    }, [hasSubmittedPut, isContactPutPending, contactPutError]);
+
+    useEffect(() => {
+        if (hasRequestedDelete && !isContactDeletePending && !contactDeleteError) {
             navigate('/contacts');
         }
-    }, [isContactDeletePending]);
+    }, [hasRequestedDelete, isContactDeletePending, contactDeleteError, navigate]);
+
+    useEffect(() => {
+        if (hasRequestedDelete && !isContactDeletePending && contactDeleteError) {
+            setHasRequestedDelete(false);
+        }
+    }, [hasRequestedDelete, isContactDeletePending, contactDeleteError]);
 
     function updateData (field, value) {
         // clear any errors
@@ -320,6 +338,7 @@ export default function EditContact (props) {
             if (isNewContact) {
                 postContact(submitChanges);
             } else {
+                setHasSubmittedPut(true);
                 putContact(contactId, submitChanges);
             }
         }
@@ -327,6 +346,7 @@ export default function EditContact (props) {
 
     function handleDeleteConfirm () {
         setShowDeleteModal(false);
+        setHasRequestedDelete(true);
         deleteContact(contactId);
     }
 
@@ -417,6 +437,7 @@ export default function EditContact (props) {
                 {isContactPending
                     ? <LoadingSpinner />
                     : <GridWrapper>
+                        {submitErrorMessage && <div className="submitError">{submitErrorMessage}</div>}
                         <div className="imageRow">
                             <div className="imagePreview">
                                 {hasImagePreview
