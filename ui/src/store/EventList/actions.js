@@ -1,7 +1,7 @@
 import * as types from './types';
 import ServiceError from '../ServiceError';
 import EventListService from '../../services/EventListService';
-// todo: import notification toasts success/error
+import { runNotifiedRequest } from '../actionNotifications';
 
 function getEventListLoading () {
     return {
@@ -23,15 +23,21 @@ function getEventListError (error) {
     };
 }
 
-export function getEventList (results, page, searchTerm, order, direction, filters, appliedContacts, appliedNotes) {
+export function getEventList (results, page, searchTerm, order, direction, filters, appliedContacts, appliedNotes, notificationOptions = {}) {
     return async dispatch => {
-        dispatch(getEventListLoading());
-        try {
-            const response = await EventListService.getEventList(results, page, searchTerm, order, direction, filters, appliedContacts, appliedNotes);
-            dispatch(getEventListSuccess(response));
-        } catch (e) {
-            dispatch(getEventListError(e));
-        }
+        return runNotifiedRequest({
+            dispatch,
+            pendingAction: getEventListLoading,
+            successAction: getEventListSuccess,
+            errorAction: getEventListError,
+            errorContext: 'get events list',
+            serviceCall: () => EventListService.getEventList(results, page, searchTerm, order, direction, filters, appliedContacts, appliedNotes),
+            defaultErrorMessage: 'Unable to load events.',
+            notificationOptions: {
+                toastId: 'event-list-load-error',
+                ...notificationOptions
+            }
+        });
     };
 }
 
@@ -55,14 +61,20 @@ function getAllEventsError (error) {
     };
 }
 
-export function getAllEvents () {
+export function getAllEvents (notificationOptions = {}) {
     return async dispatch => {
-        dispatch(getAllEventsLoading());
-        try {
-            const response = await EventListService.getAllEvents();
-            dispatch(getAllEventsSuccess(response));
-        } catch (e) {
-            dispatch(getAllEventsError(e));
-        }
+        return runNotifiedRequest({
+            dispatch,
+            pendingAction: getAllEventsLoading,
+            successAction: getAllEventsSuccess,
+            errorAction: getAllEventsError,
+            errorContext: 'get events list',
+            serviceCall: () => EventListService.getAllEvents(),
+            defaultErrorMessage: 'Unable to load events.',
+            notificationOptions: {
+                toastId: 'all-events-load-error',
+                ...notificationOptions
+            }
+        });
     };
 }

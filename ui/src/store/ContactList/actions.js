@@ -1,6 +1,7 @@
 import * as types from './types';
 import ServiceError from '../ServiceError';
 import ContactListService from '../../services/ContactListService';
+import { runNotifiedRequest } from '../actionNotifications';
 
 function getContactListLoading () {
     return {
@@ -22,15 +23,21 @@ function getContactListError (error) {
     };
 }
 
-export function getContactList (results, page, searchTerm, order, direction, filters, appliedEvents, appliedNotes) {
+export function getContactList (results, page, searchTerm, order, direction, filters, appliedEvents, appliedNotes, notificationOptions = {}) {
     return async dispatch => {
-        dispatch(getContactListLoading());
-        try {
-            const response = await ContactListService.getContactList(results, page, searchTerm, order, direction, filters, appliedEvents, appliedNotes);
-            dispatch(getContactListSuccess(response));
-        } catch (e) {
-            dispatch(getContactListError(e));
-        }
+        return runNotifiedRequest({
+            dispatch,
+            pendingAction: getContactListLoading,
+            successAction: getContactListSuccess,
+            errorAction: getContactListError,
+            errorContext: 'get contacts list',
+            serviceCall: () => ContactListService.getContactList(results, page, searchTerm, order, direction, filters, appliedEvents, appliedNotes),
+            defaultErrorMessage: 'Unable to load contacts.',
+            notificationOptions: {
+                toastId: 'contact-list-load-error',
+                ...notificationOptions
+            }
+        });
     };
 }
 
@@ -54,14 +61,20 @@ function getAllContactsError (error) {
     };
 }
 
-export function getAllContacts () {
+export function getAllContacts (notificationOptions = {}) {
     return async dispatch => {
-        dispatch(getAllContactsLoading());
-        try {
-            const response = await ContactListService.getAllContacts();
-            dispatch(getAllContactsSuccess(response));
-        } catch (e) {
-            dispatch(getAllContactsError(e));
-        }
+        return runNotifiedRequest({
+            dispatch,
+            pendingAction: getAllContactsLoading,
+            successAction: getAllContactsSuccess,
+            errorAction: getAllContactsError,
+            errorContext: 'get all contacts',
+            serviceCall: () => ContactListService.getAllContacts(),
+            defaultErrorMessage: 'Unable to load contacts.',
+            notificationOptions: {
+                toastId: 'all-contacts-load-error',
+                ...notificationOptions
+            }
+        });
     };
 }

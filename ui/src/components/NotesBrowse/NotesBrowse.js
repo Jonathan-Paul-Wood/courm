@@ -115,8 +115,8 @@ export default function NotesBrowse (props) {
 
     useEffect(() => {
         initiateSearch();
-        getAllContacts();
-        getAllEvents();
+        getAllContacts().catch(() => {});
+        getAllEvents().catch(() => {});
     }, []);
 
     useEffect(() => {
@@ -151,7 +151,7 @@ export default function NotesBrowse (props) {
     }
 
     function initiateSearch () {
-        getNoteList(RESULTS_PER_PAGE, page, searchTerm, searchOrderBy, direction, activeFilters, appliedContacts, appliedEvents);
+        getNoteList(RESULTS_PER_PAGE, page, searchTerm, searchOrderBy, direction, activeFilters, appliedContacts, appliedEvents).catch(() => {});
     }
 
     return (

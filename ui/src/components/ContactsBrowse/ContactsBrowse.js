@@ -128,8 +128,8 @@ export default function ContactsBrowse (props) {
 
     useEffect(() => {
         initiateSearch();
-        getAllEvents();
-        getAllNotes();
+        getAllEvents().catch(() => {});
+        getAllNotes().catch(() => {});
     }, []);
 
     useEffect(() => {
@@ -164,7 +164,7 @@ export default function ContactsBrowse (props) {
     }
 
     function initiateSearch () {
-        getContactList(RESULTS_PER_PAGE, page, searchTerm, searchOrderBy, direction, activeFilters, appliedEvents, appliedNotes);
+        getContactList(RESULTS_PER_PAGE, page, searchTerm, searchOrderBy, direction, activeFilters, appliedEvents, appliedNotes).catch(() => {});
     }
 
     return (

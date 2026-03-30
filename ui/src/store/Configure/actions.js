@@ -1,6 +1,7 @@
 import * as types from './types';
 import ServiceError from '../ServiceError';
 import ConfigureService from '../../services/ConfigureService';
+import { runNotifiedRequest } from '../actionNotifications';
 
 function initializeDBLoading () {
     return {
@@ -18,15 +19,20 @@ function initializeDBError (error) {
         error: new ServiceError('Error initializing the database: ', error)
     };
 }
-export function initializeDB () {
+export function initializeDB (notificationOptions = {}) {
     return async dispatch => {
-        dispatch(initializeDBLoading());
-        try {
-            const response = await ConfigureService.initializeDB();
-            dispatch(initializeDBSuccess(response));
-        } catch (e) {
-            dispatch(initializeDBError(e));
-            // TODO: display detailed Error screen for user debugging
-        }
+        return runNotifiedRequest({
+            dispatch,
+            pendingAction: initializeDBLoading,
+            successAction: initializeDBSuccess,
+            errorAction: initializeDBError,
+            errorContext: 'Error initializing the database:',
+            serviceCall: () => ConfigureService.initializeDB(),
+            defaultErrorMessage: 'Unable to initialize the application data store.',
+            notificationOptions: {
+                toastId: 'initialize-db',
+                ...notificationOptions
+            }
+        });
     };
 }

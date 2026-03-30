@@ -6,6 +6,7 @@ import Select from '../../common/Select';
 import { exportDataList } from '../../common/Utilities/utilities';
 import { templateContact } from '../../constants/contactConstants';
 import LoadingSpinner from '../../common/LoadingSpinner';
+import { showErrorToast, showSuccessToast, showWarningToast } from '../../common/App/ToastWrapper/toastNotifications';
 
 const ConfigureWrapper = styled.div`
     padding: 0 1em;
@@ -68,14 +69,63 @@ export default function AppConfigure (props) {
     const [linkedInUploadError, setLinkedInUploadError] = useState('');
     const [isLinkedInFileUploading, setIsLinkedInFileUploading] = useState(false);
     const [linkedInUploadInfo, setLinkedInUploadInfo] = useState('');
+    const bulkNotificationOptions = {
+        suppressSuccess: true,
+        suppressError: true
+    };
 
     useEffect(() => {
         // TODO: replace with getAll endpoints once made
-        getAllContacts();
-        getAllEvents();
-        getAllNotes();
-        getAllRelations();
+        refreshConfigureData();
     }, []);
+
+    async function refreshConfigureData () {
+        await Promise.allSettled([
+            getAllContacts(),
+            getAllEvents(),
+            getAllNotes(),
+            getAllRelations()
+        ]);
+    }
+
+    function parseUploadedJson () {
+        if (!pendingUpload?.result) {
+            throw new Error('Please browse and select a JSON backup file.');
+        }
+
+        try {
+            return JSON.parse(pendingUpload.result);
+        } catch (error) {
+            throw new Error('The uploaded JSON backup could not be parsed.');
+        }
+    }
+
+    function getUploadedEntities (entityType) {
+        const uploadedJSON = parseUploadedJson();
+        return uploadedJSON?.data?.[entityType]?.data || [];
+    }
+
+    async function runBulkRequests (taskFactories, successLabel, emptyLabel) {
+        if (!taskFactories.length) {
+            showWarningToast(emptyLabel);
+            return { successCount: 0, failureCount: 0 };
+        }
+
+        const results = await Promise.allSettled(taskFactories.map(taskFactory => taskFactory()));
+        const failureCount = results.filter(result => result.status === 'rejected').length;
+        const successCount = taskFactories.length - failureCount;
+
+        if (failureCount) {
+            showErrorToast(`${successLabel} finished with ${failureCount} failure${failureCount === 1 ? '' : 's'} and ${successCount} success${successCount === 1 ? '' : 'es'}.`);
+        } else {
+            showSuccessToast(`${successLabel} completed for ${successCount} record${successCount === 1 ? '' : 's'}.`);
+        }
+
+        return {
+            successCount,
+            failureCount
+        };
+    }
 
     function handleListExport () {
         const type = fileTypeOptions[selectedTypeIndex].value;
@@ -107,71 +157,107 @@ export default function AppConfigure (props) {
         setPendingLinkedInUpload(reader);
     }
 
-    function handleAddEntity (entityType) {
-        const uploadedJSON = JSON.parse(pendingUpload.result);
-        if (uploadedJSON && uploadedJSON.data && uploadedJSON.data[entityType] && uploadedJSON.data[entityType].data && uploadedJSON.data[entityType].data.length) {
-            uploadedJSON.data[entityType].data.forEach(entity => {
-                const newEntity = {
-                    ...entity
-                };
-                delete newEntity.id;
-                switch (entityType) {
-                case 'contacts':
-                    postContact(newEntity);
-                    break;
-                case 'notes':
-                    postNote(newEntity);
-                    break;
-                case 'events':
-                    postEvent(newEntity);
-                    break;
-                case 'relations':
-                    postRelation(newEntity);
-                    break;
-                }
-            });
+    async function settleTaskFactories (taskFactories) {
+        if (!taskFactories.length) {
+            return { successCount: 0, failureCount: 0 };
+        }
+
+        const results = await Promise.allSettled(taskFactories.map(taskFactory => taskFactory()));
+        const failureCount = results.filter(result => result.status === 'rejected').length;
+
+        return {
+            successCount: taskFactories.length - failureCount,
+            failureCount
+        };
+    }
+
+    function buildAddEntityTasks (entityType) {
+        return getUploadedEntities(entityType).map(entity => {
+            const newEntity = {
+                ...entity
+            };
+
+            delete newEntity.id;
+
+            switch (entityType) {
+            case 'contacts':
+                return () => postContact(newEntity, bulkNotificationOptions);
+            case 'notes':
+                return () => postNote(newEntity, bulkNotificationOptions);
+            case 'events':
+                return () => postEvent(newEntity, bulkNotificationOptions);
+            case 'relations':
+                return () => postRelation(newEntity, bulkNotificationOptions);
+            default:
+                return () => Promise.resolve();
+            }
+        });
+    }
+
+    function buildDeleteTasks (entityType) {
+        switch (entityType) {
+        case 'contacts':
+            return (contacts.results || []).map(contact => () => deleteContact(contact.id, bulkNotificationOptions));
+        case 'events':
+            return (events.results || []).map(event => () => deleteEvent(event.id, bulkNotificationOptions));
+        case 'notes':
+            return (notes.results || []).map(note => () => deleteNote(note.id, bulkNotificationOptions));
+        case 'relations':
+            return relations.map(relation => () => deleteRelation(relation.id, bulkNotificationOptions));
+        default:
+            return [];
         }
     }
 
-    function handleRestore () {
+    async function handleRestore () {
         const type = fileTypeOptions[selectedTypeIndex].value;
-        if (type === 'all') {
-            contacts.results.forEach(contact => deleteContact(contact.id));
-            handleAddEntity('contacts');
-            notes.results.forEach(note => deleteNote(note.id));
-            handleAddEntity('notes');
-            events.results.forEach(event => deleteEvent(event.id));
-            handleAddEntity(type);
-            relations.forEach(event => deleteRelation(event.id));
-            handleAddEntity(type);
-        } else if (type === 'contacts') {
-            contacts.results.forEach(contact => deleteContact(contact.id));
-            handleAddEntity(type);
-        } else if (type === 'events') {
-            events.results.forEach(event => deleteEvent(event.id));
-            handleAddEntity(type);
-        } else if (type === 'notes') {
-            notes.results.forEach(note => deleteNote(note.id));
-            handleAddEntity(type);
-        } else if (type === 'relations') {
-            relations.forEach(event => deleteRelation(event.id));
-            handleAddEntity(type);
+        const entityTypes = type === 'all' ? ['contacts', 'events', 'notes', 'relations'] : [type];
+
+        try {
+            parseUploadedJson();
+        } catch (error) {
+            showErrorToast(error);
+            return;
         }
+
+        const deleteTasks = entityTypes.flatMap(entityType => buildDeleteTasks(entityType));
+        const addTasks = entityTypes.flatMap(entityType => buildAddEntityTasks(entityType));
+        const totalTaskCount = deleteTasks.length + addTasks.length;
+
+        if (!totalTaskCount) {
+            showWarningToast(`No ${fileTypeOptions[selectedTypeIndex].label.toLowerCase()} records were available to restore.`);
+            return;
+        }
+
+        const deleteSummary = await settleTaskFactories(deleteTasks);
+        const addSummary = await settleTaskFactories(addTasks);
+        const successCount = deleteSummary.successCount + addSummary.successCount;
+        const failureCount = deleteSummary.failureCount + addSummary.failureCount;
+
+        if (failureCount) {
+            showErrorToast(`Restore ${fileTypeOptions[selectedTypeIndex].label} finished with ${failureCount} failure${failureCount === 1 ? '' : 's'} and ${successCount} success${successCount === 1 ? '' : 'es'}.`);
+        } else {
+            showSuccessToast(`Restore ${fileTypeOptions[selectedTypeIndex].label} completed for ${successCount} record${successCount === 1 ? '' : 's'}.`);
+        }
+        await refreshConfigureData();
     }
 
-    function handleParseLinkedInContacts () {
+    async function handleParseLinkedInContacts () {
         setLinkedInUploadError(null);
         setIsLinkedInFileUploading(true);
         if (!pendingLinkedInUpload) {
             setLinkedInUploadError('Please Browse and select a file');
+            setIsLinkedInFileUploading(false);
+            showErrorToast('Please browse and select a LinkedIn contacts file.');
+            return;
         }
         const linkedInFileRows = pendingLinkedInUpload.result.split(/r\n|\n/);
 
-        linkedInFileRows.forEach((row, i) => {
+        const requests = linkedInFileRows.map((row, i) => {
             const rowArr = row.split(',');
 
-            if (rowArr.length < 4) return; // skip some metadata rows
-            if (row === 'First Name,Last Name,Email Address,Company,Position,Connected On') return; // skip header
+            if (rowArr.length < 4) return null; // skip some metadata rows
+            if (row === 'First Name,Last Name,Email Address,Company,Position,Connected On') return null; // skip header
 
             let connectedOn = row.match(/[0-9]{2} [A-Z][a-z]{2} [0-9]{4}/);
             if (connectedOn && connectedOn.length) {
@@ -181,7 +267,7 @@ export default function AppConfigure (props) {
                 connectedOn = '01 Jan 1990';
             }
             setLinkedInUploadInfo(`Uploading ${i} of approximately ${row.length} contacts...`);
-            postContact({
+            return () => postContact({
                 ...templateContact,
                 firstName: rowArr[0],
                 lastName: rowArr[1],
@@ -189,23 +275,33 @@ export default function AppConfigure (props) {
                 firm: rowArr[3],
                 createdOn: new Date(connectedOn),
                 lastModifiedOn: new Date()
-            });
-        });
+            }, bulkNotificationOptions);
+        }).filter(Boolean);
 
+        await runBulkRequests(requests, 'LinkedIn import', 'No LinkedIn contacts were found in the selected file.');
+        await refreshConfigureData();
         setIsLinkedInFileUploading(false);
         setLinkedInUploadInfo('');
     }
 
-    function handleAddData () {
+    async function handleAddData () {
         const type = fileTypeOptions[selectedTypeIndex].value;
-        if (type === 'all') {
-            handleAddEntity('contacts');
-            handleAddEntity('events');
-            handleAddEntity('notes');
-            handleAddEntity('relations');
-        } else {
-            handleAddEntity(type);
+        const entityTypes = type === 'all' ? ['contacts', 'events', 'notes', 'relations'] : [type];
+
+        try {
+            parseUploadedJson();
+        } catch (error) {
+            showErrorToast(error);
+            return;
         }
+
+        const addRequests = entityTypes.flatMap(entityType => buildAddEntityTasks(entityType));
+        await runBulkRequests(
+            addRequests,
+            `Import ${fileTypeOptions[selectedTypeIndex].label}`,
+            `No ${fileTypeOptions[selectedTypeIndex].label.toLowerCase()} records were found in the uploaded backup.`
+        );
+        await refreshConfigureData();
     }
 
     return (

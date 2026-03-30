@@ -80,16 +80,15 @@ export default function EditEvent (props) {
     const [error, setError] = useState(defaultChanges);
     const navigate = useNavigate();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [pageLoaded, setPageLoaded] = useState(false);
 
     useEffect(() => {
         // initial GET of event
         if (eventId) {
-            setPendingChanges(getEvent(eventId));
+            getEvent(eventId).catch(() => {});
         } else {
             setPendingChanges(defaultChanges);
         }
-    }, []);
+    }, [eventId, getEvent]);
 
     useEffect(() => {
         // update page when GET returns
@@ -98,26 +97,6 @@ export default function EditEvent (props) {
         // TODO: handle 404, and Errors
         setPendingChanges(newValues);
     }, [event]);
-
-    // only after the page is first loaded, a post/put/delete changing from pending to success requires a redirect
-    useEffect(() => {
-        if (!isEventPending && event) {
-            setPageLoaded(true);
-        }
-    }, [isEventPending]);
-    useEffect(() => {
-        setPendingChanges(defaultChanges);
-    }, [isEventPostPending]);
-    useEffect(() => {
-        if (pageLoaded && !isEventPutPending) {
-            navigate(`/events/${eventId}`);
-        }
-    }, [isEventPutPending]);
-    useEffect(() => {
-        if (pageLoaded && !isEventDeletePending) {
-            navigate('/events');
-        }
-    }, [isEventDeletePending]);
 
     function updateData (field, value) {
         // clear any errors
@@ -131,7 +110,7 @@ export default function EditEvent (props) {
         setPendingChanges({ ...pendingChanges, ...updatedValue });
     }
 
-    function handleSaveEvent () {
+    async function handleSaveEvent () {
         // validate inputs, prompt user with actionable errors
         let valid = true;
         if (!pendingChanges.title) {
@@ -158,17 +137,30 @@ export default function EditEvent (props) {
             };
 
             // submit changes
-            if (isNewEvent) {
-                postEvent(submitChanges);
-            } else {
-                putEvent(eventId, submitChanges);
+            try {
+                if (isNewEvent) {
+                    await postEvent(submitChanges);
+                    setPendingChanges(defaultChanges);
+                    setError(defaultChanges);
+                } else {
+                    await putEvent(eventId, submitChanges);
+                    navigate(`/events/${eventId}`);
+                }
+            } catch (saveError) {
+                return saveError;
             }
         }
     }
 
-    function handleDeleteConfirm () {
+    async function handleDeleteConfirm () {
         setShowDeleteModal(false);
-        deleteEvent(eventId);
+
+        try {
+            await deleteEvent(eventId);
+            navigate('/events');
+        } catch (deleteError) {
+            return deleteError;
+        }
     }
 
     // TODO: handle loading state, 404s and errors

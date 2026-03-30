@@ -270,16 +270,15 @@ export default function EditNote (props) {
     const [pendingMediaFiles, setPendingMediaFiles] = useState([]);
     const navigate = useNavigate();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [pageLoaded, setPageLoaded] = useState(false);
 
     useEffect(() => {
         if (noteId) {
-            getNote(noteId);
+            getNote(noteId).catch(() => {});
         } else {
             setPendingChanges(defaultChanges);
             setPendingMediaFiles([]);
         }
-    }, [noteId]);
+    }, [noteId, getNote]);
 
     useEffect(() => {
         if (!noteId) {
@@ -293,29 +292,6 @@ export default function EditNote (props) {
         setPendingChanges(newValues);
         setPendingMediaFiles(mapNoteMediaFiles(note.mediaFiles));
     }, [noteId, note]);
-
-    useEffect(() => {
-        if (!isNotePending && note) {
-            setPageLoaded(true);
-        }
-    }, [isNotePending]);
-
-    useEffect(() => {
-        setPendingChanges(defaultChanges);
-        setPendingMediaFiles([]);
-    }, [isNotePostPending]);
-
-    useEffect(() => {
-        if (pageLoaded && !isNotePutPending) {
-            navigate(`/notes/${noteId}`);
-        }
-    }, [isNotePutPending]);
-
-    useEffect(() => {
-        if (pageLoaded && !isNoteDeletePending) {
-            navigate('/notes');
-        }
-    }, [isNoteDeletePending]);
 
     function updateData (field, value) {
         setError((currentError) => ({
@@ -438,7 +414,7 @@ export default function EditNote (props) {
             }));
     }
 
-    function handleSaveNote () {
+    async function handleSaveNote () {
         let valid = true;
         const nextErrorState = { ...error, mediaFiles: '' };
 
@@ -466,17 +442,34 @@ export default function EditNote (props) {
                 mediaUploads: buildSubmitMediaUploads()
             };
 
-            if (isNewNote) {
-                postNote(submitChanges);
-            } else {
-                putNote(noteId, submitChanges);
+            try {
+                if (isNewNote) {
+                    await postNote(submitChanges);
+                    setPendingChanges(defaultChanges);
+                    setPendingMediaFiles([]);
+                    setError({
+                        ...defaultChanges,
+                        mediaFiles: ''
+                    });
+                } else {
+                    await putNote(noteId, submitChanges);
+                    navigate(`/notes/${noteId}`);
+                }
+            } catch (saveError) {
+                return saveError;
             }
         }
     }
 
-    function handleDeleteConfirm () {
+    async function handleDeleteConfirm () {
         setShowDeleteModal(false);
-        deleteNote(noteId);
+
+        try {
+            await deleteNote(noteId);
+            navigate('/notes');
+        } catch (deleteError) {
+            return deleteError;
+        }
     }
 
     function renderMediaPreview (mediaFile) {

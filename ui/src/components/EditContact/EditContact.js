@@ -199,8 +199,7 @@ export default function EditContact (props) {
         isContactPutPending,
         contactPutError,
         deleteContact,
-        isContactDeletePending,
-        contactDeleteError
+        isContactDeletePending
     } = props;
     const defaultChanges = {
         firstName: '',
@@ -222,14 +221,12 @@ export default function EditContact (props) {
     const [removeCurrentImage, setRemoveCurrentImage] = useState(false);
     const navigate = useNavigate();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [hasSubmittedPut, setHasSubmittedPut] = useState(false);
-    const [hasRequestedDelete, setHasRequestedDelete] = useState(false);
     const submitErrorMessage = contactPutError?.message || contactPostError?.message || '';
 
     useEffect(() => {
         // initial GET of contact
         if (contactId) {
-            getContact(contactId);
+            getContact(contactId).catch(() => {});
         } else {
             setPendingChanges(defaultChanges);
         }
@@ -247,39 +244,6 @@ export default function EditContact (props) {
         setRemoveCurrentImage(false);
     }, [contact]);
 
-    useEffect(() => {
-        if (!isContactPostPending && !contactPostError) {
-            setPendingChanges(defaultChanges);
-            setPendingImageUpload(null);
-            setPendingImagePreview('');
-            setRemoveCurrentImage(false);
-        }
-    }, [isContactPostPending, contactPostError]);
-
-    useEffect(() => {
-        if (hasSubmittedPut && !isContactPutPending && !contactPutError) {
-            navigate(`/contacts/${contactId}`);
-        }
-    }, [hasSubmittedPut, isContactPutPending, contactPutError, contactId, navigate]);
-
-    useEffect(() => {
-        if (hasSubmittedPut && !isContactPutPending && contactPutError) {
-            setHasSubmittedPut(false);
-        }
-    }, [hasSubmittedPut, isContactPutPending, contactPutError]);
-
-    useEffect(() => {
-        if (hasRequestedDelete && !isContactDeletePending && !contactDeleteError) {
-            navigate('/contacts');
-        }
-    }, [hasRequestedDelete, isContactDeletePending, contactDeleteError, navigate]);
-
-    useEffect(() => {
-        if (hasRequestedDelete && !isContactDeletePending && contactDeleteError) {
-            setHasRequestedDelete(false);
-        }
-    }, [hasRequestedDelete, isContactDeletePending, contactDeleteError]);
-
     function updateData (field, value) {
         // clear any errors
         const updatedError = deepCopy(error);
@@ -292,7 +256,7 @@ export default function EditContact (props) {
         setPendingChanges(updatedValue);
     }
 
-    function handleSaveContact () {
+    async function handleSaveContact () {
         // validate inputs, prompt user with actionable errors
         let valid = true;
         const updatedError = deepCopy(error);
@@ -335,19 +299,34 @@ export default function EditContact (props) {
             };
 
             // submit changes
-            if (isNewContact) {
-                postContact(submitChanges);
-            } else {
-                setHasSubmittedPut(true);
-                putContact(contactId, submitChanges);
+            try {
+                if (isNewContact) {
+                    await postContact(submitChanges);
+                    setPendingChanges(defaultChanges);
+                    setError(defaultChanges);
+                    setPendingImageUpload(null);
+                    setPendingImagePreview('');
+                    setRemoveCurrentImage(false);
+                    setEntityIsOrganization(false);
+                } else {
+                    await putContact(contactId, submitChanges);
+                    navigate(`/contacts/${contactId}`);
+                }
+            } catch (saveError) {
+                return saveError;
             }
         }
     }
 
-    function handleDeleteConfirm () {
+    async function handleDeleteConfirm () {
         setShowDeleteModal(false);
-        setHasRequestedDelete(true);
-        deleteContact(contactId);
+
+        try {
+            await deleteContact(contactId);
+            navigate('/contacts');
+        } catch (deleteError) {
+            return deleteError;
+        }
     }
 
     function handlePictureUpload (e) {
