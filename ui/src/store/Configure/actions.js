@@ -28,7 +28,6 @@ export function initializeDB (notificationOptions = {}) {
             errorAction: initializeDBError,
             errorContext: 'Error initializing the database:',
             serviceCall: () => ConfigureService.initializeDB(),
-            defaultSuccessMessage: 'Application data store initialized.',
             defaultErrorMessage: 'Unable to initialize the application data store.',
             notificationOptions: {
                 toastId: 'initialize-db',
