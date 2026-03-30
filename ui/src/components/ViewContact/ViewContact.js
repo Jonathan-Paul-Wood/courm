@@ -102,9 +102,9 @@ export default function ViewContact (props) {
     useEffect(() => {
         // initial GET of contact
         if (contactId) {
-            getContact(contactId);
+            getContact(contactId).catch(() => {});
         }
-    }, [contactId]);
+    }, [contactId, getContact]);
 
     useEffect(() => {
         setFirstLoad(false);

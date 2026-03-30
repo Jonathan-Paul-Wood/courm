@@ -2,7 +2,7 @@ import RelationEditCard from './RelationEditCard';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { getRelationList } from '../../../store/RelationList/actions';
-import { postRelation, putRelation, deleteRelation } from '../../../store/Relation/actions';
+import { postRelation, deleteRelation } from '../../../store/Relation/actions';
 
 function mapStateToProps (state) {
     return {
@@ -16,7 +16,6 @@ const mapDispatchToProps = dispatch =>
         {
             getRelationList,
             postRelation,
-            putRelation,
             deleteRelation
         },
         dispatch

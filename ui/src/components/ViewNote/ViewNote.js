@@ -157,9 +157,9 @@ export default function ViewNote (props) {
 
     useEffect(() => {
         if (noteId) {
-            getNote(noteId);
+            getNote(noteId).catch(() => {});
         }
-    }, [noteId]);
+    }, [noteId, getNote]);
 
     function exportNote () {
         exportDataList(['notes'], [[note]], `note-${noteId}`);

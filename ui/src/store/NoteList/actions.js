@@ -1,7 +1,7 @@
 import * as types from './types';
 import ServiceError from '../ServiceError';
 import NoteListService from '../../services/NoteListService';
-// todo: import notification toasts success/error
+import { runNotifiedRequest } from '../actionNotifications';
 
 function getNoteListLoading () {
     return {
@@ -23,15 +23,21 @@ function getNoteListError (error) {
     };
 }
 
-export function getNoteList (results, page, searchTerm, order, direction, filters, appliedContacts, appliedEvents) {
+export function getNoteList (results, page, searchTerm, order, direction, filters, appliedContacts, appliedEvents, notificationOptions = {}) {
     return async dispatch => {
-        dispatch(getNoteListLoading());
-        try {
-            const response = await NoteListService.getNoteList(results, page, searchTerm, order, direction, filters, appliedContacts, appliedEvents);
-            dispatch(getNoteListSuccess(response));
-        } catch (e) {
-            dispatch(getNoteListError(e));
-        }
+        return runNotifiedRequest({
+            dispatch,
+            pendingAction: getNoteListLoading,
+            successAction: getNoteListSuccess,
+            errorAction: getNoteListError,
+            errorContext: 'get notes list',
+            serviceCall: () => NoteListService.getNoteList(results, page, searchTerm, order, direction, filters, appliedContacts, appliedEvents),
+            defaultErrorMessage: 'Unable to load notes.',
+            notificationOptions: {
+                toastId: 'note-list-load-error',
+                ...notificationOptions
+            }
+        });
     };
 }
 
@@ -55,14 +61,20 @@ function getAllNotesError (error) {
     };
 }
 
-export function getAllNotes () {
+export function getAllNotes (notificationOptions = {}) {
     return async dispatch => {
-        dispatch(getAllNotesLoading());
-        try {
-            const response = await NoteListService.getAllNotes();
-            dispatch(getAllNotesSuccess(response));
-        } catch (e) {
-            dispatch(getAllNotesError(e));
-        }
+        return runNotifiedRequest({
+            dispatch,
+            pendingAction: getAllNotesLoading,
+            successAction: getAllNotesSuccess,
+            errorAction: getAllNotesError,
+            errorContext: 'get notes list',
+            serviceCall: () => NoteListService.getAllNotes(),
+            defaultErrorMessage: 'Unable to load notes.',
+            notificationOptions: {
+                toastId: 'all-notes-load-error',
+                ...notificationOptions
+            }
+        });
     };
 }

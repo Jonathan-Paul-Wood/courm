@@ -52,15 +52,15 @@ export default function RelationCardManager (props) {
     } = props;
 
     useEffect(() => {
-        getRelationList(`${parentType}Id`, `${parentId}`);
-        getAllContacts();
-        getAllEvents();
-        getAllNotes();
+        getRelationList(`${parentType}Id`, `${parentId}`).catch(() => {});
+        getAllContacts().catch(() => {});
+        getAllEvents().catch(() => {});
+        getAllNotes().catch(() => {});
     }, []);
 
     useEffect(() => {
         if (!isRelationPostPending && !isRelationPutPending && !isRelationDeletePending) {
-            getRelationList(`${parentType}Id`, `${parentId}`); // get updated list when all changes resolve
+            getRelationList(`${parentType}Id`, `${parentId}`).catch(() => {}); // get updated list when all changes resolve
         }
     }, [isRelationPostPending, isRelationPutPending, isRelationDeletePending]);
 
@@ -80,7 +80,7 @@ export default function RelationCardManager (props) {
     const labelTerm = relationType === 'contact' ? 'firstName' : 'title'; // CONSTANTS
 
     function handleRelationListUpdate (value) {
-        getRelationList(`${parentType}Id`, `${parentId}`);
+        getRelationList(`${parentType}Id`, `${parentId}`).catch(() => {});
         onChange(value);
     }
 

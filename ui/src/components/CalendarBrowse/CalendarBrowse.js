@@ -409,10 +409,10 @@ export default function CalendarBrowse (props) {
     const [selectedContacts, setSelectedContacts] = useState([]);
 
     useEffect(() => {
-        getAllEvents();
-        getAllNotes();
-        getAllContacts();
-        getAllRelations();
+        getAllEvents().catch(() => {});
+        getAllNotes().catch(() => {});
+        getAllContacts().catch(() => {});
+        getAllRelations().catch(() => {});
     }, []);
 
     const today = new Date();

@@ -1,7 +1,7 @@
 import * as types from './types';
 import ServiceError from '../ServiceError';
 import NoteService from '../../services/NoteService';
-// todo: import notification toasts success/error
+import { runNotifiedRequest } from '../actionNotifications';
 
 function getNoteLoading () {
     return {
@@ -20,15 +20,21 @@ function getNoteError (error) {
         error: new ServiceError('get note ', error)
     };
 }
-export function getNote (id) {
+export function getNote (id, notificationOptions = {}) {
     return async dispatch => {
-        dispatch(getNoteLoading());
-        try {
-            const response = await NoteService.getNote(id);
-            dispatch(getNoteSuccess(response));
-        } catch (e) {
-            dispatch(getNoteError(e));
-        }
+        return runNotifiedRequest({
+            dispatch,
+            pendingAction: getNoteLoading,
+            successAction: getNoteSuccess,
+            errorAction: getNoteError,
+            errorContext: 'get note',
+            serviceCall: () => NoteService.getNote(id),
+            defaultErrorMessage: 'Unable to load note.',
+            notificationOptions: {
+                toastId: `note-load-${id}-error`,
+                ...notificationOptions
+            }
+        });
     };
 }
 
@@ -49,15 +55,19 @@ function postNoteError (error) {
         error: new ServiceError('post note ', error)
     };
 }
-export function postNote (body) {
+export function postNote (body, notificationOptions = {}) {
     return async dispatch => {
-        dispatch(postNoteLoading());
-        try {
-            const response = await NoteService.postNote(body);
-            dispatch(postNoteSuccess(response));
-        } catch (e) {
-            dispatch(postNoteError(e));
-        }
+        return runNotifiedRequest({
+            dispatch,
+            pendingAction: postNoteLoading,
+            successAction: postNoteSuccess,
+            errorAction: postNoteError,
+            errorContext: 'post note',
+            serviceCall: () => NoteService.postNote(body),
+            defaultSuccessMessage: 'Note created.',
+            defaultErrorMessage: 'Unable to create note.',
+            notificationOptions
+        });
     };
 }
 
@@ -78,15 +88,19 @@ function putNoteError (error) {
         error: new ServiceError('put note error ', error)
     };
 }
-export function putNote (id, body) {
+export function putNote (id, body, notificationOptions = {}) {
     return async dispatch => {
-        dispatch(putNoteLoading());
-        try {
-            const response = await NoteService.putNote(id, body);
-            dispatch(putNoteSuccess(response));
-        } catch (e) {
-            dispatch(putNoteError(e));
-        }
+        return runNotifiedRequest({
+            dispatch,
+            pendingAction: putNoteLoading,
+            successAction: putNoteSuccess,
+            errorAction: putNoteError,
+            errorContext: 'put note error',
+            serviceCall: () => NoteService.putNote(id, body),
+            defaultSuccessMessage: 'Note updated.',
+            defaultErrorMessage: 'Unable to update note.',
+            notificationOptions
+        });
     };
 }
 
@@ -107,14 +121,18 @@ function deleteNoteError (error) {
         error: new ServiceError('delete note error ', error)
     };
 }
-export function deleteNote (id) {
+export function deleteNote (id, notificationOptions = {}) {
     return async dispatch => {
-        dispatch(deleteNoteLoading());
-        try {
-            const response = await NoteService.deleteNote(id);
-            dispatch(deleteNoteSuccess(response));
-        } catch (e) {
-            dispatch(deleteNoteError(e));
-        }
+        return runNotifiedRequest({
+            dispatch,
+            pendingAction: deleteNoteLoading,
+            successAction: deleteNoteSuccess,
+            errorAction: deleteNoteError,
+            errorContext: 'delete note error',
+            serviceCall: () => NoteService.deleteNote(id),
+            defaultSuccessMessage: 'Note deleted.',
+            defaultErrorMessage: 'Unable to delete note.',
+            notificationOptions
+        });
     };
 }

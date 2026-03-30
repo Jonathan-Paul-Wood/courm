@@ -105,8 +105,8 @@ export default function EventsBrowse (props) {
 
     useEffect(() => {
         initiateSearch();
-        getAllContacts();
-        getAllNotes();
+        getAllContacts().catch(() => {});
+        getAllNotes().catch(() => {});
     }, []);
 
     useEffect(() => {
@@ -141,7 +141,7 @@ export default function EventsBrowse (props) {
     }
 
     function initiateSearch () {
-        getEventList(RESULTS_PER_PAGE, page, searchTerm, searchOrderBy, direction, activeFilters, appliedContacts, appliedNotes);
+        getEventList(RESULTS_PER_PAGE, page, searchTerm, searchOrderBy, direction, activeFilters, appliedContacts, appliedNotes).catch(() => {});
     }
 
     return (

@@ -39,8 +39,8 @@ export default function AppHome (props) {
 
     useEffect(() => {
         // initialize the DB on startup - ensures tables exist if not already created
-        initializeDB();
-    }, []);
+        initializeDB().catch(() => {});
+    }, [initializeDB]);
 
     return (
         <HomeWrapper>
