@@ -1,3 +1,5 @@
+const FILE_BASE_URL = process.env.REACT_APP_FILE_BASE_URL || '/api/files';
+
 export function downloadContent (content, fileName, contentType) {
     const a = document.createElement('a');
     const file = new Blob([content], { type: contentType });
@@ -34,5 +36,8 @@ export function buildStoredFileUrl (relativePath) {
         return '';
     }
 
-    return `http://localhost:8080/api/files/${relativePath.replace(/\\/g, '/').replace(/^\/+/, '')}`;
+    const normalizedBaseUrl = FILE_BASE_URL.replace(/\/+$/, '');
+    const normalizedRelativePath = relativePath.replace(/\\/g, '/').replace(/^\/+/, '');
+
+    return `${normalizedBaseUrl}/${normalizedRelativePath}`;
 }

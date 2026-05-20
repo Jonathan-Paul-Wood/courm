@@ -4,6 +4,7 @@
   "description": "Personal CRM / Address Book",
   "author": "Jonathan Paul Wood",
   "private": true,
+  "proxy": "http://localhost:8080",
   "scripts": {
     "prestart": "node scripts/patch-react-scripts.js",
     "start": "react-scripts start",

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import PropTypes from 'prop-types';
@@ -21,7 +21,6 @@ const HomeWrapper = styled.div`
 `;
 
 export default function AppHome (props) {
-    const { initializeDB } = props;
     const navigate = useNavigate();
 
     function handleActionSelection (action, object) {
@@ -36,11 +35,6 @@ export default function AppHome (props) {
             console.log('error, invalid action: ', action);
         }
     }
-
-    useEffect(() => {
-        // initialize the DB on startup - ensures tables exist if not already created
-        initializeDB().catch(() => {});
-    }, [initializeDB]);
 
     return (
         <HomeWrapper>
@@ -62,7 +56,6 @@ export default function AppHome (props) {
 }
 
 AppHome.propTypes = {
-    initializeDB: PropTypes.func.isRequired,
     isInitializingDB: PropTypes.bool.isRequired,
     initializeDBError: PropTypes.string.isRequired
 };

@@ -40,7 +40,7 @@ test('server starts successfully', async () => {
         };
 
         child.stdout.on('data', (chunk) => {
-            if (chunk.toString().includes('Server is running at http://localhost:0/')) {
+            if (chunk.toString().includes('Server is running at http://localhost:')) {
                 finish();
             }
         });

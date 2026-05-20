@@ -1,10 +1,14 @@
-const { createApp } = require("./src/app");
+const { startServer } = require("./src/startServer");
 
-const PORT = process.env.PORT || 8080;
-const app = createApp();
+const serverPromise = startServer()
+    .then(({ app: startedApp, url }) => {
+        console.log(`Server is running at ${url}/`);
+        return startedApp;
+    })
+    .catch((err) => {
+        console.error(err.message);
+        process.exitCode = 1;
+        throw err;
+    });
 
-app.listen(PORT, () => {
-    console.log(`Server is running at http://localhost:${PORT}/`);
-});
-
-module.exports = app;
+module.exports = serverPromise;

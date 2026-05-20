@@ -16,6 +16,7 @@ junit\.xml
 
 # production
 build
+dist-desktop
 statistics.html
 require.js
 pb-backend-*
