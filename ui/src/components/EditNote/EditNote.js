@@ -9,10 +9,125 @@ import TextArea from '../../common/TextArea/TextArea';
 import CommonModal from '../../common/CommonModal/CommonModal';
 import PropTypes from 'prop-types';
 import ScrollContainer from '../../common/ScrollContainer';
+import { buildStoredFileUrl } from '../../common/Utilities/utilities';
+
+const NOTE_MEDIA_SIZE_LIMITS = {
+    image: 10 * 1024 * 1024,
+    audio: 25 * 1024 * 1024,
+    video: 50 * 1024 * 1024
+};
+
+const NOTE_MEDIA_TYPE_LABELS = {
+    image: 'Image',
+    audio: 'Audio',
+    video: 'Video'
+};
 
 const GridWrapper = styled.div`
+    .mediaRow {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .mediaControls {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .mediaControls label {
+        font-weight: 600;
+    }
+
+    .supportText {
+        color: #666666;
+        font-size: 0.9rem;
+    }
+
+    .errorText {
+        color: #c62828;
+        font-size: 0.9rem;
+    }
+
+    .mediaGrid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+        gap: 1rem;
+    }
+
+    .mediaCard {
+        border: 1px solid #d9d9d9;
+        border-radius: 6px;
+        background: #fafafa;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .mediaPreview {
+        min-height: 12rem;
+        border: 1px dashed #bfbfbf;
+        border-radius: 4px;
+        background: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem;
+        color: #666666;
+        overflow: hidden;
+    }
+
+    .mediaPreview img,
+    .mediaPreview video {
+        width: 100%;
+        max-height: 16rem;
+        object-fit: contain;
+    }
+
+    .mediaPreview audio {
+        width: 100%;
+    }
+
+    .mediaMeta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 0.75rem;
+        color: #666666;
+        font-size: 0.9rem;
+    }
+
+    .mediaNameInput {
+        width: 100%;
+        padding: 0.625rem 0.75rem;
+        border: 1px solid #bfbfbf;
+        border-radius: 4px;
+        font-size: 1rem;
+    }
+
+    .mediaPath {
+        word-break: break-word;
+        color: #666666;
+        font-size: 0.9rem;
+    }
+
+    .emptyMediaState {
+        min-height: 12rem;
+        border: 1px dashed #bfbfbf;
+        border-radius: 4px;
+        background: #fafafa;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #666666;
+        padding: 1rem;
+    }
+
     .rowMargin {
         margin: 1rem 0;
+
         .input-field {
             padding: 0 3em;
         }
@@ -55,6 +170,74 @@ const GridWrapper = styled.div`
     }
 `;
 
+function createClientUuid () {
+    if (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function') {
+        return globalThis.crypto.randomUUID();
+    }
+
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (character) => {
+        const randomValue = Math.random() * 16 | 0;
+        const nextValue = character === 'x' ? randomValue : ((randomValue & 0x3) | 0x8);
+        return nextValue.toString(16);
+    });
+}
+
+function getNoteMediaType (file) {
+    if (!file || !file.type) {
+        return '';
+    }
+
+    if (file.type.startsWith('image/')) {
+        return 'image';
+    }
+
+    if (file.type.startsWith('audio/')) {
+        return 'audio';
+    }
+
+    if (file.type.startsWith('video/')) {
+        return 'video';
+    }
+
+    return '';
+}
+
+function readFileAsDataUrl (file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(typeof reader.result === 'string' ? reader.result : '');
+        reader.onerror = () => reject(new Error(`Failed to read ${file.name}`));
+        reader.readAsDataURL(file);
+    });
+}
+
+function getMediaSource (mediaFile) {
+    if (mediaFile.previewUrl) {
+        return mediaFile.previewUrl;
+    }
+
+    if (mediaFile.path) {
+        return buildStoredFileUrl(mediaFile.path);
+    }
+
+    return '';
+}
+
+function mapNoteMediaFiles (mediaFiles = []) {
+    return mediaFiles.map((mediaFile) => ({
+        id: mediaFile.id,
+        path: mediaFile.path,
+        type: mediaFile.type,
+        name: mediaFile.name,
+        previewUrl: '',
+        upload: null
+    }));
+}
+
+function getSizeLimitLabel (mediaType) {
+    return `${Math.floor(NOTE_MEDIA_SIZE_LIMITS[mediaType] / (1024 * 1024))}MB`;
+}
+
 export default function EditNote (props) {
     const location = useLocation();
     const isNewNote = !!location.pathname.match('/new');
@@ -76,74 +259,174 @@ export default function EditNote (props) {
         address: '',
         contacts: '',
         tags: '',
-        record: ''
+        record: '',
+        mediaFiles: []
     };
     const [pendingChanges, setPendingChanges] = useState(defaultChanges);
-    const [error, setError] = useState(defaultChanges);
+    const [error, setError] = useState({
+        ...defaultChanges,
+        mediaFiles: ''
+    });
+    const [pendingMediaFiles, setPendingMediaFiles] = useState([]);
     const navigate = useNavigate();
     const [showDeleteModal, setShowDeleteModal] = useState(false);
-    const [pageLoaded, setPageLoaded] = useState(false);
 
     useEffect(() => {
-        // initial GET of note
         if (noteId) {
-            setPendingChanges(getNote(noteId));
+            getNote(noteId).catch(() => {});
         } else {
             setPendingChanges(defaultChanges);
+            setPendingMediaFiles([]);
         }
-    }, []);
+    }, [noteId, getNote]);
 
     useEffect(() => {
-        // update page when GET returns
+        if (!noteId) {
+            setPendingChanges(defaultChanges);
+            setPendingMediaFiles([]);
+            return;
+        }
+
         const d = note.date ? note.date : '';
-        const newValues = { ...note, date: d };
-        // TODO: handle 404, and Errors
+        const newValues = { ...defaultChanges, ...note, date: d };
         setPendingChanges(newValues);
-    }, [note]);
-
-    // only after the page is first loaded, a post/put/delete changing from pending to success requires a redirect
-    useEffect(() => {
-        if (!isNotePending && note) {
-            setPageLoaded(true);
-        }
-    }, [isNotePending]);
-    useEffect(() => {
-        setPendingChanges(defaultChanges);
-    }, [isNotePostPending]);
-    useEffect(() => {
-        if (pageLoaded && !isNotePutPending) {
-            navigate(`/notes/${noteId}`);
-        }
-    }, [isNotePutPending]);
-    useEffect(() => {
-        if (pageLoaded && !isNoteDeletePending) {
-            navigate('/notes');
-        }
-    }, [isNoteDeletePending]);
+        setPendingMediaFiles(mapNoteMediaFiles(note.mediaFiles));
+    }, [noteId, note]);
 
     function updateData (field, value) {
-        // clear any errors
-        const updateError = {};
-        updateError[field] = '';
-        setError({ ...error, ...updateError });
+        setError((currentError) => ({
+            ...currentError,
+            [field]: ''
+        }));
 
-        // update the value
-        const updatedValue = {};
-        updatedValue[field] = value;
-        setPendingChanges({ ...pendingChanges, ...updatedValue });
+        setPendingChanges((currentChanges) => ({
+            ...currentChanges,
+            [field]: value
+        }));
     }
 
-    function handleSaveNote () {
-        // validate inputs, prompt user with actionable errors
+    async function handleMediaSelection (event) {
+        const selectedFiles = Array.from(event.target.files || []);
+        if (!selectedFiles.length) {
+            return;
+        }
+
+        const nextMediaFiles = [];
+        const selectionErrors = [];
+
+        for (const selectedFile of selectedFiles) {
+            const mediaType = getNoteMediaType(selectedFile);
+            if (!mediaType) {
+                selectionErrors.push('Only image, audio, and video files are supported.');
+                continue;
+            }
+
+            if (selectedFile.size > NOTE_MEDIA_SIZE_LIMITS[mediaType]) {
+                selectionErrors.push(`${NOTE_MEDIA_TYPE_LABELS[mediaType]} files must be ${getSizeLimitLabel(mediaType)} or smaller.`);
+                continue;
+            }
+
+            try {
+                const previewUrl = await readFileAsDataUrl(selectedFile);
+                const mediaId = createClientUuid();
+                nextMediaFiles.push({
+                    id: mediaId,
+                    path: '',
+                    type: mediaType,
+                    name: selectedFile.name,
+                    previewUrl,
+                    upload: {
+                        id: mediaId,
+                        type: mediaType,
+                        name: selectedFile.name,
+                        fileName: selectedFile.name,
+                        mimeType: selectedFile.type,
+                        dataUrl: previewUrl
+                    }
+                });
+            } catch (selectionError) {
+                selectionErrors.push(selectionError.message);
+            }
+        }
+
+        if (nextMediaFiles.length) {
+            setPendingMediaFiles((currentMediaFiles) => [...currentMediaFiles, ...nextMediaFiles]);
+        }
+
+        setError((currentError) => ({
+            ...currentError,
+            mediaFiles: selectionErrors.join(' ')
+        }));
+
+        event.target.value = '';
+    }
+
+    function handleRemoveMedia (mediaId) {
+        setPendingMediaFiles((currentMediaFiles) => currentMediaFiles.filter((mediaFile) => mediaFile.id !== mediaId));
+        setError((currentError) => ({
+            ...currentError,
+            mediaFiles: ''
+        }));
+    }
+
+    function handleMediaNameChange (mediaId, value) {
+        setPendingMediaFiles((currentMediaFiles) => {
+            return currentMediaFiles.map((mediaFile) => {
+                if (mediaFile.id !== mediaId) {
+                    return mediaFile;
+                }
+
+                const nextUpload = mediaFile.upload
+                    ? {
+                        ...mediaFile.upload,
+                        name: value
+                    }
+                    : null;
+
+                return {
+                    ...mediaFile,
+                    name: value,
+                    upload: nextUpload
+                };
+            });
+        });
+    }
+
+    function buildSubmitMediaFiles () {
+        return pendingMediaFiles
+            .filter((mediaFile) => !mediaFile.upload)
+            .map((mediaFile) => ({
+                id: mediaFile.id,
+                path: mediaFile.path,
+                type: mediaFile.type,
+                name: mediaFile.name
+            }));
+    }
+
+    function buildSubmitMediaUploads () {
+        return pendingMediaFiles
+            .filter((mediaFile) => mediaFile.upload)
+            .map((mediaFile) => ({
+                ...mediaFile.upload,
+                id: mediaFile.id,
+                type: mediaFile.type,
+                name: mediaFile.name
+            }));
+    }
+
+    async function handleSaveNote () {
         let valid = true;
+        const nextErrorState = { ...error, mediaFiles: '' };
+
         if (!pendingChanges.title) {
             valid = false;
-            setError({ ...error, ...{ title: 'Please enter title' } });
+            nextErrorState.title = 'Please enter title';
         }
         if (pendingChanges.date && !pendingChanges.date.match(/^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}/g)) {
             valid = false;
-            setError({ ...error, ...{ date: 'Expected format: YYYY-MM-DD' } });
+            nextErrorState.date = 'Expected format: YYYY-MM-DD';
         }
+        setError(nextErrorState);
 
         if (valid) {
             let d = pendingChanges.date;
@@ -154,24 +437,63 @@ export default function EditNote (props) {
             const submitChanges = {
                 ...pendingChanges,
                 lastModifiedOn: new Date().toISOString(),
-                date: d
+                date: d,
+                mediaFiles: buildSubmitMediaFiles(),
+                mediaUploads: buildSubmitMediaUploads()
             };
 
-            // submit changes
-            if (isNewNote) {
-                postNote(submitChanges);
-            } else {
-                putNote(noteId, submitChanges);
+            try {
+                if (isNewNote) {
+                    await postNote(submitChanges);
+                    setPendingChanges(defaultChanges);
+                    setPendingMediaFiles([]);
+                    setError({
+                        ...defaultChanges,
+                        mediaFiles: ''
+                    });
+                } else {
+                    await putNote(noteId, submitChanges);
+                    navigate(`/notes/${noteId}`);
+                }
+            } catch (saveError) {
+                return saveError;
             }
         }
     }
 
-    function handleDeleteConfirm () {
+    async function handleDeleteConfirm () {
         setShowDeleteModal(false);
-        deleteNote(noteId);
+
+        try {
+            await deleteNote(noteId);
+            navigate('/notes');
+        } catch (deleteError) {
+            return deleteError;
+        }
     }
 
-    // TODO: handle loading state, 404s and errors
+    function renderMediaPreview (mediaFile) {
+        const mediaSource = getMediaSource(mediaFile);
+
+        if (!mediaSource) {
+            return <span>No preview available</span>;
+        }
+
+        if (mediaFile.type === 'image') {
+            return <img src={mediaSource} alt={mediaFile.name || 'Note attachment'} />;
+        }
+
+        if (mediaFile.type === 'audio') {
+            return <audio controls src={mediaSource} />;
+        }
+
+        if (mediaFile.type === 'video') {
+            return <video controls src={mediaSource} />;
+        }
+
+        return <span>No preview available</span>;
+    }
+
     return (
         <>
             <EntityTitleHeader
@@ -192,6 +514,52 @@ export default function EditNote (props) {
                 }}
             >
                 <GridWrapper>
+                    <div className="mediaRow rowMargin">
+                        <div className="mediaControls">
+                            <label htmlFor="note-media-upload">Attachments</label>
+                            <input
+                                id="note-media-upload"
+                                type="file"
+                                accept="image/*,audio/*,video/*"
+                                multiple
+                                onChange={handleMediaSelection}
+                            />
+                            <div className="supportText">Attach multiple images, audio files, or videos to this note.</div>
+                            <div className="supportText">Uploaded note media is stored locally under `storage/note/images`, `storage/note/audio`, and `storage/note/video`.</div>
+                            {error.mediaFiles && <div className="errorText">{error.mediaFiles}</div>}
+                        </div>
+                        {pendingMediaFiles.length
+                            ? (
+                                <div className="mediaGrid">
+                                    {pendingMediaFiles.map((mediaFile) => (
+                                        <div key={mediaFile.id} className="mediaCard">
+                                            <div className="mediaPreview">
+                                                {renderMediaPreview(mediaFile)}
+                                            </div>
+                                            <div className="mediaMeta">
+                                                <span>{NOTE_MEDIA_TYPE_LABELS[mediaFile.type]}</span>
+                                                <Button
+                                                    label="Remove"
+                                                    type="secondary"
+                                                    icon="trashCan"
+                                                    onClick={() => handleRemoveMedia(mediaFile.id)}
+                                                />
+                                            </div>
+                                            <input
+                                                className="mediaNameInput"
+                                                value={mediaFile.name}
+                                                onChange={(event) => handleMediaNameChange(mediaFile.id, event.target.value)}
+                                                placeholder="Attachment name"
+                                            />
+                                            {mediaFile.path && (
+                                                <div className="mediaPath">Saved path: {mediaFile.path}</div>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            )
+                            : <div className="emptyMediaState">No media uploaded</div>}
+                    </div>
                     <div className="metadataRow">
                         <div id="titleData" className="inputRow rowMargin">
                             <Input
@@ -218,13 +586,6 @@ export default function EditNote (props) {
                                 error={error.address}
                                 onChange={(event) => updateData('address', event.target.value)}
                             />
-                            {/* <Input
-                                placeholder="upload files"
-                                value={pendingChanges.files}
-                                label="Files"
-                                error={error.files}
-                                onChange={(event) => updateData('files', event.target.value)}
-                            /> */}
                         </div>
                     </div>
                     <div className="recordRow">

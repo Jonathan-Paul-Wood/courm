@@ -7,10 +7,16 @@ import Input from '../../common/Input/Input';
 import DateInput from '../../common/DateInput/DateInput';
 import TextArea from '../../common/TextArea/TextArea';
 import LoadingSpinner from '../../common/LoadingSpinner/LoadingSpinner';
-import { exportDataList } from '../../common/Utilities/utilities';
+import { buildStoredFileUrl, exportDataList } from '../../common/Utilities/utilities';
 import PropTypes from 'prop-types';
 import RelationCardManager from '../../common/RelationCardManager';
 import ScrollContainer from '../../common/ScrollContainer';
+
+const NOTE_MEDIA_TYPE_LABELS = {
+    image: 'Image',
+    audio: 'Audio',
+    video: 'Video'
+};
 
 const ContentWrapper = styled.div`
     padding: 0 1em;
@@ -23,6 +29,64 @@ const ContentWrapper = styled.div`
 `;
 
 const GridWrapper = styled.div`
+    .mediaRow {
+        margin-bottom: 1.5rem;
+    }
+
+    .mediaGrid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+        gap: 1rem;
+    }
+
+    .mediaCard {
+        border: 1px solid #d9d9d9;
+        border-radius: 6px;
+        background: #fafafa;
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .mediaPreview {
+        width: 100%;
+        min-height: 14rem;
+        border: 1px solid #d9d9d9;
+        border-radius: 4px;
+        background: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        padding: 0.75rem;
+    }
+
+    .mediaPreview img,
+    .mediaPreview video {
+        width: 100%;
+        max-height: 22rem;
+        object-fit: contain;
+    }
+
+    .mediaPreview audio {
+        width: 100%;
+    }
+
+    .mediaMeta {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.75rem;
+        color: #666666;
+        font-size: 0.9rem;
+    }
+
+    .mediaPath {
+        color: #666666;
+        font-size: 0.9rem;
+        word-break: break-word;
+    }
+
     .configureRow {
         height: 15vh;
         display: flex;
@@ -70,6 +134,14 @@ const GridWrapper = styled.div`
     }
 `;
 
+function getMediaSource (mediaFile) {
+    if (!mediaFile || !mediaFile.path) {
+        return '';
+    }
+
+    return buildStoredFileUrl(mediaFile.path);
+}
+
 export default function ViewNote (props) {
     const { noteId } = useParams();
     const {
@@ -84,17 +156,40 @@ export default function ViewNote (props) {
     const navigate = useNavigate();
 
     useEffect(() => {
-        // initial GET of note
         if (noteId) {
-            getNote(noteId);
+            getNote(noteId).catch(() => {});
         }
-    }, [noteId]);
+    }, [noteId, getNote]);
 
     function exportNote () {
         exportDataList(['notes'], [[note]], `note-${noteId}`);
     }
 
-    // TODO: handle loading state, 404s and errors
+    function renderMediaPreview (mediaFile) {
+        const mediaSource = getMediaSource(mediaFile);
+
+        if (!mediaSource) {
+            return <span>No preview available</span>;
+        }
+
+        if (mediaFile.type === 'image') {
+            return <img src={mediaSource} alt={mediaFile.name || `${note.title} attachment`} />;
+        }
+
+        if (mediaFile.type === 'audio') {
+            return <audio controls src={mediaSource} />;
+        }
+
+        if (mediaFile.type === 'video') {
+            return <video controls src={mediaSource} />;
+        }
+
+        return <span>No preview available</span>;
+    }
+
+    const noteDate = note.date ? note.date.split('T')[0] : '';
+    const mediaFiles = Array.isArray(note.mediaFiles) ? note.mediaFiles : [];
+
     return (
         <>
             {noteError
@@ -104,7 +199,7 @@ export default function ViewNote (props) {
                 : (
                     <>
                         <EntityTitleHeader
-                            title={`${note.title} ${note.date.split('T')[0]}`}
+                            title={`${note.title} ${noteDate}`.trim()}
                             editMode={false}
                             type='Note'
                         />
@@ -116,6 +211,24 @@ export default function ViewNote (props) {
                                         style={{ margin: '2em 2em 0 2em' }}
                                     >
                                         <GridWrapper>
+                                            {!!mediaFiles.length && (
+                                                <div className="mediaRow">
+                                                    <div className="mediaGrid">
+                                                        {mediaFiles.map((mediaFile) => (
+                                                            <div key={mediaFile.id} className="mediaCard">
+                                                                <div className="mediaPreview">
+                                                                    {renderMediaPreview(mediaFile)}
+                                                                </div>
+                                                                <div className="mediaMeta">
+                                                                    <span>{mediaFile.name}</span>
+                                                                    <span>{NOTE_MEDIA_TYPE_LABELS[mediaFile.type]}</span>
+                                                                </div>
+                                                                <div className="mediaPath">Saved path: {mediaFile.path}</div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            )}
                                             <div className="metadataRow">
                                                 <div id="titleData" className="inputRow rowMargin">
                                                     <Input
@@ -135,13 +248,6 @@ export default function ViewNote (props) {
                                                         label="Address"
                                                         locked={true}
                                                     />
-                                                    {/* <Input
-                                placeholder="upload files"
-                                value={note.files}
-                                label="Files"
-                                error={error.files}
-                                onChange={(event) => updateData('files', event.target.value)}
-                            /> */}
                                                 </div>
                                                 {/* <div className="tagsRow">
 

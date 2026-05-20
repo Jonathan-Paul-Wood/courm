@@ -1,7 +1,7 @@
 import * as types from './types';
 import ServiceError from '../ServiceError';
 import RelationListService from '../../services/RelationListService';
-// todo: import notification toasts success/error
+import { runNotifiedRequest } from '../actionNotifications';
 
 function getRelationListLoading () {
     return {
@@ -23,15 +23,21 @@ function getRelationListError (error) {
     };
 }
 
-export function getRelationList (entity, id) {
+export function getRelationList (entity, id, notificationOptions = {}) {
     return async dispatch => {
-        dispatch(getRelationListLoading());
-        try {
-            const response = await RelationListService.getRelationList(entity, id);
-            dispatch(getRelationListSuccess(response));
-        } catch (e) {
-            dispatch(getRelationListError(e));
-        }
+        return runNotifiedRequest({
+            dispatch,
+            pendingAction: getRelationListLoading,
+            successAction: getRelationListSuccess,
+            errorAction: getRelationListError,
+            errorContext: 'get relation list',
+            serviceCall: () => RelationListService.getRelationList(entity, id),
+            defaultErrorMessage: 'Unable to load relations.',
+            notificationOptions: {
+                toastId: `relation-list-${entity}-${id}-error`,
+                ...notificationOptions
+            }
+        });
     };
 }
 
@@ -55,14 +61,20 @@ function getAllRelationsError (error) {
     };
 }
 
-export function getAllRelations () {
+export function getAllRelations (notificationOptions = {}) {
     return async dispatch => {
-        dispatch(getAllRelationsLoading());
-        try {
-            const response = await RelationListService.getAllRelations();
-            dispatch(getAllRelationsSuccess(response));
-        } catch (e) {
-            dispatch(getAllRelationsError(e));
-        }
+        return runNotifiedRequest({
+            dispatch,
+            pendingAction: getAllRelationsLoading,
+            successAction: getAllRelationsSuccess,
+            errorAction: getAllRelationsError,
+            errorContext: 'get all relations',
+            serviceCall: () => RelationListService.getAllRelations(),
+            defaultErrorMessage: 'Unable to load relations.',
+            notificationOptions: {
+                toastId: 'all-relations-load-error',
+                ...notificationOptions
+            }
+        });
     };
 }

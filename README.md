@@ -7,8 +7,12 @@ This tool was born of a frustration with the default assumption of nearly every 
 
 CouRM is open source and built to be run 100% locally, so that you have full control over your use of the tool and the data you put in it. None of your information or metadata is shared outside of your machine by CouRM.
 
-## Downloading (Currently only supporting windows OS)
-For regular use, you can download the latest release at https://jonathanpaulwood.com/courm/. You will find a ".zip" file to extract, and from there can double click "LAUNCH APPLICATION" for the program to open in your default browser.
+## Downloading
+For regular use, you can download the latest release at https://jonathanpaulwood.com/courm/. End users should download the installer for their operating system only:
+
+- Windows: `CouRM-Setup-<version>.exe`
+- macOS: `CouRM-<version>.dmg`
+- Linux: `CouRM-<version>.AppImage`
 
 Below are instructions for working directly with the code.
 
@@ -34,8 +38,59 @@ Currently, CouRM runs by using a backend and frontend process. From a terminal o
 
 The UI will start on localhost:3000 (and open in your default browser), and the backend will start on localhost:8080
 
+## Desktop App
+CouRM can also be packaged as a desktop application. The packaged app:
+
+- starts the local backend automatically
+- creates the sqlite database on first launch if it does not already exist
+- stores the database and uploaded files in a writable per-user data directory
+- serves the built UI from the same local process, so no second terminal is needed
+- preserves existing user data during normal updates and uninstall/reinstall of the app binaries
+
+### Local desktop run
+Install dependencies in all three package roots:
+
+    npm install
+    npm install --prefix backend
+    npm install --prefix ui
+
+Then build the UI and start the Electron shell:
+
+    npm run desktop
+
+By default, local Electron runs keep data inside `backend/`. You can override the data folder for development or testing with `COURM_DATA_DIR`.
+
+### Build desktop executables
+From the repository root:
+
+    npm run dist:win
+    npm run dist:mac
+    npm run dist:linux
+
+Each command writes packaged output to `dist-desktop/` for the current operating system.
+
+The default `npm run dist` command builds the Windows installer for local Windows packaging compatibility.
+
+### Cross-platform builds
+Native desktop targets should be built on their matching operating systems. A GitHub Actions workflow is included at `.github/workflows/desktop-build.yml` to produce Windows, macOS, and Linux artifacts from a matrix build on native runners.
+
+## Backend Structure
+The backend uses a modular source tree under `backend/src/`:
+
+- `app.js` builds the Express app
+- `routes/` defines API endpoints
+- `services/` owns resource-specific shaping logic
+- `lib/` owns shared helpers
+- `db/` owns sqlite access and schema setup
+- `config/` owns constants and derived paths
+
+Additional backend guidance lives in:
+
+- [`backend/documentation.md`](backend/documentation.md)
+- [`backend/src/documentation.md`](backend/src/documentation.md)
+- [`Documentation/Data_Structures.md`](Documentation/Data_Structures.md)
+
 ## Future Development Overview
-- Port code to an integrated desktop application, so command line is not needed to run the project
 - Support GPS coordinates and addresses displayed on a map for Contacts
 - In addition to Contacts, support record types for Events and Notes
 - Ability to link Contacts, Events, and Notes

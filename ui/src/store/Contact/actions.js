@@ -1,6 +1,7 @@
 import * as types from './types';
 import ServiceError from '../ServiceError';
 import ContactService from '../../services/ContactService';
+import { runNotifiedRequest } from '../actionNotifications';
 
 function getContactLoading () {
     return {
@@ -19,15 +20,21 @@ function getContactError (error) {
         error: new ServiceError('get contact ', error)
     };
 }
-export function getContact (id) {
+export function getContact (id, notificationOptions = {}) {
     return async dispatch => {
-        dispatch(getContactLoading());
-        try {
-            const response = await ContactService.getContact(id);
-            dispatch(getContactSuccess(response));
-        } catch (e) {
-            dispatch(getContactError(e));
-        }
+        return runNotifiedRequest({
+            dispatch,
+            pendingAction: getContactLoading,
+            successAction: getContactSuccess,
+            errorAction: getContactError,
+            errorContext: 'get contact',
+            serviceCall: () => ContactService.getContact(id),
+            defaultErrorMessage: 'Unable to load contact.',
+            notificationOptions: {
+                toastId: `contact-load-${id}-error`,
+                ...notificationOptions
+            }
+        });
     };
 }
 
@@ -48,15 +55,19 @@ function postContactError (error) {
         error: new ServiceError('post contact ', error)
     };
 }
-export function postContact (body) {
+export function postContact (body, notificationOptions = {}) {
     return async dispatch => {
-        dispatch(postContactLoading());
-        try {
-            const response = await ContactService.postContact(body);
-            dispatch(postContactSuccess(response));
-        } catch (e) {
-            dispatch(postContactError(e));
-        }
+        return runNotifiedRequest({
+            dispatch,
+            pendingAction: postContactLoading,
+            successAction: postContactSuccess,
+            errorAction: postContactError,
+            errorContext: 'post contact',
+            serviceCall: () => ContactService.postContact(body),
+            defaultSuccessMessage: 'Contact created.',
+            defaultErrorMessage: 'Unable to create contact.',
+            notificationOptions
+        });
     };
 }
 
@@ -77,15 +88,19 @@ function putContactError (error) {
         error: new ServiceError('put contact error ', error)
     };
 }
-export function putContact (id, body) {
+export function putContact (id, body, notificationOptions = {}) {
     return async dispatch => {
-        dispatch(putContactLoading());
-        try {
-            const response = await ContactService.putContact(id, body);
-            dispatch(putContactSuccess(response));
-        } catch (e) {
-            dispatch(putContactError(e));
-        }
+        return runNotifiedRequest({
+            dispatch,
+            pendingAction: putContactLoading,
+            successAction: putContactSuccess,
+            errorAction: putContactError,
+            errorContext: 'put contact error',
+            serviceCall: () => ContactService.putContact(id, body),
+            defaultSuccessMessage: 'Contact updated.',
+            defaultErrorMessage: 'Unable to update contact.',
+            notificationOptions
+        });
     };
 }
 
@@ -106,14 +121,18 @@ function deleteContactError (error) {
         error: new ServiceError('delete contact error ', error)
     };
 }
-export function deleteContact (id) {
+export function deleteContact (id, notificationOptions = {}) {
     return async dispatch => {
-        dispatch(deleteContactLoading());
-        try {
-            const response = await ContactService.deleteContact(id);
-            dispatch(deleteContactSuccess(response));
-        } catch (e) {
-            dispatch(deleteContactError(e));
-        }
+        return runNotifiedRequest({
+            dispatch,
+            pendingAction: deleteContactLoading,
+            successAction: deleteContactSuccess,
+            errorAction: deleteContactError,
+            errorContext: 'delete contact error',
+            serviceCall: () => ContactService.deleteContact(id),
+            defaultSuccessMessage: 'Contact deleted.',
+            defaultErrorMessage: 'Unable to delete contact.',
+            notificationOptions
+        });
     };
 }

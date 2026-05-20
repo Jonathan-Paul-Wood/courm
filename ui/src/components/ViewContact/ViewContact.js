@@ -8,7 +8,7 @@ import DateInput from '../../common/DateInput/DateInput';
 import TextArea from '../../common/TextArea/TextArea';
 import icons from '../../assets/icons/bootstrapIcons';
 import LoadingSpinner from '../../common/LoadingSpinner/LoadingSpinner';
-import { exportDataList } from '../../common/Utilities/utilities';
+import { buildStoredFileUrl, exportDataList } from '../../common/Utilities/utilities';
 import PropTypes from 'prop-types';
 import RelationCardManager from '../../common/RelationCardManager';
 import ScrollContainer from '../../common/ScrollContainer';
@@ -33,6 +33,16 @@ const GridWrapper = styled.div`
             margin: auto 0;
             max-height: 13vh;
             width: auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #profile-picture img {
+            max-height: 13vh;
+            width: auto;
+            border-radius: 4px;
+            object-fit: cover;
         }
     }
 
@@ -92,9 +102,9 @@ export default function ViewContact (props) {
     useEffect(() => {
         // initial GET of contact
         if (contactId) {
-            getContact(contactId);
+            getContact(contactId).catch(() => {});
         }
-    }, [contactId]);
+    }, [contactId, getContact]);
 
     useEffect(() => {
         setFirstLoad(false);
@@ -129,7 +139,9 @@ export default function ViewContact (props) {
                                         <GridWrapper>
                                             <div className="imageRow">
                                                 <div id="profile-picture">
-                                                    {contact.profilePicture ? contact.profilePicture : icons.personCard}
+                                                    {contact.profilePicture
+                                                        ? <img src={buildStoredFileUrl(contact.profilePicture)} alt={`${contact.firstName} ${contact.lastName}`} />
+                                                        : icons.personCard}
                                                 </div>
                                                 <Button icon="download" label="Export" onClick={exportContact}/>
                                             </div>

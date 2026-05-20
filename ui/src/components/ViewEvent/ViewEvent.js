@@ -87,9 +87,9 @@ export default function ViewEvent (props) {
     useEffect(() => {
         // initial GET of event
         if (eventId) {
-            getEvent(eventId);
+            getEvent(eventId).catch(() => {});
         }
-    }, [eventId]);
+    }, [eventId, getEvent]);
 
     function exportEvent () {
         exportDataList(['events'], [[event]], `event-${eventId}`);

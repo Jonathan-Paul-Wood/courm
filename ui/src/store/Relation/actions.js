@@ -1,7 +1,7 @@
 import * as types from './types';
 import ServiceError from '../ServiceError';
 import RelationService from '../../services/RelationService';
-// todo: import notification toasts success/error
+import { runNotifiedRequest } from '../actionNotifications';
 
 function postRelationLoading () {
     return {
@@ -20,15 +20,19 @@ function postRelationError (error) {
         error: new ServiceError('post relation ', error)
     };
 }
-export function postRelation (body) {
+export function postRelation (body, notificationOptions = {}) {
     return async dispatch => {
-        dispatch(postRelationLoading());
-        try {
-            const response = await RelationService.postRelation(body);
-            dispatch(postRelationSuccess(response));
-        } catch (e) {
-            dispatch(postRelationError(e));
-        }
+        return runNotifiedRequest({
+            dispatch,
+            pendingAction: postRelationLoading,
+            successAction: postRelationSuccess,
+            errorAction: postRelationError,
+            errorContext: 'post relation',
+            serviceCall: () => RelationService.postRelation(body),
+            defaultSuccessMessage: 'Relation created.',
+            defaultErrorMessage: 'Unable to create relation.',
+            notificationOptions
+        });
     };
 }
 
@@ -49,15 +53,19 @@ function putRelationError (error) {
         error: new ServiceError('put relation error ', error)
     };
 }
-export function putRelation (id, body) {
+export function putRelation (id, body, notificationOptions = {}) {
     return async dispatch => {
-        dispatch(putRelationLoading());
-        try {
-            const response = await RelationService.putRelation(id, body);
-            dispatch(putRelationSuccess(response));
-        } catch (e) {
-            dispatch(putRelationError(e));
-        }
+        return runNotifiedRequest({
+            dispatch,
+            pendingAction: putRelationLoading,
+            successAction: putRelationSuccess,
+            errorAction: putRelationError,
+            errorContext: 'put relation error',
+            serviceCall: () => RelationService.putRelation(id, body),
+            defaultSuccessMessage: 'Relation updated.',
+            defaultErrorMessage: 'Unable to update relation.',
+            notificationOptions
+        });
     };
 }
 
@@ -78,14 +86,18 @@ function deleteRelationError (error) {
         error: new ServiceError('delete relation error ', error)
     };
 }
-export function deleteRelation (id) {
+export function deleteRelation (id, notificationOptions = {}) {
     return async dispatch => {
-        dispatch(deleteRelationLoading());
-        try {
-            const response = await RelationService.deleteRelation(id);
-            dispatch(deleteRelationSuccess(response));
-        } catch (e) {
-            dispatch(deleteRelationError(e));
-        }
+        return runNotifiedRequest({
+            dispatch,
+            pendingAction: deleteRelationLoading,
+            successAction: deleteRelationSuccess,
+            errorAction: deleteRelationError,
+            errorContext: 'delete relation error',
+            serviceCall: () => RelationService.deleteRelation(id),
+            defaultSuccessMessage: 'Relation deleted.',
+            defaultErrorMessage: 'Unable to delete relation.',
+            notificationOptions
+        });
     };
 }

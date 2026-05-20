@@ -36,9 +36,10 @@ display: inline-block;
       }
 `;
 
-export default function LoadingLoop (props) {
-    const { styleGroup, size } = props;
-
+export default function LoadingLoop ({
+    styleGroup = 'primary',
+    size = 'lg'
+}) {
     return (
         <LoadingContainer>
             <div className={`bubbles ${styleGroup} ${size}`}>
@@ -49,11 +50,6 @@ export default function LoadingLoop (props) {
         </LoadingContainer>
     );
 }
-
-LoadingLoop.defaultProps = {
-    styleGroup: 'primary',
-    size: 'lg'
-};
 
 LoadingLoop.propTypes = {
     styleGroup: PropTypes.string,

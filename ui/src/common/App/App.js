@@ -16,6 +16,7 @@ import EditEvent from '../../components/EditEvent';
 import NotesBrowse from '../../components/NotesBrowse';
 import ViewNote from '../../components/ViewNote';
 import EditNote from '../../components/EditNote';
+import CalendarBrowse from '../../components/CalendarBrowse';
 import AppConfigure from '../../components/AppConfigure';
 import FaqHome from '../../components/FaqHome';
 import LeftSidebar from '../../layouts/AppLayout/LeftSideBar/LeftSideBar';
@@ -63,6 +64,7 @@ export default function App () {
                             <Route path="/notes/new" exact element={<EditNote />} />
                             <Route path="/notes/:noteId/edit" element={<EditNote />} />
                             <Route path="/notes/:noteId" element={<ViewNote />} />
+                            <Route path="/calendar" exact element={<CalendarBrowse />} />
                             <Route path="configure" element={<AppConfigure />} />
                             <Route path="faq" element={<FaqHome />} />
                             <Route path="*" element={<Navigate to="/home" replace /> } />

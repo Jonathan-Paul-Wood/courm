@@ -1,7 +1,7 @@
 import * as types from './types';
 import ServiceError from '../ServiceError';
 import EventService from '../../services/EventService';
-// todo: import notification toasts success/error
+import { runNotifiedRequest } from '../actionNotifications';
 
 function getEventLoading () {
     return {
@@ -20,15 +20,21 @@ function getEventError (error) {
         error: new ServiceError('get event ', error)
     };
 }
-export function getEvent (id) {
+export function getEvent (id, notificationOptions = {}) {
     return async dispatch => {
-        dispatch(getEventLoading());
-        try {
-            const response = await EventService.getEvent(id);
-            dispatch(getEventSuccess(response));
-        } catch (e) {
-            dispatch(getEventError(e));
-        }
+        return runNotifiedRequest({
+            dispatch,
+            pendingAction: getEventLoading,
+            successAction: getEventSuccess,
+            errorAction: getEventError,
+            errorContext: 'get event',
+            serviceCall: () => EventService.getEvent(id),
+            defaultErrorMessage: 'Unable to load event.',
+            notificationOptions: {
+                toastId: `event-load-${id}-error`,
+                ...notificationOptions
+            }
+        });
     };
 }
 
@@ -49,15 +55,19 @@ function postEventError (error) {
         error: new ServiceError('post event ', error)
     };
 }
-export function postEvent (body) {
+export function postEvent (body, notificationOptions = {}) {
     return async dispatch => {
-        dispatch(postEventLoading());
-        try {
-            const response = await EventService.postEvent(body);
-            dispatch(postEventSuccess(response));
-        } catch (e) {
-            dispatch(postEventError(e));
-        }
+        return runNotifiedRequest({
+            dispatch,
+            pendingAction: postEventLoading,
+            successAction: postEventSuccess,
+            errorAction: postEventError,
+            errorContext: 'post event',
+            serviceCall: () => EventService.postEvent(body),
+            defaultSuccessMessage: 'Event created.',
+            defaultErrorMessage: 'Unable to create event.',
+            notificationOptions
+        });
     };
 }
 
@@ -78,15 +88,19 @@ function putEventError (error) {
         error: new ServiceError('put event error ', error)
     };
 }
-export function putEvent (id, body) {
+export function putEvent (id, body, notificationOptions = {}) {
     return async dispatch => {
-        dispatch(putEventLoading());
-        try {
-            const response = await EventService.putEvent(id, body);
-            dispatch(putEventSuccess(response));
-        } catch (e) {
-            dispatch(putEventError(e));
-        }
+        return runNotifiedRequest({
+            dispatch,
+            pendingAction: putEventLoading,
+            successAction: putEventSuccess,
+            errorAction: putEventError,
+            errorContext: 'put event error',
+            serviceCall: () => EventService.putEvent(id, body),
+            defaultSuccessMessage: 'Event updated.',
+            defaultErrorMessage: 'Unable to update event.',
+            notificationOptions
+        });
     };
 }
 
@@ -107,14 +121,18 @@ function deleteEventError (error) {
         error: new ServiceError('delete event error ', error)
     };
 }
-export function deleteEvent (id) {
+export function deleteEvent (id, notificationOptions = {}) {
     return async dispatch => {
-        dispatch(deleteEventLoading());
-        try {
-            const response = await EventService.deleteEvent(id);
-            dispatch(deleteEventSuccess(response));
-        } catch (e) {
-            dispatch(deleteEventError(e));
-        }
+        return runNotifiedRequest({
+            dispatch,
+            pendingAction: deleteEventLoading,
+            successAction: deleteEventSuccess,
+            errorAction: deleteEventError,
+            errorContext: 'delete event error',
+            serviceCall: () => EventService.deleteEvent(id),
+            defaultSuccessMessage: 'Event deleted.',
+            defaultErrorMessage: 'Unable to delete event.',
+            notificationOptions
+        });
     };
 }

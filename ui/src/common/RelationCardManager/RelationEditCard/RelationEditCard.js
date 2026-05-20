@@ -3,9 +3,10 @@ import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import Select from '../../Select';
 import Button from '../../Button';
-import { deepCopy, isJSONEqual } from '../../../utilities/utilities';
+import { isJSONEqual } from '../../../utilities/utilities';
 import { GREY, WHITE } from '../../../assets/colorsConstants';
 import ScrollContainer from '../../ScrollContainer';
+import { showErrorToast, showSuccessToast } from '../../App/ToastWrapper/toastNotifications';
 
 const RelationContainer = styled.div`
     width: calc(100% - 0em);
@@ -86,8 +87,8 @@ export default function RelationEditCard (props) {
         relatedEntityList,
         relationList,
         postRelation,
-        putRelation,
         deleteRelation,
+        getRelationList,
         parentType,
         parentId,
         relationType,
@@ -142,21 +143,15 @@ export default function RelationEditCard (props) {
         onChange(false);
     }
 
-    function handleConfirm () {
-        const existingDatabaseRelations = deepCopy(relationsOfCurrentType);
-        pendingChanges.forEach(change => {
-            if (existingDatabaseRelations.find((relation, i) => {
-                if (relation[`${relationType}Id`] === change.id) {
-                    existingDatabaseRelations.splice(i, 1);
-                    return true;
-                }
-                return false;
-            })) {
-                const newBody = {};
-                newBody[`${parentType}Id`] = parentId;
-                newBody[`${relationType}Id`] = change.id;
-                putRelation(change.id, newBody);
-            } else {
+    async function handleConfirm () {
+        const existingRelationIds = relationsOfCurrentType.map(relation => relation[`${relationType}Id`]);
+        const pendingRelationIds = pendingChanges.map(change => change.id);
+
+        const relationsToCreate = pendingChanges.filter(change => !existingRelationIds.includes(change.id));
+        const relationsToDelete = relationsOfCurrentType.filter(relation => !pendingRelationIds.includes(relation[`${relationType}Id`]));
+
+        const requests = [
+            ...relationsToCreate.map(change => {
                 const newBody = {
                     contactId: null,
                     eventId: null,
@@ -164,14 +159,29 @@ export default function RelationEditCard (props) {
                 };
                 newBody[`${parentType}Id`] = parentId;
                 newBody[`${relationType}Id`] = change.id;
-                postRelation(newBody);
-            }
-        });
-        // existingDatabaseRelations that did not have corresponding pendingChanges have been removed
-        existingDatabaseRelations.forEach(relation => {
-            deleteRelation(relation.id);
-        });
 
+                return postRelation(newBody, {
+                    suppressSuccess: true,
+                    suppressError: true
+                });
+            }),
+            ...relationsToDelete.map(relation => deleteRelation(relation.id, {
+                suppressSuccess: true,
+                suppressError: true
+            }))
+        ];
+
+        const results = await Promise.allSettled(requests);
+        const failureCount = results.filter(result => result.status === 'rejected').length;
+        const successCount = results.length - failureCount;
+
+        if (failureCount) {
+            showErrorToast(`Saved ${successCount} relation change${successCount === 1 ? '' : 's'}, but ${failureCount} failed.`);
+        } else {
+            showSuccessToast(`Saved ${successCount} relation change${successCount === 1 ? '' : 's'}.`);
+        }
+
+        await getRelationList(`${parentType}Id`, `${parentId}`).catch(() => {});
         onChange(false);
     }
 
@@ -221,8 +231,8 @@ RelationEditCard.propTypes = {
     relatedEntityList: PropTypes.array.isRequired,
     relationList: PropTypes.array.isRequired,
     postRelation: PropTypes.func.isRequired,
-    putRelation: PropTypes.func.isRequired,
     deleteRelation: PropTypes.func.isRequired,
+    getRelationList: PropTypes.func.isRequired,
     parentType: PropTypes.string.isRequired,
     parentId: PropTypes.number.isRequired,
     relationType: PropTypes.string.isRequired,

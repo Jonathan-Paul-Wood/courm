@@ -1,17 +1,57 @@
 ## Toast Notifications
 
-We use the `react-toastify` library for rendering notifications.
+We use `react-toastify` for app-level notifications.
 
-Notifications are rendered within the ToastWrapper component used in the App.js file.
+Notifications are rendered by `ToastWrapper`, which is mounted in `ui/src/common/App/App.js`.
 
-A notification can be called from almost anywhere in the app using one of the
-following functions:
+## Project Policy
 
+- `GET` / list / load flows should only toast on failure.
+- `POST` / `PUT` / `DELETE` flows should toast on success and failure by default.
+- Bulk actions must suppress per-item toasts and emit a single aggregate summary toast.
+- Reducer error state should still be updated even when a toast is shown.
+
+## Shared Helper
+
+Use the shared helper in `ui/src/common/App/ToastWrapper/toastNotifications.js`.
+
+```js
+import {
+    showSuccessToast,
+    showErrorToast,
+    showWarningToast,
+    normalizeToastMessage
+} from '../../common/App/ToastWrapper/toastNotifications';
 ```
-    toast.success('Success');
-    toast.error('Error');
-    toast.warning('Warning');
-    toast('Generic');
+
+Prefer these helpers over calling `toast.success(...)` or `toast.error(...)` directly.
+
+## Store Action Contract
+
+Async thunk actions should:
+
+- dispatch their existing pending / success / error actions,
+- resolve with the service response on success,
+- reject with `ServiceError` on failure,
+- accept an optional final `notificationOptions` object:
+
+```js
+{
+    successMessage?: string | false,
+    errorMessage?: string,
+    suppressSuccess?: boolean,
+    suppressError?: boolean,
+    toastId?: string
+}
 ```
 
-More documentation is available: https://fkhadra.github.io/react-toastify/introduction
+Use stable `toastId` values for repeated read failures so retries do not stack duplicate error toasts.
+
+## UI Defaults
+
+- Success toasts auto-close after a short delay.
+- Error toasts remain visible until dismissed.
+- `ToastWrapper` owns the shared visual styling for toast variants.
+
+More library documentation is available here:
+https://fkhadra.github.io/react-toastify/introduction
